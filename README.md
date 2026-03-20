@@ -5,7 +5,7 @@
 - Nguyễn Trọng Nghĩa - MSSV: 172100321
 - Tô Văn Dương - MSSV: 1721001336
 
-## Cấu trúc thư mục
+## Mô tả dự án
 - src/          (mã nguồn chính)
 - docs/         (tài liệu)
 - .gitignore
