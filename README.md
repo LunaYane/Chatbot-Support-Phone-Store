@@ -5,13 +5,11 @@
 - Nguyễn Trọng Nghĩa - MSSV: 172100321
 - Tô Văn Dương - MSSV: 1721001336
 
-# 📱 Chatbot Thông Minh Hỗ Trợ Bán Hàng Điện Thoại
+## 📱 Chatbot Thông Minh Hỗ Trợ Bán Hàng Điện Thoại
 
 **Đề tài:** Phát triển Chatbot thông minh hỗ trợ bán hàng cho website kinh doanh điện thoại di động  
 **Mã học phần:** 03700222  
 **Giảng viên hướng dẫn:** TS. Phạm Đình Lâm  
-
----
 
 ## 📋 Mô tả dự án
 
