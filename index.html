@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PhoneStore - Chatbot AI Bán Điện Thoại</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  
+  <style>
+    .chat-window { bottom: 90px; right: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .message { max-width: 80%; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- HEADER -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <i class="fa-solid fa-mobile-screen-button text-4xl text-blue-600"></i>
+        <h1 class="text-3xl font-bold text-gray-900">PhoneStore</h1>
+      </div>
+      <nav class="flex gap-10 text-lg font-medium">
+        <a href="#" class="hover:text-blue-600">Trang chủ</a>
+        <a href="#sanpham" class="hover:text-blue-600">Sản phẩm</a>
+        <a href="#" class="hover:text-blue-600">Khuyến mãi</a>
+      </nav>
+      <button onclick="toggleCart()" class="relative text-3xl">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-24">
+    <div class="max-w-7xl mx-auto px-8 grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="text-5xl font-bold leading-tight">Mua Điện Thoại Thông Minh<br>Chỉ Với 1 Cú Click!</h2>
+        <p class="mt-6 text-2xl">Chatbot AI tư vấn 24/7 – Đặt hàng trong 30 giây</p>
+        <button onclick="openChat()" class="mt-10 bg-white text-blue-700 px-10 py-5 rounded-2xl text-xl font-bold hover:bg-yellow-300 transition">
+          💬 Chat ngay với AI Assistant
+        </button>
+      </div>
+      <img src="https://picsum.photos/id/1015/700/450" alt="iPhone" class="rounded-3xl shadow-2xl"/>
+    </div>
+  </section>
+
+  <!-- SẢN PHẨM -->
+  <section id="sanpham" class="max-w-7xl mx-auto px-8 py-20">
+    <h2 class="text-4xl font-bold text-center mb-12">Sản phẩm nổi bật</h2>
+    <div class="grid md:grid-cols-4 gap-8" id="product-list"></div>
+  </section>
+
+  <!-- CHATBOT BUTTON -->
+  <button onclick="openChat()" class="fixed bottom-8 right-8 bg-green-500 hover:bg-green-600 w-16 h-16 rounded-2xl shadow-2xl flex items-center justify-center text-4xl text-white z-50 transition">
+    <i class="fa-solid fa-robot"></i>
+  </button>
+
+  <!-- CHAT WINDOW -->
+  <div id="chat-window" class="hidden fixed chat-window w-96 bg-white rounded-3xl overflow-hidden border">
+    <div class="bg-blue-600 text-white p-5 flex items-center gap-4">
+      <i class="fa-solid fa-robot text-3xl"></i>
+      <div>
+        <p class="font-bold text-lg">AI Phone Assistant</p>
+        <p class="text-sm opacity-90">Tư vấn bán hàng 24/7</p>
+      </div>
+      <button onclick="closeChat()" class="ml-auto text-3xl">✕</button>
+    </div>
+    
+    <div id="chat-messages" class="h-96 p-5 overflow-y-auto bg-gray-50 flex flex-col gap-4"></div>
+    
+    <div class="p-4 border-t flex gap-3">
+      <input id="chat-input" type="text" placeholder="Hỏi về iPhone, Samsung, giá cả..." 
+             class="flex-1 border-2 border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500"
+             onkeypress="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()" class="bg-blue-600 text-white px-7 rounded-2xl text-xl">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ================== SẢN PHẨM ==================
+    const products = [
+      {id:1, name:"iPhone 16 Pro Max", price:34990000, img:"https://picsum.photos/id/1015/300/300"},
+      {id:2, name:"Samsung Galaxy S25 Ultra", price:28990000, img:"https://picsum.photos/id/160/300/300"},
+      {id:3, name:"Xiaomi 14T Pro", price:14990000, img:"https://picsum.photos/id/201/300/300"},
+      {id:4, name:"Oppo Reno12 Pro", price:12990000, img:"https://picsum.photos/id/251/300/300"}
+    ];
+
+    let cart = [];
+
+    function renderProducts() {
+      document.getElementById("product-list").innerHTML = products.map(p => `
+        <div class="bg-white rounded-3xl overflow-hidden shadow-xl hover:scale-105 transition">
+          <img src="${p.img}" class="w-full h-64 object-cover">
+          <div class="p-6">
+            <h3 class="font-bold text-xl">${p.name}</h3>
+            <p class="text-2xl font-bold text-green-600 mt-2">${p.price.toLocaleString('vi-VN')} ₫</p>
+            <button onclick="addToCart(${p.id})" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl text-white font-medium">
+              Thêm vào giỏ hàng
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addToCart(id) {
+      const p = products.find(x => x.id === id);
+      cart.push(p);
+      document.getElementById("cart-count").textContent = cart.length;
+      alert(`${p.name} đã thêm vào giỏ hàng!`);
+    }
+
+    function toggleCart() {
+      alert("Giỏ hàng:\n" + cart.map(p => `• ${p.name}`).join("\n") || "Giỏ hàng trống");
+    }
+
+    // ================== CHATBOT ==================
+    const botReplies = {
+      "hello": "Chào bạn! Bạn muốn tư vấn điện thoại nào hôm nay?",
+      "giá": "Bạn muốn xem giá iPhone hay Samsung?",
+      "iphone": "iPhone 16 Pro Max hiện giá 34.990.000 ₫. Bạn có muốn xem chi tiết?",
+      "samsung": "Galaxy S25 Ultra chỉ 28.990.000 ₫. Camera 200MP siêu đẹp!",
+      "bảo hành": "Bảo hành chính hãng 12 tháng, đổi mới trong 30 ngày.",
+      "mua": "Bạn muốn đặt hàng ngay? Mình sẽ tạo đơn hàng cho bạn!",
+      "default": "Mình chưa hiểu rõ. Bạn hỏi về giá, sản phẩm, bảo hành hay đặt hàng nhé?"
+    };
+
+    function addMessage(text, isBot) {
+      const container = document.getElementById("chat-messages");
+      const div = document.createElement("div");
+      div.className = `flex ${isBot ? '' : 'justify-end'}`;
+      div.innerHTML = `<div class="${isBot ? 'bg-white' : 'bg-blue-600 text-white'} px-6 py-4 rounded-3xl message">${text}</div>`;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("chat-input");
+      const text = input.value.trim();
+      if (!text) return;
+      
+      addMessage(text, false);
+      input.value = "";
+
+      setTimeout(() => {
+        let reply = botReplies.default;
+        const lower = text.toLowerCase();
+        for (let key in botReplies) {
+          if (lower.includes(key)) { reply = botReplies[key]; break; }
+        }
+        addMessage(reply, true);
+      }, 700);
+    }
+
+    function openChat() {
+      const win = document.getElementById("chat-window");
+      win.classList.remove("hidden");
+      if (!document.getElementById("chat-messages").hasChildNodes()) {
+        addMessage("Chào bạn! Mình là AI tư vấn bán điện thoại. Hỏi mình bất cứ điều gì nhé!", true);
+      }
+    }
+
+    function closeChat() {
+      document.getElementById("chat-window").classList.add("hidden");
+    }
+
+    // Khởi chạy
+    renderProducts();
+  </script>
+</body>
+</html>
