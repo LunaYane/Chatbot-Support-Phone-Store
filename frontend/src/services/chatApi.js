@@ -1,7 +1,10 @@
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 /**
  * Gọi API /api/chat từ frontend.
+ * Dữ liệu gửi lên:
+ * - sessionId: mã phiên chat
+ * - message: nội dung người dùng nhập
  */
 export async function sendChatMessage({ sessionId, message }) {
   const response = await fetch(`${API_BASE_URL}/api/chat`, {
@@ -12,9 +15,11 @@ export async function sendChatMessage({ sessionId, message }) {
     body: JSON.stringify({ sessionId, message })
   });
 
-  if (!response.ok) {
-    throw new Error('Không thể gửi tin nhắn đến chatbot');
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Không thể gửi tin nhắn đến chatbot');
   }
 
-  return response.json();
+  return data;
 }

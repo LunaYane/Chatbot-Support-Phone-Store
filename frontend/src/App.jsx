@@ -16,6 +16,7 @@ function App() {
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorText, setErrorText] = useState('');
 
   const handleSendMessage = async (messageText) => {
     const userMessage = {
@@ -26,6 +27,7 @@ function App() {
 
     setMessages((previousMessages) => [...previousMessages, userMessage]);
     setIsLoading(true);
+    setErrorText('');
 
     try {
       const result = await sendChatMessage({
@@ -33,15 +35,18 @@ function App() {
         message: messageText
       });
 
+      // Backend trả về trực tiếp: reply, products, detectedIntent
       const botMessage = {
         id: Date.now() + 1,
         role: 'bot',
         text: result.reply || 'Mình chưa có phản hồi phù hợp.',
-        products: result.products || []
+        products: result.products || [],
+        detectedIntent: result.detectedIntent || 'general'
       };
 
       setMessages((previousMessages) => [...previousMessages, botMessage]);
     } catch (error) {
+      setErrorText(error.message || 'Không thể kết nối API chatbot');
       setMessages((previousMessages) => [
         ...previousMessages,
         {
@@ -81,6 +86,8 @@ function App() {
               </div>
             )}
           </div>
+
+          {errorText && <p className="mb-3 text-sm text-red-600">{errorText}</p>}
 
           <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
         </div>
