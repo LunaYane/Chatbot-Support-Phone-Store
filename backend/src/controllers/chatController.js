@@ -1,14 +1,14 @@
 const ChatLog = require('../models/ChatLog');
-const Product = require('../models/Product');
-const Faq = require('../models/Faq');
+const { processChat } = require('../services/chatbotService');
 
 /**
  * POST /api/chat
- * Controller cơ bản cho chatbot:
+ * Controller chatbot chính:
  * - Nhận message từ user
- * - Trả lời mẫu
- * - Gợi ý sản phẩm cơ bản
- * - Lưu chat log
+ * - Phân tích intent
+ * - Query sản phẩm / FAQ
+ * - Tạo reply tự nhiên
+ * - Lưu lịch sử chat
  */
 async function chatWithBot(request, response) {
   try {
@@ -21,25 +21,14 @@ async function chatWithBot(request, response) {
       });
     }
 
-    // Lấy 3 sản phẩm đầu để gợi ý cơ bản
-    const suggestedProducts = await Product.find({ inStock: true })
-      .sort({ price: 1 })
-      .limit(3)
-      .lean();
-
-    // Lấy 1 FAQ bất kỳ để làm câu trả lời tham khảo cơ bản
-    const faq = await Faq.findOne({ isActive: true }).lean();
-
-    const basicReply = faq
-      ? `Mình đã nhận câu hỏi: "${message}". Bạn có thể tham khảo thêm: ${faq.answer}`
-      : `Mình đã nhận câu hỏi: "${message}". Mình sẽ tư vấn điện thoại phù hợp cho bạn nhé!`;
+    const chatResult = await processChat(message);
 
     await ChatLog.create({
       sessionId,
       userMessage: message,
-      botReply: basicReply,
-      detectedIntent: 'general',
-      suggestedProducts: suggestedProducts.map(function (product) {
+      botReply: chatResult.reply,
+      detectedIntent: chatResult.detectedIntent,
+      suggestedProducts: chatResult.products.map(function (product) {
         return {
           productId: product._id,
           name: product.name,
@@ -51,11 +40,9 @@ async function chatWithBot(request, response) {
 
     return response.status(200).json({
       success: true,
-      data: {
-        reply: basicReply,
-        intent: 'general',
-        suggestedProducts
-      }
+      reply: chatResult.reply,
+      products: chatResult.products,
+      detectedIntent: chatResult.detectedIntent
     });
   } catch (error) {
     return response.status(500).json({
