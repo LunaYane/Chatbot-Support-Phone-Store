@@ -1,0 +1,21 @@
+{
+  "name": "phone-store-demo",
+  "version": "1.0.0",
+  "description": "Simple phone store demo website using HTML/CSS/JS + Node.js/Express",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "phone-store",
+    "demo"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
