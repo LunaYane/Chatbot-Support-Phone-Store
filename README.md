@@ -10,30 +10,39 @@ Simple demo website for selling mobile phones.
 ## Features
 
 1. Homepage showing a list of mobile phones
-2. Each product has:
+2. Click product card to open product detail page
+3. Product detail page shows:
    - Name
    - Brand
    - Price
    - Image
-   - Short description
-3. Clean and modern UI
-4. Static sample product data
+   - Specifications
+   - Description
+4. Clean and modern UI
+5. Static sample product data
 
-## Project Structure
+## Updated Project Structure
 
 ```text
 Chatbot-Support-Phone-Store/
 ├── data/
-│   └── phones.js
+│   └── phones.js                # Product sample data + specifications
 ├── public/
-│   ├── index.html
-│   ├── styles.css
-│   └── script.js
+│   ├── index.html               # Homepage
+│   ├── detail.html              # Product detail page (NEW)
+│   ├── styles.css               # Shared styles (UPDATED)
+│   ├── script.js                # Homepage logic (UPDATED)
+│   └── detail.js                # Detail page logic (NEW)
 ├── .gitignore
 ├── package.json
-├── server.js
+├── server.js                    # Express API + routing (UPDATED)
 └── README.md
 ```
+
+## API Endpoints
+
+- `GET /api/phones` → get all products
+- `GET /api/phones/:id` → get one product by ID
 
 ## How to run locally
 
@@ -58,15 +67,31 @@ npm start
 
 ### 4) Open browser
 
-Go to:
+- Homepage: `http://localhost:3000`
+- Product detail example: `http://localhost:3000/product/1`
 
-```text
-http://localhost:3000
-```
+## Files Added / Modified
 
-## Notes for university demo
+### Added
+- `public/detail.html`
+- `public/detail.js`
 
-- Code is intentionally simple and readable.
+### Modified
+- `data/phones.js`
+  - Added `specifications` object for each product.
+- `server.js`
+  - Added route `GET /api/phones/:id`.
+  - Added route `/product/:id` to serve detail page.
+- `public/script.js`
+  - Product cards now link to `/product/:id`.
+- `public/styles.css`
+  - Added styles for detail page and product links.
+- `README.md`
+  - Updated structure and instructions for detail page.
+
+## Notes for university final project demo
+
+- Code is intentionally simple, readable, and easy to explain.
 - Frontend and backend are separated clearly.
-- Data is static, so no database setup is required.
-- You can easily extend with search, filter, cart, or admin page later.
+- No database required (static data).
+- Easy to extend with search/filter/cart/admin in next steps.

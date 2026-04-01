@@ -8,13 +8,15 @@ function formatPrice(price) {
 function createPhoneCard(phone) {
   return `
     <article class="phone-card">
-      <img class="phone-image" src="${phone.image}" alt="${phone.name}" />
-      <div class="phone-content">
-        <div class="brand">${phone.brand}</div>
-        <h3 class="phone-name">${phone.name}</h3>
-        <p class="phone-desc">${phone.description}</p>
-        <div class="phone-price">${formatPrice(phone.price)}</div>
-      </div>
+      <a class="phone-link" href="/product/${phone.id}">
+        <img class="phone-image" src="${phone.image}" alt="${phone.name}" />
+        <div class="phone-content">
+          <div class="brand">${phone.brand}</div>
+          <h3 class="phone-name">${phone.name}</h3>
+          <p class="phone-desc">${phone.description}</p>
+          <div class="phone-price">${formatPrice(phone.price)}</div>
+        </div>
+      </a>
     </article>
   `;
 }
