@@ -56,6 +56,25 @@
       <p>© 2026 Phone Store Demo - University Final Project</p>
     </footer>
 
+    <button id="chat-toggle" class="chat-toggle" type="button">💬 Chat</button>
+
+    <section id="chatbox" class="chatbox hidden" aria-label="Support chatbox">
+      <header class="chatbox-header">
+        <h3>Support Chat</h3>
+        <button id="chat-close" type="button" class="chat-close">✕</button>
+      </header>
+
+      <div id="chat-messages" class="chat-messages">
+        <div class="chat-message bot">Hi! I am Phone Store Bot. Ask me about products, price, or brand.</div>
+      </div>
+
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" type="text" placeholder="Type your message..." autocomplete="off" />
+        <button type="submit">Send</button>
+      </form>
+    </section>
+
+    <script src="chat.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
