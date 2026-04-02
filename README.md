@@ -6,57 +6,76 @@ Simple demo website for selling mobile phones.
 
 - **Frontend:** HTML, CSS, JavaScript (no framework)
 - **Backend:** Node.js + Express
+- **Database:** MongoDB + Mongoose
 
 ## Features
 
 1. Homepage showing a list of mobile phones
-2. Click product card to open product detail page
-3. Product detail page shows:
-   - Name
-   - Brand
-   - Price
-   - Image
-   - Specifications
-   - Description
-4. Clean and modern UI
-5. Static sample product data
+2. Product detail page (`/product/:id`)
+3. Search by product name
+4. Filter by brand
+5. Filter by price range (min/max)
+6. Clean and modern UI for easy demo
 
 ## Updated Project Structure
 
 ```text
 Chatbot-Support-Phone-Store/
 ├── data/
-│   └── phones.js                # Product sample data + specifications
+│   └── phones.js                # Sample product data for seeding
+├── models/
+│   └── Phone.js                 # Mongoose model
+├── seed/
+│   └── phonesSeed.js            # Seed script (import sample data to MongoDB)
 ├── public/
-│   ├── index.html               # Homepage
-│   ├── detail.html              # Product detail page (NEW)
-│   ├── styles.css               # Shared styles (UPDATED)
-│   ├── script.js                # Homepage logic (UPDATED)
-│   └── detail.js                # Detail page logic (NEW)
+│   ├── index.html               # Homepage + search/filter UI
+│   ├── detail.html              # Product detail page
+│   ├── styles.css               # Shared styles (includes filter UI styles)
+│   ├── script.js                # Homepage logic (search/filter requests)
+│   └── detail.js                # Detail page logic
 ├── .gitignore
 ├── package.json
-├── server.js                    # Express API + routing (UPDATED)
+├── server.js                    # Express API + MongoDB query logic
 └── README.md
 ```
 
 ## API Endpoints
 
-- `GET /api/phones` → get all products
+- `GET /api/phones`
+  - Supports query params:
+    - `search` (search by name, case-insensitive)
+    - `brand` (exact brand)
+    - `minPrice` (minimum price)
+    - `maxPrice` (maximum price)
+- `GET /api/brands` → get all distinct brands for dropdown filter
 - `GET /api/phones/:id` → get one product by ID
+
+## MongoDB Connection
+
+Default URI in code:
+
+```text
+mongodb://localhost:27017/phone-store-demo
+```
+
+You can override via environment variable:
+
+```bash
+MONGO_URI=mongodb://localhost:27017/phone-store-demo
+```
 
 ## How to run locally
 
-### 1) Clone repository
-
-```bash
-git clone https://github.com/LunaYane/Chatbot-Support-Phone-Store.git
-cd Chatbot-Support-Phone-Store
-```
-
-### 2) Install dependencies
+### 1) Install dependencies
 
 ```bash
 npm install
+```
+
+### 2) Seed sample data into MongoDB
+
+```bash
+npm run seed
 ```
 
 ### 3) Run server
@@ -67,31 +86,41 @@ npm start
 
 ### 4) Open browser
 
-- Homepage: `http://localhost:3000`
-- Product detail example: `http://localhost:3000/product/1`
+- Homepage: `http://localhost:3001`
+- Product detail example: `http://localhost:3001/product/1`
+
+## Search & Filter flow (brief)
+
+1. User types keyword / selects brand / enters min-max price on homepage.
+2. Frontend builds query string, for example:
+
+```text
+/api/phones?search=iphone&brand=Apple&minPrice=10000000&maxPrice=30000000
+```
+
+3. Backend converts query params into MongoDB filter object:
+   - `search` → `$regex` on `name` (case-insensitive)
+   - `brand` → exact match
+   - `minPrice`, `maxPrice` → `$gte`, `$lte` on `price`
+4. Backend returns filtered list and frontend re-renders the product grid.
 
 ## Files Added / Modified
 
 ### Added
-- `public/detail.html`
-- `public/detail.js`
+- `models/Phone.js`
+- `seed/phonesSeed.js`
 
 ### Modified
-- `data/phones.js`
-  - Added `specifications` object for each product.
 - `server.js`
-  - Added route `GET /api/phones/:id`.
-  - Added route `/product/:id` to serve detail page.
+- `public/index.html`
 - `public/script.js`
-  - Product cards now link to `/product/:id`.
 - `public/styles.css`
-  - Added styles for detail page and product links.
+- `package.json`
 - `README.md`
-  - Updated structure and instructions for detail page.
 
 ## Notes for university final project demo
 
-- Code is intentionally simple, readable, and easy to explain.
-- Frontend and backend are separated clearly.
-- No database required (static data).
-- Easy to extend with search/filter/cart/admin in next steps.
+- Code is intentionally simple and easy to explain.
+- Uses traditional server-rendered static frontend with API calls.
+- No advanced frameworks.
+- Easy to extend with sorting, cart, login, and admin management.
