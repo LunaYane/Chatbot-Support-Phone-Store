@@ -17,6 +17,37 @@
     <main class="container">
       <section>
         <h2 class="section-title">Available Phones</h2>
+
+        <div class="filters">
+          <div class="filter-group filter-search">
+            <label for="search-input">Search by product name</label>
+            <input id="search-input" type="text" placeholder="Example: iPhone, Galaxy..." />
+          </div>
+
+          <div class="filter-group">
+            <label for="brand-filter">Brand</label>
+            <select id="brand-filter">
+              <option value="">All brands</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="min-price">Min price (VND)</label>
+            <input id="min-price" type="number" min="0" step="100000" placeholder="0" />
+          </div>
+
+          <div class="filter-group">
+            <label for="max-price">Max price (VND)</label>
+            <input id="max-price" type="number" min="0" step="100000" placeholder="30000000" />
+          </div>
+
+          <div class="filter-actions">
+            <button id="apply-filters" type="button">Apply</button>
+            <button id="clear-filters" type="button" class="btn-secondary">Clear</button>
+          </div>
+        </div>
+
+        <p id="result-count" class="result-count"></p>
         <div id="phone-list" class="phone-grid"></div>
       </section>
     </main>
