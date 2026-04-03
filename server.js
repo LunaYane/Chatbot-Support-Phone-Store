@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const crypto = require('crypto');
 const Phone = require('./models/Phone');
 const { normalizeText, withRecommendation, buildRecommendationAttributes } = require('./utils/recommendation');
 
@@ -97,6 +98,35 @@ const NEED_KEYWORDS = {
   battery: ['battery', 'pin', 'dung lau', 'pin trau', 'battery life', 'lau het pin'],
   basic: ['hoc tap', 'study', 'studying', 'basic', 'co ban', 'sinh vien', 'van phong']
 };
+
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+const adminTokens = new Set();
+
+function safeCompare(valueA, valueB) {
+  const bufferA = Buffer.from(String(valueA));
+  const bufferB = Buffer.from(String(valueB));
+
+  if (bufferA.length !== bufferB.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(bufferA, bufferB);
+}
+
+function isValidAdminCredential(username, password) {
+  return safeCompare(username, ADMIN_USERNAME) && safeCompare(password, ADMIN_PASSWORD);
+}
+
+function requireAdmin(req, res, next) {
+  const token = req.header('x-admin-token') || '';
+
+  if (!token || !adminTokens.has(token)) {
+    return res.status(401).json({ message: 'Admin login required.' });
+  }
+
+  return next();
+}
 
 function formatPriceVND(amount) {
   return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
@@ -347,6 +377,33 @@ app.get('/api/phones', async (req, res) => {
   }
 });
 
+app.post('/api/admin/login', (req, res) => {
+  const username = String(req.body?.username || '').trim();
+  const password = String(req.body?.password || '').trim();
+
+  if (!isValidAdminCredential(username, password)) {
+    return res.status(401).json({ message: 'Invalid admin username or password.' });
+  }
+
+  const token = crypto.randomBytes(24).toString('hex');
+  adminTokens.add(token);
+
+  return res.json({ token, username: ADMIN_USERNAME });
+});
+
+app.get('/api/admin/session', (req, res) => {
+  const token = req.header('x-admin-token') || '';
+  const isAdmin = Boolean(token && adminTokens.has(token));
+
+  return res.json({ isAdmin, username: isAdmin ? ADMIN_USERNAME : null });
+});
+
+app.post('/api/admin/logout', requireAdmin, (req, res) => {
+  const token = req.header('x-admin-token') || '';
+  adminTokens.delete(token);
+  return res.json({ message: 'Logged out successfully.' });
+});
+
 app.get('/api/admin/products', async (req, res) => {
   try {
     const products = await Phone.find({}).sort({ id: 1 });
@@ -356,7 +413,7 @@ app.get('/api/admin/products', async (req, res) => {
   }
 });
 
-app.post('/api/admin/products', async (req, res) => {
+app.post('/api/admin/products', requireAdmin, async (req, res) => {
   try {
     const {
       name,
@@ -405,7 +462,7 @@ app.post('/api/admin/products', async (req, res) => {
   }
 });
 
-app.put('/api/admin/products/:id', async (req, res) => {
+app.put('/api/admin/products/:id', requireAdmin, async (req, res) => {
   try {
     const phoneId = Number(req.params.id);
 
@@ -458,7 +515,7 @@ app.put('/api/admin/products/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/admin/products/:id', async (req, res) => {
+app.delete('/api/admin/products/:id', requireAdmin, async (req, res) => {
   try {
     const phoneId = Number(req.params.id);
     const deletedPhone = await Phone.findOneAndDelete({ id: phoneId });

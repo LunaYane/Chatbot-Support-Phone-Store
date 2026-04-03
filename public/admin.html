@@ -10,16 +10,41 @@
     <header class="hero">
       <div class="container">
         <div class="hero-top">
-          <h1>Admin Product Management</h1>
+          <h1>Product Management</h1>
           <a class="admin-link" href="/">Back to Store</a>
         </div>
-        <p>Simple CRUD page for university project demo</p>
+        <p>Guest can view products. Login as Admin to add/edit/delete.</p>
       </div>
     </header>
 
     <main class="container admin-page">
-      <section class="admin-card">
-        <h2>Add / Edit Product</h2>
+      <section class="admin-card" id="auth-card">
+        <h2>Admin Login</h2>
+
+        <form id="login-form" class="admin-form">
+          <div class="admin-grid">
+            <div class="field-group">
+              <label for="admin-username">Username</label>
+              <input id="admin-username" type="text" placeholder="admin" required />
+            </div>
+
+            <div class="field-group">
+              <label for="admin-password">Password</label>
+              <input id="admin-password" type="password" placeholder="••••••" required />
+            </div>
+          </div>
+
+          <div class="admin-actions">
+            <button type="submit" class="btn-primary">Login Admin</button>
+            <button type="button" class="btn-neutral hidden" id="logout-btn">Logout</button>
+          </div>
+        </form>
+
+        <p id="auth-status" class="result-count">Current role: Guest (view only)</p>
+      </section>
+
+      <section class="admin-card hidden" id="editor-card">
+        <h2>Add / Edit Product (Admin Only)</h2>
         <form id="admin-form" class="admin-form">
           <input type="hidden" id="product-id" />
 
@@ -99,7 +124,7 @@
                 <th>Name</th>
                 <th>Brand</th>
                 <th>Price</th>
-                <th>Actions</th>
+                <th id="actions-header" class="hidden">Actions</th>
               </tr>
             </thead>
             <tbody id="admin-product-list"></tbody>

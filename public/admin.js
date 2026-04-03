@@ -4,12 +4,42 @@ const submitBtnEl = document.getElementById('submit-btn');
 const cancelEditBtnEl = document.getElementById('cancel-edit');
 const tableBodyEl = document.getElementById('admin-product-list');
 const countEl = document.getElementById('admin-count');
+const loginFormEl = document.getElementById('login-form');
+const logoutBtnEl = document.getElementById('logout-btn');
+const authStatusEl = document.getElementById('auth-status');
+const editorCardEl = document.getElementById('editor-card');
+const actionsHeaderEl = document.getElementById('actions-header');
+
+let adminToken = localStorage.getItem('adminToken') || '';
+let isAdmin = false;
 
 function formatPrice(price) {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND'
   }).format(price);
+}
+
+function authHeaders() {
+  if (!adminToken) return {};
+  return { 'x-admin-token': adminToken };
+}
+
+function setAdminMode(enabled, username = 'Admin') {
+  isAdmin = enabled;
+
+  if (enabled) {
+    authStatusEl.textContent = `Current role: ${username} (full access)`;
+    editorCardEl.classList.remove('hidden');
+    actionsHeaderEl.classList.remove('hidden');
+    logoutBtnEl.classList.remove('hidden');
+  } else {
+    authStatusEl.textContent = 'Current role: Guest (view only)';
+    editorCardEl.classList.add('hidden');
+    actionsHeaderEl.classList.add('hidden');
+    logoutBtnEl.classList.add('hidden');
+    resetForm();
+  }
 }
 
 function getFormData() {
@@ -52,28 +82,33 @@ function renderProducts(products) {
   countEl.textContent = `Total: ${products.length} product(s)`;
 
   if (!products.length) {
-    tableBodyEl.innerHTML =
-      '<tr><td colspan="5" class="admin-empty">No product found. Please add your first product.</td></tr>';
+    tableBodyEl.innerHTML = `<tr><td colspan="${isAdmin ? 5 : 4}" class="admin-empty">No product found.</td></tr>`;
     return;
   }
 
   tableBodyEl.innerHTML = products
-    .map(
-      (phone) => `
+    .map((phone) => {
+      const actionCell = isAdmin
+        ? `
+          <td>
+            <div class="table-actions">
+              <button type="button" class="btn-small btn-edit" data-id="${phone.id}">Edit</button>
+              <button type="button" class="btn-small btn-delete" data-id="${phone.id}">Delete</button>
+            </div>
+          </td>
+        `
+        : '';
+
+      return `
       <tr>
         <td>${phone.id}</td>
         <td>${phone.name}</td>
         <td>${phone.brand}</td>
         <td>${formatPrice(phone.price)}</td>
-        <td>
-          <div class="table-actions">
-            <button type="button" class="btn-small btn-edit" data-id="${phone.id}">Edit</button>
-            <button type="button" class="btn-small btn-delete" data-id="${phone.id}">Delete</button>
-          </div>
-        </td>
+        ${actionCell}
       </tr>
-    `
-    )
+      `;
+    })
     .join('');
 }
 
@@ -90,7 +125,10 @@ async function loadProducts() {
 async function createProduct(payload) {
   const response = await fetch('/api/admin/products', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders()
+    },
     body: JSON.stringify(payload)
   });
 
@@ -101,7 +139,10 @@ async function createProduct(payload) {
 async function updateProduct(id, payload) {
   const response = await fetch(`/api/admin/products/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders()
+    },
     body: JSON.stringify(payload)
   });
 
@@ -111,15 +152,99 @@ async function updateProduct(id, payload) {
 
 async function deleteProduct(id) {
   const response = await fetch(`/api/admin/products/${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: authHeaders()
   });
 
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to delete product');
 }
 
+async function loginAdmin(username, password) {
+  const response = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Login failed');
+
+  adminToken = data.token;
+  localStorage.setItem('adminToken', adminToken);
+  setAdminMode(true, data.username || 'Admin');
+}
+
+async function checkSession() {
+  if (!adminToken) {
+    setAdminMode(false);
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/admin/session', {
+      headers: authHeaders()
+    });
+
+    const data = await response.json();
+
+    if (!data.isAdmin) {
+      adminToken = '';
+      localStorage.removeItem('adminToken');
+      setAdminMode(false);
+      return;
+    }
+
+    setAdminMode(true, data.username || 'Admin');
+  } catch (error) {
+    setAdminMode(false);
+  }
+}
+
+async function logoutAdmin() {
+  try {
+    await fetch('/api/admin/logout', {
+      method: 'POST',
+      headers: authHeaders()
+    });
+  } catch (error) {
+    // ignore
+  }
+
+  adminToken = '';
+  localStorage.removeItem('adminToken');
+  setAdminMode(false);
+  loadProducts();
+}
+
+loginFormEl.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const username = document.getElementById('admin-username').value.trim();
+  const password = document.getElementById('admin-password').value.trim();
+
+  try {
+    await loginAdmin(username, password);
+    alert('Admin login successful.');
+    loginFormEl.reset();
+    loadProducts();
+  } catch (error) {
+    alert(error.message || 'Cannot login right now.');
+  }
+});
+
+logoutBtnEl.addEventListener('click', async () => {
+  await logoutAdmin();
+  alert('Logged out. You are now guest mode.');
+});
+
 formEl.addEventListener('submit', async (event) => {
   event.preventDefault();
+
+  if (!isAdmin) {
+    alert('Only Admin can add/edit products.');
+    return;
+  }
 
   const payload = getFormData();
   const editingId = productIdEl.value;
@@ -145,6 +270,8 @@ cancelEditBtnEl.addEventListener('click', () => {
 });
 
 tableBodyEl.addEventListener('click', async (event) => {
+  if (!isAdmin) return;
+
   const target = event.target;
   const productId = target.dataset.id;
 
@@ -184,4 +311,5 @@ tableBodyEl.addEventListener('click', async (event) => {
   }
 });
 
+checkSession();
 loadProducts();
