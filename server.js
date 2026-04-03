@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const crypto = require('crypto');
 const Phone = require('./models/Phone');
+const rawPhones = require('./data/phones');
 const { normalizeText, withRecommendation, buildRecommendationAttributes } = require('./utils/recommendation');
 
 const app = express();
@@ -17,87 +18,35 @@ mongoose
   .then(() => console.log('Connected to MongoDB.'))
   .catch((error) => console.error('MongoDB connection error:', error.message));
 
-const SAMPLE_PRODUCTS = [
-  {
-    id: 1,
-    name: 'iPhone 15',
-    brand: 'Apple',
-    price: 21990000,
-    specifications: { processor: 'Apple A16 Bionic', ram: '6 GB', battery: '3349 mAh', camera: '48MP + 12MP' },
-    description: 'Balanced iPhone model with great cameras and smooth iOS experience.'
-  },
-  {
-    id: 2,
-    name: 'Galaxy S24 Ultra',
-    brand: 'Samsung',
-    price: 27990000,
-    specifications: {
-      processor: 'Snapdragon 8 Gen 3 for Galaxy',
-      ram: '12 GB',
-      battery: '5000 mAh',
-      camera: '200MP + 12MP + 50MP + 10MP'
-    },
-    description: 'Large AMOLED display, S Pen support, and powerful performance for work and entertainment.'
-  },
-  {
-    id: 3,
-    name: 'Galaxy A55 5G',
-    brand: 'Samsung',
-    price: 9990000,
-    specifications: { processor: 'Exynos 1480', ram: '8 GB', battery: '5000 mAh', camera: '50MP + 12MP + 5MP' },
-    description: 'Popular mid-range phone with premium metal frame and great battery life.'
-  },
-  {
-    id: 4,
-    name: 'Xiaomi 14',
-    brand: 'Xiaomi',
-    price: 17990000,
-    specifications: { processor: 'Snapdragon 8 Gen 3', ram: '12 GB', battery: '4610 mAh', camera: '50MP + 50MP + 50MP' },
-    description: 'High-value flagship with smooth performance, great display, and fast charging.'
-  },
-  {
-    id: 5,
-    name: 'Redmi Note 13 Pro+',
-    brand: 'Xiaomi',
-    price: 10990000,
-    specifications: {
-      processor: 'MediaTek Dimensity 7200 Ultra',
-      ram: '12 GB',
-      battery: '5000 mAh',
-      camera: '200MP + 8MP + 2MP'
-    },
-    description: 'Curved display phone with 200MP camera and fast charging.'
-  },
-  {
-    id: 6,
-    name: 'Nokia G42 5G',
-    brand: 'Nokia',
-    price: 5990000,
-    specifications: { processor: 'Snapdragon 480+', ram: '6 GB', battery: '5000 mAh', camera: '50MP + 2MP + 2MP' },
-    description: 'Durable and affordable 5G phone with clean Android experience.'
-  }
-].map(withRecommendation);
+const SAMPLE_PRODUCTS = rawPhones.map(withRecommendation);
 
 const FAQ_RESPONSES = {
-  openingHours: 'Our store is open from 08:30 to 21:30 every day (Monday - Sunday).',
+  openingHours: 'Cửa hàng mở cửa từ 08:30 đến 21:30 hằng ngày (Thứ 2 đến Chủ nhật).',
   warranty:
-    'Most phones include official 12-month warranty. You can bring invoice + phone to our store/service center for support.',
+    'Bên mình bảo hành chính hãng 12 tháng cho đa số sản phẩm. Khi cần hỗ trợ, bạn mang máy + hóa đơn đến cửa hàng nhé.',
   promotions:
-    'Current promotions: up to 10% discount on selected models and free shipping in city area. Please check homepage for the latest deals.'
+    'Hiện có ưu đãi giảm đến 10% trên một số mẫu và hỗ trợ freeship nội thành. Bạn muốn mình gợi ý mẫu đang giá tốt luôn không?',
+  contact:
+    'Bạn có thể liên hệ hotline 0909 123 456, email support@phonestoredemo.vn hoặc đến trực tiếp 123 Lê Lợi, Q1, TP.HCM.'
 };
 
 const BRAND_KEYWORDS = {
   Apple: ['apple', 'iphone', 'ios'],
   Samsung: ['samsung', 'galaxy'],
-  Xiaomi: ['xiaomi', 'redmi', 'mi']
+  Xiaomi: ['xiaomi', 'redmi', 'mi'],
+  OPPO: ['oppo'],
+  vivo: ['vivo']
 };
 
 const NEED_KEYWORDS = {
-  gaming: ['gaming', 'choi game', 'game', 'pubg', 'lien quan', 'fps'],
-  camera: ['camera', 'chup anh', 'photography', 'selfie', 'quay phim', 'photo'],
-  battery: ['battery', 'pin', 'dung lau', 'pin trau', 'battery life', 'lau het pin'],
-  basic: ['hoc tap', 'study', 'studying', 'basic', 'co ban', 'sinh vien', 'van phong']
+  gaming: ['choi game', 'gaming', 'game', 'pubg', 'lien quan', 'fps', 'hieu nang manh'],
+  camera: ['chup anh', 'camera dep', 'camera', 'selfie', 'quay phim', 'photography', 'anh dep'],
+  battery: ['pin trau', 'pin lau', 'dung lau', 'battery', 'thoi luong pin', 'khong muon sac nhieu'],
+  student: ['hoc tap', 'sinh vien', 'co ban', 'van phong', 'study', 'basic use', 'gia mem']
 };
+
+const UNDER_BUDGET_KEYWORDS = ['duoi', 'toi da', 'khong qua', 'it hon', 'nho hon', 'under', 'max'];
+const AROUND_BUDGET_KEYWORDS = ['tam', 'khoang', 'gan', 'co', 'around'];
 
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
@@ -129,7 +78,7 @@ function requireAdmin(req, res, next) {
 }
 
 function formatPriceVND(amount) {
-  return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+  return `${new Intl.NumberFormat('vi-VN').format(amount)}đ`;
 }
 
 function getMatchedBrand(message) {
@@ -142,7 +91,13 @@ function getMatchedBrand(message) {
   return null;
 }
 
-function extractBudget(message) {
+function detectNeeds(message) {
+  return Object.entries(NEED_KEYWORDS)
+    .filter(([, keywords]) => keywords.some((keyword) => message.includes(keyword)))
+    .map(([need]) => need);
+}
+
+function extractBudgetNumber(message) {
   const millionPattern = /(\d+[\.,]?\d*)\s*(tr|trieu|m|million)/;
   const thousandPattern = /(\d+[\.,]?\d*)\s*(k|nghin|thousand)/;
   const plainNumberPattern = /\b\d{6,9}\b/;
@@ -165,12 +120,44 @@ function extractBudget(message) {
   return null;
 }
 
+function detectBudget(message) {
+  const value = extractBudgetNumber(message);
+  if (!value) return null;
+
+  const isUnderBudget = UNDER_BUDGET_KEYWORDS.some((keyword) => message.includes(keyword));
+  const isAroundBudget = AROUND_BUDGET_KEYWORDS.some((keyword) => message.includes(keyword));
+
+  if (isUnderBudget) {
+    return {
+      type: 'under',
+      min: 0,
+      max: value,
+      text: `dưới ${formatPriceVND(value)}`
+    };
+  }
+
+  const spread = Math.max(1000000, Math.round(value * 0.2));
+  const min = Math.max(0, value - spread);
+  const max = value + spread;
+
+  if (isAroundBudget || !isUnderBudget) {
+    return {
+      type: 'around',
+      min,
+      max,
+      text: `khoảng ${formatPriceVND(value)}`
+    };
+  }
+
+  return null;
+}
+
 function detectFaqIntent(message) {
   if (
     message.includes('gio mo cua') ||
     message.includes('mo cua') ||
-    message.includes('opening hour') ||
-    message.includes('open')
+    message.includes('may gio mo') ||
+    message.includes('opening hour')
   ) {
     return 'openingHours';
   }
@@ -179,7 +166,7 @@ function detectFaqIntent(message) {
     message.includes('bao hanh') ||
     message.includes('warranty') ||
     message.includes('doi tra') ||
-    message.includes('return')
+    message.includes('bao tri')
   ) {
     return 'warranty';
   }
@@ -194,13 +181,17 @@ function detectFaqIntent(message) {
     return 'promotions';
   }
 
-  return null;
-}
+  if (
+    message.includes('lien he') ||
+    message.includes('hotline') ||
+    message.includes('so dien thoai') ||
+    message.includes('dia chi') ||
+    message.includes('contact')
+  ) {
+    return 'contact';
+  }
 
-function detectNeeds(message) {
-  return Object.entries(NEED_KEYWORDS)
-    .filter(([, keywords]) => keywords.some((keyword) => message.includes(keyword)))
-    .map(([need]) => need);
+  return null;
 }
 
 function detectIntent(message) {
@@ -213,24 +204,24 @@ function detectIntent(message) {
     return { intent: 'faq', faqIntent };
   }
 
-  if (message.includes('hello') || message.includes('hi') || message.includes('xin chao')) {
+  if (message.includes('xin chao') || message.includes('chao') || message.includes('hello') || message === 'hi') {
     return { intent: 'greeting' };
   }
 
-  const budget = extractBudget(message);
+  const budget = detectBudget(message);
   const brand = getMatchedBrand(message);
   const needs = detectNeeds(message);
 
   if (budget || brand || needs.length > 0) {
     return {
-      intent: 'recommendation',
+      intent: 'consultation',
       budget,
       brand,
       needs
     };
   }
 
-  return { intent: 'fallback' };
+  return { intent: 'clarify' };
 }
 
 async function getChatbotProducts() {
@@ -265,83 +256,105 @@ function matchNeed(phone, need) {
   if (need === 'gaming') return phone.recommendation?.suitable_for_gaming;
   if (need === 'camera') return phone.recommendation?.suitable_for_camera;
   if (need === 'battery') return phone.recommendation?.suitable_for_battery;
-  if (need === 'basic') return phone.recommendation?.suitable_for_basic_use;
+  if (need === 'student') return phone.recommendation?.suitable_for_basic_use;
   return false;
 }
 
-function needLabel(need) {
-  if (need === 'gaming') return 'gaming';
-  if (need === 'camera') return 'camera';
-  if (need === 'battery') return 'battery';
-  if (need === 'basic') return 'basic use';
-  return '';
+function needDisplayText(need) {
+  if (need === 'gaming') return 'chơi game';
+  if (need === 'camera') return 'chụp ảnh đẹp';
+  if (need === 'battery') return 'pin trâu';
+  if (need === 'student') return 'học tập / sinh viên';
+  return need;
 }
 
-function getPhoneStrengthTags(phone) {
-  const tags = [];
-  if (phone.recommendation?.suitable_for_gaming) tags.push('gaming');
-  if (phone.recommendation?.suitable_for_camera) tags.push('camera');
-  if (phone.recommendation?.suitable_for_battery) tags.push('battery');
-  if (phone.recommendation?.suitable_for_basic_use) tags.push('basic use');
-  return tags;
+function buildReasonForPhone(phone, needs) {
+  const reasons = [];
+  if (needs.includes('gaming') && phone.recommendation?.suitable_for_gaming) reasons.push('hiệu năng ổn cho game');
+  if (needs.includes('camera') && phone.recommendation?.suitable_for_camera) reasons.push('camera chụp ảnh tốt');
+  if (needs.includes('battery') && phone.recommendation?.suitable_for_battery) reasons.push('pin tốt, dùng lâu');
+  if (needs.includes('student') && phone.recommendation?.suitable_for_basic_use) reasons.push('phù hợp học tập/sinh viên');
+
+  return reasons.length > 0 ? reasons.join(', ') : 'giá/nhu cầu khá cân bằng';
 }
 
-function buildRecommendationReply(products, filters) {
+function applyBudgetFilter(products, budget) {
+  if (!budget) return products;
+
+  if (budget.type === 'under') {
+    return products.filter((product) => product.price <= budget.max);
+  }
+
+  return products.filter((product) => product.price >= budget.min && product.price <= budget.max);
+}
+
+function buildNoMatchResponse({ budget, brand, needs }) {
+  const conditions = [];
+  if (budget) conditions.push(budget.text);
+  if (brand) conditions.push(`hãng ${brand}`);
+  if (needs.length > 0) conditions.push(`nhu cầu ${needs.map(needDisplayText).join(', ')}`);
+
+  return `Xin lỗi bạn, hiện mình chưa tìm thấy mẫu phù hợp ${conditions.join(' + ')}. Bạn muốn nới ngân sách hoặc đổi hãng để mình gợi ý lại tốt hơn không?`;
+}
+
+function buildConsultationReply(products, filters) {
   const { budget, brand, needs } = filters;
 
   let filtered = [...products];
 
-  if (budget) {
-    filtered = filtered.filter((product) => product.price <= budget);
+  if (brand) {
+    filtered = filtered.filter((product) => normalizeText(product.brand) === normalizeText(brand));
   }
 
-  if (brand) {
-    filtered = filtered.filter((product) => product.brand.toLowerCase() === brand.toLowerCase());
-  }
+  filtered = applyBudgetFilter(filtered, budget);
+
+  let usedRelaxedMatch = false;
+  let scored = [];
 
   if (needs.length > 0) {
-    filtered = filtered.filter((product) => needs.every((need) => matchNeed(product, need)));
+    const strictMatches = filtered.filter((product) => needs.every((need) => matchNeed(product, need)));
+
+    if (strictMatches.length > 0) {
+      filtered = strictMatches;
+    } else {
+      usedRelaxedMatch = true;
+      scored = filtered
+        .map((product) => ({
+          ...product,
+          matchScore: needs.reduce((score, need) => score + (matchNeed(product, need) ? 1 : 0), 0)
+        }))
+        .filter((product) => product.matchScore > 0)
+        .sort((a, b) => b.matchScore - a.matchScore || a.price - b.price);
+
+      filtered = scored;
+    }
   }
 
-  let exactMatch = true;
-
-  if (filtered.length === 0 && needs.length > 0) {
-    exactMatch = false;
-    let fallback = [...products];
-
-    if (budget) fallback = fallback.filter((product) => product.price <= budget);
-    if (brand) fallback = fallback.filter((product) => product.brand.toLowerCase() === brand.toLowerCase());
-
-    filtered = fallback
-      .map((product) => ({
-        ...product,
-        score: needs.reduce((sum, need) => sum + (matchNeed(product, need) ? 1 : 0), 0)
-      }))
-      .filter((product) => product.score > 0)
-      .sort((a, b) => b.score - a.score || a.price - b.price);
-  }
-
-  filtered = filtered.sort((a, b) => a.price - b.price).slice(0, 5);
+  filtered = filtered.sort((a, b) => a.price - b.price).slice(0, 3);
 
   if (filtered.length === 0) {
-    return 'Sorry, I cannot find phones matching your conditions right now. Please increase budget or try another brand/need.';
+    return buildNoMatchResponse({ budget, brand, needs });
   }
 
-  const conditionParts = [];
-  if (budget) conditionParts.push(`budget <= ${formatPriceVND(budget)}`);
-  if (brand) conditionParts.push(`brand ${brand}`);
-  if (needs.length > 0) conditionParts.push(`need: ${needs.map(needLabel).join(', ')}`);
+  const conditions = [];
+  if (budget) conditions.push(budget.text);
+  if (brand) conditions.push(`hãng ${brand}`);
+  if (needs.length > 0) conditions.push(`nhu cầu ${needs.map(needDisplayText).join(', ')}`);
 
-  const header = exactMatch
-    ? `Here are the best matches for ${conditionParts.join(' | ')}:`
-    : `I could not find exact matches, but these are close options for ${conditionParts.join(' | ')}:`;
+  const intro = usedRelaxedMatch
+    ? `Mình chưa thấy mẫu khớp 100% theo ${conditions.join(' + ')}, nhưng đây là 3 lựa chọn gần nhất:`
+    : `Mình gợi ý 3 mẫu phù hợp theo ${conditions.join(' + ')}:`;
 
-  const lines = filtered.map((product) => {
-    const tags = getPhoneStrengthTags(product).join(', ');
-    return `- ${product.name} (${product.brand}) - ${formatPriceVND(product.price)} [${tags}]`;
+  const lines = filtered.map((product, index) => {
+    const reason = buildReasonForPhone(product, needs);
+    return `${index + 1}. ${product.name} (${product.brand}) - ${formatPriceVND(product.price)}\n   → ${reason}`;
   });
 
-  return `${header}\n${lines.join('\n')}\nIf you want, I can narrow this down to only 2-3 best picks.`;
+  return `${intro}\n${lines.join('\n')}\nBạn muốn mình chốt 1 mẫu tối ưu nhất theo nhu cầu của bạn không?`;
+}
+
+function buildClarifyReply() {
+  return 'Mình có thể tư vấn theo ngân sách (ví dụ: dưới 7 triệu), hãng (iPhone/Samsung/Xiaomi/Oppo/Vivo), hoặc nhu cầu (chơi game, chụp ảnh, pin trâu, học tập). Bạn muốn theo tiêu chí nào trước?';
 }
 
 app.get('/api/phones', async (req, res) => {
@@ -556,34 +569,34 @@ app.get('/api/phones/:id', async (req, res) => {
 });
 
 app.post('/api/chat', async (req, res) => {
-  const rawMessage = (req.body.message || '').toString().trim();
-  const normalizedMessage = normalizeText(rawMessage);
+  const rawMessage = String(req.body?.message || '').trim();
+  const message = normalizeText(rawMessage);
 
-  const { intent, faqIntent, budget, brand, needs } = detectIntent(normalizedMessage);
+  const { intent, faqIntent, budget, brand, needs } = detectIntent(message);
   const products = await getChatbotProducts();
 
   let reply =
-    'Sorry, I did not fully understand. Please ask with budget, brand, or need (gaming/camera/battery/basic use).';
+    'Mình chưa hiểu rõ lắm. Bạn thử nói theo dạng: dưới 7 triệu, hãng Samsung, hoặc nhu cầu chụp ảnh/pin trâu để mình tư vấn chính xác hơn nhé.';
 
   switch (intent) {
     case 'empty':
-      reply = 'Please type your question so I can help you.';
+      reply = 'Bạn mô tả nhu cầu giúp mình nhé. Ví dụ: dưới 10 triệu, pin trâu, hoặc muốn iPhone.';
       break;
 
     case 'greeting':
-      reply = 'Hello! Tell me your budget, preferred brand, or usage needs (gaming/camera/battery/basic).';
+      reply = 'Chào bạn 👋 Mình có thể tư vấn điện thoại theo ngân sách, hãng và nhu cầu sử dụng. Bạn đang muốn tìm máy khoảng bao nhiêu tiền?';
       break;
 
     case 'faq':
       reply = FAQ_RESPONSES[faqIntent];
       break;
 
-    case 'recommendation':
-      reply = buildRecommendationReply(products, {
-        budget,
-        brand,
-        needs
-      });
+    case 'consultation':
+      reply = buildConsultationReply(products, { budget, brand, needs });
+      break;
+
+    case 'clarify':
+      reply = buildClarifyReply();
       break;
 
     default:
