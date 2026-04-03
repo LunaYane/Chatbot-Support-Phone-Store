@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const Phone = require('./models/Phone');
+const { normalizeText, withRecommendation } = require('./utils/recommendation');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,19 +17,68 @@ mongoose
   .catch((error) => console.error('MongoDB connection error:', error.message));
 
 const SAMPLE_PRODUCTS = [
-  { id: 1, name: 'iPhone 15', brand: 'Apple', price: 21990000 },
-  { id: 2, name: 'iPhone 14 Plus', brand: 'Apple', price: 19990000 },
-  { id: 3, name: 'Galaxy S24', brand: 'Samsung', price: 21990000 },
-  { id: 4, name: 'Galaxy A55 5G', brand: 'Samsung', price: 9990000 },
-  { id: 5, name: 'Xiaomi 14', brand: 'Xiaomi', price: 17990000 },
-  { id: 6, name: 'Redmi Note 13 Pro+', brand: 'Xiaomi', price: 10990000 },
-  { id: 7, name: 'OPPO A79 5G', brand: 'OPPO', price: 7290000 },
-  { id: 8, name: 'Nokia G42 5G', brand: 'Nokia', price: 5990000 }
-];
+  {
+    id: 1,
+    name: 'iPhone 15',
+    brand: 'Apple',
+    price: 21990000,
+    specifications: { processor: 'Apple A16 Bionic', ram: '6 GB', battery: '3349 mAh', camera: '48MP + 12MP' },
+    description: 'Balanced iPhone model with great cameras and smooth iOS experience.'
+  },
+  {
+    id: 2,
+    name: 'Galaxy S24 Ultra',
+    brand: 'Samsung',
+    price: 27990000,
+    specifications: {
+      processor: 'Snapdragon 8 Gen 3 for Galaxy',
+      ram: '12 GB',
+      battery: '5000 mAh',
+      camera: '200MP + 12MP + 50MP + 10MP'
+    },
+    description: 'Large AMOLED display, S Pen support, and powerful performance for work and entertainment.'
+  },
+  {
+    id: 3,
+    name: 'Galaxy A55 5G',
+    brand: 'Samsung',
+    price: 9990000,
+    specifications: { processor: 'Exynos 1480', ram: '8 GB', battery: '5000 mAh', camera: '50MP + 12MP + 5MP' },
+    description: 'Popular mid-range phone with premium metal frame and great battery life.'
+  },
+  {
+    id: 4,
+    name: 'Xiaomi 14',
+    brand: 'Xiaomi',
+    price: 17990000,
+    specifications: { processor: 'Snapdragon 8 Gen 3', ram: '12 GB', battery: '4610 mAh', camera: '50MP + 50MP + 50MP' },
+    description: 'High-value flagship with smooth performance, great display, and fast charging.'
+  },
+  {
+    id: 5,
+    name: 'Redmi Note 13 Pro+',
+    brand: 'Xiaomi',
+    price: 10990000,
+    specifications: {
+      processor: 'MediaTek Dimensity 7200 Ultra',
+      ram: '12 GB',
+      battery: '5000 mAh',
+      camera: '200MP + 8MP + 2MP'
+    },
+    description: 'Curved display phone with 200MP camera and fast charging.'
+  },
+  {
+    id: 6,
+    name: 'Nokia G42 5G',
+    brand: 'Nokia',
+    price: 5990000,
+    specifications: { processor: 'Snapdragon 480+', ram: '6 GB', battery: '5000 mAh', camera: '50MP + 2MP + 2MP' },
+    description: 'Durable and affordable 5G phone with clean Android experience.'
+  }
+].map(withRecommendation);
 
 const FAQ_RESPONSES = {
-  openingHours:
-    'Our store is open from 08:30 to 21:30 every day (Monday - Sunday).',
+  openingHours: 'Our store is open from 08:30 to 21:30 every day (Monday - Sunday).',
   warranty:
     'Most phones include official 12-month warranty. You can bring invoice + phone to our store/service center for support.',
   promotions:
@@ -41,13 +91,12 @@ const BRAND_KEYWORDS = {
   Xiaomi: ['xiaomi', 'redmi', 'mi']
 };
 
-function normalizeText(text) {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim();
-}
+const NEED_KEYWORDS = {
+  gaming: ['gaming', 'choi game', 'game', 'pubg', 'lien quan', 'fps'],
+  camera: ['camera', 'chup anh', 'photography', 'selfie', 'quay phim', 'photo'],
+  battery: ['battery', 'pin', 'dung lau', 'pin trau', 'battery life', 'lau het pin'],
+  basic: ['hoc tap', 'study', 'studying', 'basic', 'co ban', 'sinh vien', 'van phong']
+};
 
 function formatPriceVND(amount) {
   return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
@@ -118,6 +167,12 @@ function detectFaqIntent(message) {
   return null;
 }
 
+function detectNeeds(message) {
+  return Object.entries(NEED_KEYWORDS)
+    .filter(([, keywords]) => keywords.some((keyword) => message.includes(keyword)))
+    .map(([need]) => need);
+}
+
 function detectIntent(message) {
   if (!message) {
     return { intent: 'empty' };
@@ -128,31 +183,21 @@ function detectIntent(message) {
     return { intent: 'faq', faqIntent };
   }
 
-  const budgetKeywords = [
-    'duoi',
-    'under',
-    'budget',
-    'toi da',
-    'khong qua',
-    'max',
-    'tam',
-    'khoang',
-    'gia'
-  ];
-  const budget = extractBudget(message);
-  const hasBudgetKeyword = budgetKeywords.some((keyword) => message.includes(keyword));
-
-  if (budget && hasBudgetKeyword) {
-    return { intent: 'budget', budget };
-  }
-
-  const matchedBrand = getMatchedBrand(message);
-  if (matchedBrand) {
-    return { intent: 'brand', brand: matchedBrand };
-  }
-
   if (message.includes('hello') || message.includes('hi') || message.includes('xin chao')) {
     return { intent: 'greeting' };
+  }
+
+  const budget = extractBudget(message);
+  const brand = getMatchedBrand(message);
+  const needs = detectNeeds(message);
+
+  if (budget || brand || needs.length > 0) {
+    return {
+      intent: 'recommendation',
+      budget,
+      brand,
+      needs
+    };
   }
 
   return { intent: 'fallback' };
@@ -160,12 +205,24 @@ function detectIntent(message) {
 
 async function getChatbotProducts() {
   try {
-    const products = await Phone.find({}, { _id: 0, id: 1, name: 1, brand: 1, price: 1 })
+    const products = await Phone.find(
+      {},
+      {
+        _id: 0,
+        id: 1,
+        name: 1,
+        brand: 1,
+        price: 1,
+        description: 1,
+        specifications: 1,
+        recommendation: 1
+      }
+    )
       .sort({ price: 1 })
       .lean();
 
     if (products.length > 0) {
-      return products;
+      return products.map(withRecommendation);
     }
 
     return SAMPLE_PRODUCTS;
@@ -174,44 +231,87 @@ async function getChatbotProducts() {
   }
 }
 
-function buildBudgetReply(products, budget) {
-  const matched = products
-    .filter((product) => product.price <= budget)
-    .sort((a, b) => a.price - b.price)
-    .slice(0, 5);
-
-  if (matched.length === 0) {
-    return `Sorry, I cannot find phones under ${formatPriceVND(
-      budget
-    )} right now. Please try a higher budget.`;
-  }
-
-  const lines = matched.map(
-    (product) => `- ${product.name} (${product.brand}) - ${formatPriceVND(product.price)}`
-  );
-
-  return `Here are phones under ${formatPriceVND(budget)}:\n${lines.join(
-    '\n'
-  )}\nYou can also use the price filter on homepage for more options.`;
+function matchNeed(phone, need) {
+  if (need === 'gaming') return phone.recommendation?.suitable_for_gaming;
+  if (need === 'camera') return phone.recommendation?.suitable_for_camera;
+  if (need === 'battery') return phone.recommendation?.suitable_for_battery;
+  if (need === 'basic') return phone.recommendation?.suitable_for_basic_use;
+  return false;
 }
 
-function buildBrandReply(products, brand) {
-  const matched = products
-    .filter((product) => product.brand.toLowerCase() === brand.toLowerCase())
-    .sort((a, b) => a.price - b.price)
-    .slice(0, 5);
+function needLabel(need) {
+  if (need === 'gaming') return 'gaming';
+  if (need === 'camera') return 'camera';
+  if (need === 'battery') return 'battery';
+  if (need === 'basic') return 'basic use';
+  return '';
+}
 
-  if (matched.length === 0) {
-    return `Sorry, we do not have ${brand} products in current sample data.`;
+function getPhoneStrengthTags(phone) {
+  const tags = [];
+  if (phone.recommendation?.suitable_for_gaming) tags.push('gaming');
+  if (phone.recommendation?.suitable_for_camera) tags.push('camera');
+  if (phone.recommendation?.suitable_for_battery) tags.push('battery');
+  if (phone.recommendation?.suitable_for_basic_use) tags.push('basic use');
+  return tags;
+}
+
+function buildRecommendationReply(products, filters) {
+  const { budget, brand, needs } = filters;
+
+  let filtered = [...products];
+
+  if (budget) {
+    filtered = filtered.filter((product) => product.price <= budget);
   }
 
-  const lines = matched.map(
-    (product) => `- ${product.name} - ${formatPriceVND(product.price)}`
-  );
+  if (brand) {
+    filtered = filtered.filter((product) => product.brand.toLowerCase() === brand.toLowerCase());
+  }
 
-  return `Top ${brand} suggestions:\n${lines.join(
-    '\n'
-  )}\nTell me your budget if you want more specific recommendations.`;
+  if (needs.length > 0) {
+    filtered = filtered.filter((product) => needs.every((need) => matchNeed(product, need)));
+  }
+
+  let exactMatch = true;
+
+  if (filtered.length === 0 && needs.length > 0) {
+    exactMatch = false;
+    let fallback = [...products];
+
+    if (budget) fallback = fallback.filter((product) => product.price <= budget);
+    if (brand) fallback = fallback.filter((product) => product.brand.toLowerCase() === brand.toLowerCase());
+
+    filtered = fallback
+      .map((product) => ({
+        ...product,
+        score: needs.reduce((sum, need) => sum + (matchNeed(product, need) ? 1 : 0), 0)
+      }))
+      .filter((product) => product.score > 0)
+      .sort((a, b) => b.score - a.score || a.price - b.price);
+  }
+
+  filtered = filtered.sort((a, b) => a.price - b.price).slice(0, 5);
+
+  if (filtered.length === 0) {
+    return 'Sorry, I cannot find phones matching your conditions right now. Please increase budget or try another brand/need.';
+  }
+
+  const conditionParts = [];
+  if (budget) conditionParts.push(`budget <= ${formatPriceVND(budget)}`);
+  if (brand) conditionParts.push(`brand ${brand}`);
+  if (needs.length > 0) conditionParts.push(`need: ${needs.map(needLabel).join(', ')}`);
+
+  const header = exactMatch
+    ? `Here are the best matches for ${conditionParts.join(' | ')}:`
+    : `I could not find exact matches, but these are close options for ${conditionParts.join(' | ')}:`;
+
+  const lines = filtered.map((product) => {
+    const tags = getPhoneStrengthTags(product).join(', ');
+    return `- ${product.name} (${product.brand}) - ${formatPriceVND(product.price)} [${tags}]`;
+  });
+
+  return `${header}\n${lines.join('\n')}\nIf you want, I can narrow this down to only 2-3 best picks.`;
 }
 
 app.get('/api/phones', async (req, res) => {
@@ -276,11 +376,11 @@ app.post('/api/chat', async (req, res) => {
   const rawMessage = (req.body.message || '').toString().trim();
   const normalizedMessage = normalizeText(rawMessage);
 
-  const { intent, faqIntent, brand, budget } = detectIntent(normalizedMessage);
+  const { intent, faqIntent, budget, brand, needs } = detectIntent(normalizedMessage);
   const products = await getChatbotProducts();
 
   let reply =
-    'Sorry, I did not fully understand. Please ask about budget, brand (iPhone/Samsung/Xiaomi), opening hours, warranty, or promotions.';
+    'Sorry, I did not fully understand. Please ask with budget, brand, or need (gaming/camera/battery/basic use).';
 
   switch (intent) {
     case 'empty':
@@ -288,19 +388,19 @@ app.post('/api/chat', async (req, res) => {
       break;
 
     case 'greeting':
-      reply = 'Hello! Welcome to Phone Store. How can I help you today?';
+      reply = 'Hello! Tell me your budget, preferred brand, or usage needs (gaming/camera/battery/basic).';
       break;
 
     case 'faq':
       reply = FAQ_RESPONSES[faqIntent];
       break;
 
-    case 'budget':
-      reply = buildBudgetReply(products, budget);
-      break;
-
-    case 'brand':
-      reply = buildBrandReply(products, brand);
+    case 'recommendation':
+      reply = buildRecommendationReply(products, {
+        budget,
+        brand,
+        needs
+      });
       break;
 
     default:
