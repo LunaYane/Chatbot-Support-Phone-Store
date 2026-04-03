@@ -1,5 +1,5 @@
 const formEl = document.getElementById('admin-form');
-const productIdEl = document.getElementById('product-id');
+const originalIdEl = document.getElementById('editing-original-id');
 const submitBtnEl = document.getElementById('submit-btn');
 const cancelEditBtnEl = document.getElementById('cancel-edit');
 const tableBodyEl = document.getElementById('admin-product-list');
@@ -12,6 +12,7 @@ const actionsHeaderEl = document.getElementById('actions-header');
 
 let adminToken = localStorage.getItem('adminToken') || '';
 let isAdmin = false;
+let cachedProducts = [];
 
 function formatPrice(price) {
   return new Intl.NumberFormat('vi-VN', {
@@ -42,39 +43,62 @@ function setAdminMode(enabled, username = 'Admin') {
   }
 }
 
+function parseSpecsInput() {
+  const raw = document.getElementById('specs').value.trim();
+  if (!raw) return {};
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') {
+      throw new Error('Invalid specs JSON');
+    }
+    return parsed;
+  } catch (error) {
+    throw new Error('Specs JSON is invalid. Please check format.');
+  }
+}
+
 function getFormData() {
+  const specs = parseSpecsInput();
+
   return {
+    id: Number(document.getElementById('id').value),
     name: document.getElementById('name').value.trim(),
     brand: document.getElementById('brand').value.trim(),
     price: Number(document.getElementById('price').value),
     image: document.getElementById('image').value.trim(),
-    description: document.getElementById('description').value.trim(),
-    display: document.getElementById('display').value.trim(),
-    processor: document.getElementById('processor').value.trim(),
-    ram: document.getElementById('ram').value.trim(),
-    storage: document.getElementById('storage').value.trim(),
-    battery: document.getElementById('battery').value.trim(),
-    camera: document.getElementById('camera').value.trim()
+    shortDescription: document.getElementById('shortDescription').value.trim(),
+    fullDescription: document.getElementById('fullDescription').value.trim(),
+    specs,
+    tags: document.getElementById('tags').value.trim()
   };
 }
 
 function setFormData(phone) {
+  document.getElementById('id').value = phone.id || '';
   document.getElementById('name').value = phone.name || '';
   document.getElementById('brand').value = phone.brand || '';
   document.getElementById('price').value = phone.price || '';
   document.getElementById('image').value = phone.image || '';
-  document.getElementById('description').value = phone.description || '';
-  document.getElementById('display').value = phone.specifications?.display || '';
-  document.getElementById('processor').value = phone.specifications?.processor || '';
-  document.getElementById('ram').value = phone.specifications?.ram || '';
-  document.getElementById('storage').value = phone.specifications?.storage || '';
-  document.getElementById('battery').value = phone.specifications?.battery || '';
-  document.getElementById('camera').value = phone.specifications?.camera || '';
+  document.getElementById('shortDescription').value = phone.shortDescription || '';
+  document.getElementById('fullDescription').value = phone.fullDescription || phone.description || '';
+  document.getElementById('tags').value = Array.isArray(phone.tags) ? phone.tags.join(', ') : '';
+
+  const specs = {
+    display: phone.specifications?.display || '',
+    processor: phone.specifications?.processor || '',
+    ram: phone.specifications?.ram || '',
+    storage: phone.specifications?.storage || '',
+    battery: phone.specifications?.battery || '',
+    camera: phone.specifications?.camera || ''
+  };
+
+  document.getElementById('specs').value = JSON.stringify(specs, null, 2);
 }
 
 function resetForm() {
   formEl.reset();
-  productIdEl.value = '';
+  originalIdEl.value = '';
   submitBtnEl.textContent = 'Add Product';
 }
 
@@ -82,12 +106,13 @@ function renderProducts(products) {
   countEl.textContent = `Total: ${products.length} product(s)`;
 
   if (!products.length) {
-    tableBodyEl.innerHTML = `<tr><td colspan="${isAdmin ? 5 : 4}" class="admin-empty">No product found.</td></tr>`;
+    tableBodyEl.innerHTML = `<tr><td colspan="${isAdmin ? 6 : 5}" class="admin-empty">No product found.</td></tr>`;
     return;
   }
 
   tableBodyEl.innerHTML = products
     .map((phone) => {
+      const tags = Array.isArray(phone.tags) && phone.tags.length > 0 ? phone.tags.join(', ') : '-';
       const actionCell = isAdmin
         ? `
           <td>
@@ -105,6 +130,7 @@ function renderProducts(products) {
         <td>${phone.name}</td>
         <td>${phone.brand}</td>
         <td>${formatPrice(phone.price)}</td>
+        <td>${tags}</td>
         ${actionCell}
       </tr>
       `;
@@ -116,9 +142,10 @@ async function loadProducts() {
   try {
     const response = await fetch('/api/admin/products');
     const products = await response.json();
-    renderProducts(products);
+    cachedProducts = Array.isArray(products) ? products : [];
+    renderProducts(cachedProducts);
   } catch (error) {
-    tableBodyEl.innerHTML = '<tr><td colspan="5" class="admin-empty">Cannot load products right now.</td></tr>';
+    tableBodyEl.innerHTML = '<tr><td colspan="6" class="admin-empty">Cannot load products right now.</td></tr>';
   }
 }
 
@@ -136,8 +163,8 @@ async function createProduct(payload) {
   if (!response.ok) throw new Error(data.message || 'Failed to create product');
 }
 
-async function updateProduct(id, payload) {
-  const response = await fetch(`/api/admin/products/${id}`, {
+async function updateProduct(originalId, payload) {
+  const response = await fetch(`/api/admin/products/${originalId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -246,12 +273,12 @@ formEl.addEventListener('submit', async (event) => {
     return;
   }
 
-  const payload = getFormData();
-  const editingId = productIdEl.value;
-
   try {
-    if (editingId) {
-      await updateProduct(editingId, payload);
+    const payload = getFormData();
+    const editingOriginalId = originalIdEl.value;
+
+    if (editingOriginalId) {
+      await updateProduct(editingOriginalId, payload);
       alert('Product updated successfully.');
     } else {
       await createProduct(payload);
@@ -278,23 +305,17 @@ tableBodyEl.addEventListener('click', async (event) => {
   if (!productId) return;
 
   if (target.classList.contains('btn-edit')) {
-    try {
-      const response = await fetch('/api/admin/products');
-      const products = await response.json();
-      const phone = products.find((item) => String(item.id) === String(productId));
+    const phone = cachedProducts.find((item) => String(item.id) === String(productId));
 
-      if (!phone) {
-        alert('Product not found.');
-        return;
-      }
-
-      setFormData(phone);
-      productIdEl.value = phone.id;
-      submitBtnEl.textContent = 'Update Product';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error) {
-      alert('Cannot load product for edit.');
+    if (!phone) {
+      alert('Product not found.');
+      return;
     }
+
+    setFormData(phone);
+    originalIdEl.value = phone.id;
+    submitBtnEl.textContent = 'Update Product';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   if (target.classList.contains('btn-delete')) {

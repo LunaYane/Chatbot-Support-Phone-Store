@@ -443,8 +443,23 @@ app.get('/api/phones', async (req, res) => {
       }
     }
 
-    const phones = await Phone.find(query).sort({ price: 1 });
-    return res.json(phones);
+    const phones = await Phone.find(query).sort({ price: 1 }).lean();
+
+    const normalized = phones.map((phone) => {
+      const shortDescription = phone.shortDescription || '';
+      const fullDescription = phone.fullDescription || '';
+      const fallbackDescription = phone.description || shortDescription || fullDescription || '';
+
+      return {
+        ...phone,
+        shortDescription: shortDescription || fallbackDescription,
+        fullDescription: fullDescription || fallbackDescription,
+        description: fallbackDescription,
+        tags: Array.isArray(phone.tags) ? phone.tags : []
+      };
+    });
+
+    return res.json(normalized);
   } catch (error) {
     return res.status(500).json({ message: 'Cannot load phones right now.' });
   }
@@ -489,10 +504,15 @@ app.get('/api/admin/products', async (req, res) => {
 app.post('/api/admin/products', requireAdmin, async (req, res) => {
   try {
     const {
+      id,
       name,
       brand,
       price,
       image,
+      shortDescription,
+      fullDescription,
+      specs,
+      tags,
       description,
       display,
       processor,
@@ -502,12 +522,25 @@ app.post('/api/admin/products', requireAdmin, async (req, res) => {
       camera
     } = req.body;
 
-    if (!name || !brand || !price || !image || !description) {
+    if (!name || !brand || !price || !image) {
       return res.status(400).json({ message: 'Please provide required fields.' });
     }
 
+    const resolvedDescription = String(fullDescription || shortDescription || description || '').trim();
+    if (!resolvedDescription) {
+      return res.status(400).json({ message: 'Please provide shortDescription or fullDescription.' });
+    }
+
     const maxPhone = await Phone.findOne().sort({ id: -1 }).lean();
-    const newId = maxPhone ? maxPhone.id + 1 : 1;
+    const generatedId = maxPhone ? maxPhone.id + 1 : 1;
+    const newId = Number(id) > 0 ? Number(id) : generatedId;
+
+    const idExists = await Phone.findOne({ id: newId });
+    if (idExists) {
+      return res.status(400).json({ message: 'ID already exists. Please choose another ID.' });
+    }
+
+    const specsFromObject = typeof specs === 'object' && specs !== null ? specs : {};
 
     const newPhoneData = {
       id: newId,
@@ -515,14 +548,22 @@ app.post('/api/admin/products', requireAdmin, async (req, res) => {
       brand: String(brand).trim(),
       price: Number(price),
       image: String(image).trim(),
-      description: String(description).trim(),
+      shortDescription: String(shortDescription || '').trim(),
+      fullDescription: String(fullDescription || '').trim(),
+      tags: Array.isArray(tags)
+        ? tags.map((item) => String(item).trim()).filter(Boolean)
+        : String(tags || '')
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean),
+      description: resolvedDescription,
       specifications: {
-        display: String(display || '').trim(),
-        processor: String(processor || '').trim(),
-        ram: String(ram || '').trim(),
-        storage: String(storage || '').trim(),
-        battery: String(battery || '').trim(),
-        camera: String(camera || '').trim()
+        display: String(specsFromObject.display || display || '').trim(),
+        processor: String(specsFromObject.processor || processor || '').trim(),
+        ram: String(specsFromObject.ram || ram || '').trim(),
+        storage: String(specsFromObject.storage || storage || '').trim(),
+        battery: String(specsFromObject.battery || battery || '').trim(),
+        camera: String(specsFromObject.camera || camera || '').trim()
       }
     };
 
@@ -545,10 +586,15 @@ app.put('/api/admin/products/:id', requireAdmin, async (req, res) => {
     }
 
     const {
+      id,
       name,
       brand,
       price,
       image,
+      shortDescription,
+      fullDescription,
+      specs,
+      tags,
       description,
       display,
       processor,
@@ -558,20 +604,45 @@ app.put('/api/admin/products/:id', requireAdmin, async (req, res) => {
       camera
     } = req.body;
 
+    const nextId = Number(id || phoneId);
+    if (nextId !== phoneId) {
+      const idExists = await Phone.findOne({ id: nextId });
+      if (idExists) {
+        return res.status(400).json({ message: 'ID already exists. Please choose another ID.' });
+      }
+    }
+
+    const specsFromObject = typeof specs === 'object' && specs !== null ? specs : {};
+
     const updatedData = {
-      id: phoneId,
+      id: nextId,
       name: String(name || existingPhone.name).trim(),
       brand: String(brand || existingPhone.brand).trim(),
       price: Number(price || existingPhone.price),
       image: String(image || existingPhone.image).trim(),
-      description: String(description || existingPhone.description).trim(),
+      shortDescription: String(shortDescription || existingPhone.shortDescription || '').trim(),
+      fullDescription: String(fullDescription || existingPhone.fullDescription || '').trim(),
+      tags: Array.isArray(tags)
+        ? tags.map((item) => String(item).trim()).filter(Boolean)
+        : String(tags || existingPhone.tags?.join(',') || '')
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean),
+      description: String(
+        fullDescription ||
+          shortDescription ||
+          description ||
+          existingPhone.fullDescription ||
+          existingPhone.shortDescription ||
+          existingPhone.description
+      ).trim(),
       specifications: {
-        display: String(display || existingPhone.specifications?.display || '').trim(),
-        processor: String(processor || existingPhone.specifications?.processor || '').trim(),
-        ram: String(ram || existingPhone.specifications?.ram || '').trim(),
-        storage: String(storage || existingPhone.specifications?.storage || '').trim(),
-        battery: String(battery || existingPhone.specifications?.battery || '').trim(),
-        camera: String(camera || existingPhone.specifications?.camera || '').trim()
+        display: String(specsFromObject.display || display || existingPhone.specifications?.display || '').trim(),
+        processor: String(specsFromObject.processor || processor || existingPhone.specifications?.processor || '').trim(),
+        ram: String(specsFromObject.ram || ram || existingPhone.specifications?.ram || '').trim(),
+        storage: String(specsFromObject.storage || storage || existingPhone.specifications?.storage || '').trim(),
+        battery: String(specsFromObject.battery || battery || existingPhone.specifications?.battery || '').trim(),
+        camera: String(specsFromObject.camera || camera || existingPhone.specifications?.camera || '').trim()
       }
     };
 
@@ -616,13 +687,23 @@ app.get('/api/brands', async (req, res) => {
 app.get('/api/phones/:id', async (req, res) => {
   try {
     const phoneId = Number(req.params.id);
-    const phone = await Phone.findOne({ id: phoneId });
+    const phone = await Phone.findOne({ id: phoneId }).lean();
 
     if (!phone) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    return res.json(phone);
+    const shortDescription = phone.shortDescription || '';
+    const fullDescription = phone.fullDescription || '';
+    const fallbackDescription = phone.description || shortDescription || fullDescription || '';
+
+    return res.json({
+      ...phone,
+      shortDescription: shortDescription || fallbackDescription,
+      fullDescription: fullDescription || fallbackDescription,
+      description: fallbackDescription,
+      tags: Array.isArray(phone.tags) ? phone.tags : []
+    });
   } catch (error) {
     return res.status(500).json({ message: 'Cannot load product detail right now.' });
   }

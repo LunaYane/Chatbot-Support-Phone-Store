@@ -10,32 +10,30 @@
     <header class="hero">
       <div class="container">
         <div class="hero-top">
-          <h1>Product Management</h1>
+          <h1>Admin Product Management</h1>
           <a class="admin-link" href="/">Back to Store</a>
         </div>
-        <p>Guest can view products. Login as Admin to add/edit/delete.</p>
+        <p>Simple and clean CRUD page for final project demo</p>
       </div>
     </header>
 
     <main class="container admin-page">
-      <section class="admin-card" id="auth-card">
+      <section class="admin-card admin-login-card" id="auth-card">
         <h2>Admin Login</h2>
 
-        <form id="login-form" class="admin-form">
-          <div class="admin-grid">
-            <div class="field-group">
-              <label for="admin-username">Username</label>
-              <input id="admin-username" type="text" placeholder="admin" required />
-            </div>
+        <form id="login-form" class="admin-form login-form-grid">
+          <div class="field-group">
+            <label for="admin-username">Username</label>
+            <input id="admin-username" type="text" placeholder="admin" required />
+          </div>
 
-            <div class="field-group">
-              <label for="admin-password">Password</label>
-              <input id="admin-password" type="password" placeholder="••••••" required />
-            </div>
+          <div class="field-group">
+            <label for="admin-password">Password</label>
+            <input id="admin-password" type="password" placeholder="••••••" required />
           </div>
 
           <div class="admin-actions">
-            <button type="submit" class="btn-primary">Login Admin</button>
+            <button type="submit" class="btn-primary">Login</button>
             <button type="button" class="btn-neutral hidden" id="logout-btn">Logout</button>
           </div>
         </form>
@@ -44,11 +42,16 @@
       </section>
 
       <section class="admin-card hidden" id="editor-card">
-        <h2>Add / Edit Product (Admin Only)</h2>
+        <h2>Add / Edit Product</h2>
         <form id="admin-form" class="admin-form">
-          <input type="hidden" id="product-id" />
+          <input type="hidden" id="editing-original-id" />
 
           <div class="admin-grid">
+            <div class="field-group">
+              <label for="id">ID *</label>
+              <input id="id" type="number" min="1" required />
+            </div>
+
             <div class="field-group">
               <label for="name">Name *</label>
               <input id="name" type="text" required />
@@ -70,38 +73,27 @@
             </div>
 
             <div class="field-group field-span-2">
-              <label for="description">Description *</label>
-              <textarea id="description" rows="3" required></textarea>
+              <label for="shortDescription">Short Description</label>
+              <textarea id="shortDescription" rows="2" placeholder="Short text for card view"></textarea>
             </div>
 
-            <div class="field-group">
-              <label for="display">Display</label>
-              <input id="display" type="text" />
+            <div class="field-group field-span-2">
+              <label for="fullDescription">Full Description</label>
+              <textarea id="fullDescription" rows="3" placeholder="Detailed product description"></textarea>
             </div>
 
-            <div class="field-group">
-              <label for="processor">Processor</label>
-              <input id="processor" type="text" />
+            <div class="field-group field-span-2">
+              <label for="tags">Tags (comma separated)</label>
+              <input id="tags" type="text" placeholder="gaming, camera, battery" />
             </div>
 
-            <div class="field-group">
-              <label for="ram">RAM</label>
-              <input id="ram" type="text" />
-            </div>
-
-            <div class="field-group">
-              <label for="storage">Storage</label>
-              <input id="storage" type="text" />
-            </div>
-
-            <div class="field-group">
-              <label for="battery">Battery</label>
-              <input id="battery" type="text" />
-            </div>
-
-            <div class="field-group">
-              <label for="camera">Camera</label>
-              <input id="camera" type="text" />
+            <div class="field-group field-span-2">
+              <label for="specs">Specs (JSON)</label>
+              <textarea
+                id="specs"
+                rows="4"
+                placeholder='{"display":"6.7-inch OLED","processor":"Snapdragon 8 Gen 3","ram":"12 GB","storage":"256 GB","battery":"5000 mAh","camera":"50MP + 12MP"}'
+              ></textarea>
             </div>
           </div>
 
@@ -124,6 +116,7 @@
                 <th>Name</th>
                 <th>Brand</th>
                 <th>Price</th>
+                <th>Tags</th>
                 <th id="actions-header" class="hidden">Actions</th>
               </tr>
             </thead>

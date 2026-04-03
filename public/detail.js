@@ -36,7 +36,7 @@ function renderProductDetail(phone) {
         ${renderSpecifications(phone.specifications)}
 
         <h3>Description</h3>
-        <p class="detail-description">${phone.description}</p>
+        <p class="detail-description">${phone.fullDescription || phone.description || ''}</p>
       </div>
     </article>
   `;

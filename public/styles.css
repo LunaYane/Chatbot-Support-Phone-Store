@@ -82,6 +82,21 @@ body {
   margin-top: 0;
 }
 
+.admin-login-card {
+  background: linear-gradient(135deg, #ffffff, #f8fbff);
+}
+
+.login-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.login-form-grid .admin-actions {
+  margin-bottom: 1px;
+}
+
 .admin-form {
   display: grid;
   gap: 12px;
@@ -558,7 +573,8 @@ footer {
     grid-column: span 12;
   }
 
-  .admin-grid {
+  .admin-grid,
+  .login-form-grid {
     grid-template-columns: 1fr;
   }
 

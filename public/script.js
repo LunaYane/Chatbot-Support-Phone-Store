@@ -13,7 +13,7 @@ function createPhoneCard(phone) {
         <div class="phone-content">
           <div class="brand">${phone.brand}</div>
           <h3 class="phone-name">${phone.name}</h3>
-          <p class="phone-desc">${phone.description}</p>
+          <p class="phone-desc">${phone.shortDescription || phone.description || ''}</p>
           <div class="phone-price">${formatPrice(phone.price)}</div>
         </div>
       </a>
