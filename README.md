@@ -15,7 +15,8 @@ Simple demo website for selling mobile phones.
 3. Search by product name
 4. Filter by brand
 5. Filter by price range (min/max)
-6. Clean and modern UI for easy demo
+6. Chatbot popup UI at bottom-right corner
+7. Clean and modern UI for easy demo
 
 ## Updated Project Structure
 
@@ -28,14 +29,15 @@ Chatbot-Support-Phone-Store/
 ├── seed/
 │   └── phonesSeed.js            # Seed script (import sample data to MongoDB)
 ├── public/
-│   ├── index.html               # Homepage + search/filter UI
-│   ├── detail.html              # Product detail page
-│   ├── styles.css               # Shared styles (includes filter UI styles)
+│   ├── index.html               # Homepage + search/filter + chatbot popup
+│   ├── detail.html              # Product detail page + chatbot popup
+│   ├── styles.css               # Shared styles (filter + chatbot UI)
 │   ├── script.js                # Homepage logic (search/filter requests)
-│   └── detail.js                # Detail page logic
+│   ├── detail.js                # Detail page logic
+│   └── chat.js                  # Chatbox frontend logic (send/receive messages)
 ├── .gitignore
 ├── package.json
-├── server.js                    # Express API + MongoDB query logic
+├── server.js                    # Express API + MongoDB + chat API
 └── README.md
 ```
 
@@ -49,6 +51,7 @@ Chatbot-Support-Phone-Store/
     - `maxPrice` (maximum price)
 - `GET /api/brands` → get all distinct brands for dropdown filter
 - `GET /api/phones/:id` → get one product by ID
+- `POST /api/chat` → chatbot reply based on predefined rules
 
 ## MongoDB Connection
 
@@ -104,15 +107,29 @@ npm start
    - `minPrice`, `maxPrice` → `$gte`, `$lte` on `price`
 4. Backend returns filtered list and frontend re-renders the product grid.
 
+## Chatbot flow (brief)
+
+1. User clicks **💬 Chat** button in bottom-right corner.
+2. Popup chatbox appears with:
+   - chat window
+   - input field
+   - send button
+3. User sends message.
+4. Frontend (`chat.js`) calls `POST /api/chat` with JSON body `{ message }`.
+5. Backend returns predefined reply based on message keywords (hello, price, iphone, samsung, thank...).
+6. Frontend appends bot response to chat window.
+
 ## Files Added / Modified
 
 ### Added
 - `models/Phone.js`
 - `seed/phonesSeed.js`
+- `public/chat.js`
 
 ### Modified
 - `server.js`
 - `public/index.html`
+- `public/detail.html`
 - `public/script.js`
 - `public/styles.css`
 - `package.json`
@@ -121,6 +138,6 @@ npm start
 ## Notes for university final project demo
 
 - Code is intentionally simple and easy to explain.
-- Uses traditional server-rendered static frontend with API calls.
+- Uses traditional static frontend + Express APIs.
 - No advanced frameworks.
-- Easy to extend with sorting, cart, login, and admin management.
+- Easy to extend with real AI chatbot, cart, login, and admin management.
