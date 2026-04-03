@@ -459,7 +459,7 @@ function buildClarifyReply() {
 
 app.get('/api/phones', async (req, res) => {
   try {
-    const { search = '', brand = '', minPrice = '', maxPrice = '' } = req.query;
+    const { search = '', brand = '', minPrice = '', maxPrice = '', category = '' } = req.query;
 
     const query = {};
 
@@ -484,7 +484,19 @@ app.get('/api/phones', async (req, res) => {
     }
 
     const phones = await Phone.find(query).sort({ price: 1 }).lean();
-    const normalized = phones.map(normalizePhoneData);
+
+    let normalized = phones.map((phone) => normalizePhoneData(withRecommendation(phone)));
+
+    const selectedCategory = String(category || '').trim().toLowerCase();
+    if (selectedCategory === 'gaming') {
+      normalized = normalized.filter((phone) => phone.recommendation?.suitable_for_gaming);
+    } else if (selectedCategory === 'camera') {
+      normalized = normalized.filter((phone) => phone.recommendation?.suitable_for_camera);
+    } else if (selectedCategory === 'battery') {
+      normalized = normalized.filter((phone) => phone.recommendation?.suitable_for_battery);
+    } else if (selectedCategory === 'brand') {
+      normalized = normalized.filter((phone) => String(phone.brand || '').trim().length > 0);
+    }
 
     return res.json(normalized);
   } catch (error) {

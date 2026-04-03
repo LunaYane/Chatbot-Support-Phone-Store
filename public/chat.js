@@ -1,11 +1,13 @@
-const chatToggleBtn = document.getElementById('chat-toggle');
 const chatbox = document.getElementById('chatbox');
 const chatCloseBtn = document.getElementById('chat-close');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 const chatMessages = document.getElementById('chat-messages');
 
-if (chatToggleBtn && chatbox && chatCloseBtn && chatForm && chatInput && chatMessages) {
+const supportWidget = document.getElementById('floating-support');
+const supportOpenChatBtn = document.getElementById('support-open-chat');
+
+if (chatbox && chatCloseBtn && chatForm && chatInput && chatMessages && supportWidget && supportOpenChatBtn) {
   function addMessage(text, role) {
     const messageEl = document.createElement('div');
     messageEl.className = `chat-message ${role}`;
@@ -15,16 +17,22 @@ if (chatToggleBtn && chatbox && chatCloseBtn && chatForm && chatInput && chatMes
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  chatToggleBtn.addEventListener('click', () => {
+  function openSupportChat() {
     chatbox.classList.remove('hidden');
-    chatToggleBtn.classList.add('hidden');
+    supportWidget.classList.add('hidden');
     chatInput.focus();
-  });
+  }
 
-  chatCloseBtn.addEventListener('click', () => {
+  function closeSupportChat() {
     chatbox.classList.add('hidden');
-    chatToggleBtn.classList.remove('hidden');
-  });
+    supportWidget.classList.remove('hidden');
+  }
+
+  window.openSupportChat = openSupportChat;
+
+  supportOpenChatBtn.addEventListener('click', openSupportChat);
+
+  chatCloseBtn.addEventListener('click', closeSupportChat);
 
   chatForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -45,9 +53,9 @@ if (chatToggleBtn && chatbox && chatCloseBtn && chatForm && chatInput && chatMes
       });
 
       const data = await response.json();
-      addMessage(data.reply || 'Sorry, I cannot reply right now.', 'bot');
+      addMessage(data.reply || 'Xin lỗi, hiện tại mình chưa thể phản hồi.', 'bot');
     } catch (error) {
-      addMessage('Connection error. Please try again later.', 'bot');
+      addMessage('Lỗi kết nối, vui lòng thử lại sau.', 'bot');
     }
   });
 }
