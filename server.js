@@ -19,7 +19,44 @@ mongoose
   .then(() => console.log('Connected to MongoDB.'))
   .catch((error) => console.error('MongoDB connection error:', error.message));
 
-const SAMPLE_PRODUCTS = rawPhones.map(withRecommendation);
+function normalizeTags(tags) {
+  if (Array.isArray(tags)) {
+    return tags.map((item) => String(item).trim()).filter(Boolean);
+  }
+
+  return String(tags || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizeSpecifications(specs = {}) {
+  return {
+    display: String(specs.display || '').trim(),
+    processor: String(specs.processor || '').trim(),
+    ram: String(specs.ram || '').trim(),
+    storage: String(specs.storage || '').trim(),
+    battery: String(specs.battery || '').trim(),
+    camera: String(specs.camera || '').trim()
+  };
+}
+
+function normalizePhoneData(phone) {
+  const shortDescription = String(phone.shortDescription || '').trim();
+  const fullDescription = String(phone.fullDescription || '').trim();
+  const fallbackDescription = String(phone.description || shortDescription || fullDescription || '').trim();
+
+  return {
+    ...phone,
+    shortDescription: shortDescription || fallbackDescription,
+    fullDescription: fullDescription || fallbackDescription,
+    description: fallbackDescription,
+    tags: normalizeTags(phone.tags),
+    specifications: normalizeSpecifications(phone.specifications)
+  };
+}
+
+const SAMPLE_PRODUCTS = rawPhones.map((phone) => normalizePhoneData(withRecommendation(phone)));
 
 const FAQ_RESPONSES = {
   openingHours: 'Cửa hàng mở cửa từ 08:30 đến 21:30 mỗi ngày (Thứ 2 - Chủ nhật).',
@@ -274,7 +311,10 @@ async function getChatbotProducts() {
         name: 1,
         brand: 1,
         price: 1,
+        shortDescription: 1,
+        fullDescription: 1,
         description: 1,
+        tags: 1,
         specifications: 1,
         recommendation: 1
       }
@@ -283,7 +323,7 @@ async function getChatbotProducts() {
       .lean();
 
     if (products.length > 0) {
-      return products.map(withRecommendation);
+      return products.map((phone) => normalizePhoneData(withRecommendation(phone)));
     }
 
     return SAMPLE_PRODUCTS;
@@ -444,20 +484,7 @@ app.get('/api/phones', async (req, res) => {
     }
 
     const phones = await Phone.find(query).sort({ price: 1 }).lean();
-
-    const normalized = phones.map((phone) => {
-      const shortDescription = phone.shortDescription || '';
-      const fullDescription = phone.fullDescription || '';
-      const fallbackDescription = phone.description || shortDescription || fullDescription || '';
-
-      return {
-        ...phone,
-        shortDescription: shortDescription || fallbackDescription,
-        fullDescription: fullDescription || fallbackDescription,
-        description: fallbackDescription,
-        tags: Array.isArray(phone.tags) ? phone.tags : []
-      };
-    });
+    const normalized = phones.map(normalizePhoneData);
 
     return res.json(normalized);
   } catch (error) {
@@ -494,8 +521,8 @@ app.post('/api/admin/logout', requireAdmin, (req, res) => {
 
 app.get('/api/admin/products', async (req, res) => {
   try {
-    const products = await Phone.find({}).sort({ id: 1 });
-    return res.json(products);
+    const products = await Phone.find({}).sort({ id: 1 }).lean();
+    return res.json(products.map(normalizePhoneData));
   } catch (error) {
     return res.status(500).json({ message: 'Cannot load admin products right now.' });
   }
@@ -550,21 +577,16 @@ app.post('/api/admin/products', requireAdmin, async (req, res) => {
       image: String(image).trim(),
       shortDescription: String(shortDescription || '').trim(),
       fullDescription: String(fullDescription || '').trim(),
-      tags: Array.isArray(tags)
-        ? tags.map((item) => String(item).trim()).filter(Boolean)
-        : String(tags || '')
-            .split(',')
-            .map((item) => item.trim())
-            .filter(Boolean),
+      tags: normalizeTags(tags),
       description: resolvedDescription,
-      specifications: {
-        display: String(specsFromObject.display || display || '').trim(),
-        processor: String(specsFromObject.processor || processor || '').trim(),
-        ram: String(specsFromObject.ram || ram || '').trim(),
-        storage: String(specsFromObject.storage || storage || '').trim(),
-        battery: String(specsFromObject.battery || battery || '').trim(),
-        camera: String(specsFromObject.camera || camera || '').trim()
-      }
+      specifications: normalizeSpecifications({
+        display: specsFromObject.display || display,
+        processor: specsFromObject.processor || processor,
+        ram: specsFromObject.ram || ram,
+        storage: specsFromObject.storage || storage,
+        battery: specsFromObject.battery || battery,
+        camera: specsFromObject.camera || camera
+      })
     };
 
     newPhoneData.recommendation = buildRecommendationAttributes(newPhoneData);
@@ -614,6 +636,15 @@ app.put('/api/admin/products/:id', requireAdmin, async (req, res) => {
 
     const specsFromObject = typeof specs === 'object' && specs !== null ? specs : {};
 
+    const resolvedDescription = String(
+      fullDescription ||
+        shortDescription ||
+        description ||
+        existingPhone.fullDescription ||
+        existingPhone.shortDescription ||
+        existingPhone.description
+    ).trim();
+
     const updatedData = {
       id: nextId,
       name: String(name || existingPhone.name).trim(),
@@ -622,28 +653,16 @@ app.put('/api/admin/products/:id', requireAdmin, async (req, res) => {
       image: String(image || existingPhone.image).trim(),
       shortDescription: String(shortDescription || existingPhone.shortDescription || '').trim(),
       fullDescription: String(fullDescription || existingPhone.fullDescription || '').trim(),
-      tags: Array.isArray(tags)
-        ? tags.map((item) => String(item).trim()).filter(Boolean)
-        : String(tags || existingPhone.tags?.join(',') || '')
-            .split(',')
-            .map((item) => item.trim())
-            .filter(Boolean),
-      description: String(
-        fullDescription ||
-          shortDescription ||
-          description ||
-          existingPhone.fullDescription ||
-          existingPhone.shortDescription ||
-          existingPhone.description
-      ).trim(),
-      specifications: {
-        display: String(specsFromObject.display || display || existingPhone.specifications?.display || '').trim(),
-        processor: String(specsFromObject.processor || processor || existingPhone.specifications?.processor || '').trim(),
-        ram: String(specsFromObject.ram || ram || existingPhone.specifications?.ram || '').trim(),
-        storage: String(specsFromObject.storage || storage || existingPhone.specifications?.storage || '').trim(),
-        battery: String(specsFromObject.battery || battery || existingPhone.specifications?.battery || '').trim(),
-        camera: String(specsFromObject.camera || camera || existingPhone.specifications?.camera || '').trim()
-      }
+      tags: normalizeTags(tags || existingPhone.tags),
+      description: resolvedDescription,
+      specifications: normalizeSpecifications({
+        display: specsFromObject.display || display || existingPhone.specifications?.display,
+        processor: specsFromObject.processor || processor || existingPhone.specifications?.processor,
+        ram: specsFromObject.ram || ram || existingPhone.specifications?.ram,
+        storage: specsFromObject.storage || storage || existingPhone.specifications?.storage,
+        battery: specsFromObject.battery || battery || existingPhone.specifications?.battery,
+        camera: specsFromObject.camera || camera || existingPhone.specifications?.camera
+      })
     };
 
     updatedData.recommendation = buildRecommendationAttributes(updatedData);
@@ -693,17 +712,7 @@ app.get('/api/phones/:id', async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    const shortDescription = phone.shortDescription || '';
-    const fullDescription = phone.fullDescription || '';
-    const fallbackDescription = phone.description || shortDescription || fullDescription || '';
-
-    return res.json({
-      ...phone,
-      shortDescription: shortDescription || fallbackDescription,
-      fullDescription: fullDescription || fallbackDescription,
-      description: fallbackDescription,
-      tags: Array.isArray(phone.tags) ? phone.tags : []
-    });
+    return res.json(normalizePhoneData(phone));
   } catch (error) {
     return res.status(500).json({ message: 'Cannot load product detail right now.' });
   }
