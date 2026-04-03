@@ -10,9 +10,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/phone-store-demo';
 
-const AI_ENABLED = process.env.AI_ENABLED === 'true';
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -43,10 +40,48 @@ const BRAND_KEYWORDS = {
 };
 
 const NEED_KEYWORDS = {
-  gaming: ['choi game', 'gaming', 'game', 'pubg', 'lien quan', 'fps', 'hieu nang manh'],
-  camera: ['chup anh', 'camera dep', 'camera', 'selfie', 'quay phim', 'photography', 'anh dep'],
-  battery: ['pin trau', 'pin lau', 'dung lau', 'battery', 'thoi luong pin'],
-  student: ['hoc tap', 'sinh vien', 'co ban', 'van phong', 'study', 'basic']
+  gaming: [
+    'choi game',
+    'gaming',
+    'game',
+    'pubg',
+    'lien quan',
+    'fps',
+    'hieu nang manh',
+    'chien game',
+    'game on dinh'
+  ],
+  camera: [
+    'chup anh',
+    'camera dep',
+    'camera',
+    'selfie',
+    'quay phim',
+    'photography',
+    'anh dep',
+    'chup dep',
+    'song ao'
+  ],
+  battery: [
+    'pin trau',
+    'pin lau',
+    'dung lau',
+    'battery',
+    'thoi luong pin',
+    'pin khoe',
+    'it sac',
+    'xai lau'
+  ],
+  student: [
+    'hoc tap',
+    'sinh vien',
+    'co ban',
+    'van phong',
+    'study',
+    'basic',
+    'gia re',
+    'de dung'
+  ]
 };
 
 const UNDER_BUDGET_KEYWORDS = ['duoi', 'toi da', 'khong qua', 'it hon', 'under', 'max'];
@@ -56,7 +91,6 @@ const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const adminTokens = new Set();
 
-const conversationStore = new Map();
 
 function safeCompare(valueA, valueB) {
   const bufferA = Buffer.from(String(valueA));
@@ -269,29 +303,63 @@ function matchNeed(phone, need) {
 function needDisplayText(need) {
   if (need === 'gaming') return 'chơi game';
   if (need === 'camera') return 'chụp ảnh đẹp';
-  if (need === 'battery') return 'pin trâu';
+  if (need === 'battery') return 'pin khỏe';
   if (need === 'student') return 'học tập / sinh viên';
   return need;
 }
 
-function buildReasonForPhone(phone, needs) {
-  const reasons = [];
-  if (needs.includes('gaming') && phone.recommendation?.suitable_for_gaming) reasons.push('hiệu năng ổn cho game');
-  if (needs.includes('camera') && phone.recommendation?.suitable_for_camera) reasons.push('camera chụp đẹp');
-  if (needs.includes('battery') && phone.recommendation?.suitable_for_battery) reasons.push('pin khỏe dùng lâu');
-  if (needs.includes('student') && phone.recommendation?.suitable_for_basic_use) reasons.push('phù hợp học tập/sinh viên');
+function scoreProduct(phone, filters) {
+  const { budget, brand, needs } = filters;
+  let score = 0;
 
-  return reasons.length > 0 ? reasons.join(', ') : 'giá và nhu cầu khá cân bằng';
-}
-
-function applyBudgetFilter(products, budget) {
-  if (!budget) return products;
-
-  if (budget.type === 'under') {
-    return products.filter((product) => product.price <= budget.max);
+  if (brand && normalizeText(phone.brand) === normalizeText(brand)) {
+    score += 35;
   }
 
-  return products.filter((product) => product.price >= budget.min && product.price <= budget.max);
+  if (budget) {
+    if (budget.type === 'under') {
+      if (phone.price <= budget.max) {
+        score += 30;
+        score += Math.max(0, Math.round((budget.max - phone.price) / 1000000));
+      } else {
+        score -= 40;
+      }
+    } else {
+      const center = Math.round((budget.min + budget.max) / 2);
+      const distance = Math.abs(phone.price - center);
+      if (phone.price >= budget.min && phone.price <= budget.max) {
+        score += 25;
+      }
+      score += Math.max(0, 15 - Math.round(distance / 1000000));
+    }
+  }
+
+  if (needs.length > 0) {
+    needs.forEach((need) => {
+      score += matchNeed(phone, need) ? 20 : -8;
+    });
+  }
+
+  return score;
+}
+
+function buildReasonForPhone(phone, needs, budget) {
+  const reasons = [];
+
+  if (budget?.type === 'under' && phone.price <= budget.max) {
+    reasons.push(`đúng ngân sách dưới ${formatPriceVND(budget.max)}`);
+  }
+
+  if (budget?.type === 'around') {
+    reasons.push(`nằm trong tầm giá ${budget.text}`);
+  }
+
+  if (needs.includes('gaming') && phone.recommendation?.suitable_for_gaming) reasons.push('hiệu năng chơi game ổn');
+  if (needs.includes('camera') && phone.recommendation?.suitable_for_camera) reasons.push('camera chụp ảnh đẹp');
+  if (needs.includes('battery') && phone.recommendation?.suitable_for_battery) reasons.push('pin khỏe, dùng lâu');
+  if (needs.includes('student') && phone.recommendation?.suitable_for_basic_use) reasons.push('phù hợp cho sinh viên');
+
+  return reasons.slice(0, 2).join(', ') || 'cấu hình và giá khá cân bằng';
 }
 
 function buildNoMatchResponse({ budget, brand, needs }) {
@@ -300,46 +368,26 @@ function buildNoMatchResponse({ budget, brand, needs }) {
   if (brand) conditions.push(`hãng ${brand}`);
   if (needs.length > 0) conditions.push(`nhu cầu ${needs.map(needDisplayText).join(', ')}`);
 
-  return `Xin lỗi bạn, hiện mình chưa tìm thấy mẫu phù hợp ${conditions.join(' + ')}. Bạn muốn nới ngân sách hoặc đổi hãng để mình gợi ý lại tốt hơn không?`;
+  return `Xin lỗi bạn, hiện chưa có mẫu thật sự phù hợp với ${conditions.join(' + ')}. Bạn muốn nới ngân sách nhẹ hoặc đổi hãng để mình gợi ý tốt hơn không?`;
 }
 
 function buildConsultationResult(products, filters) {
   const { budget, brand, needs } = filters;
 
-  let filtered = [...products];
+  const scored = products
+    .map((product) => ({
+      ...product,
+      score: scoreProduct(product, filters)
+    }))
+    .filter((product) => product.score > -20)
+    .sort((a, b) => b.score - a.score || a.price - b.price);
 
-  if (brand) {
-    filtered = filtered.filter((product) => normalizeText(product.brand) === normalizeText(brand));
-  }
+  const topMatches = scored.slice(0, 3);
 
-  filtered = applyBudgetFilter(filtered, budget);
-
-  let usedRelaxedMatch = false;
-
-  if (needs.length > 0) {
-    const strictMatches = filtered.filter((product) => needs.every((need) => matchNeed(product, need)));
-
-    if (strictMatches.length > 0) {
-      filtered = strictMatches;
-    } else {
-      usedRelaxedMatch = true;
-      filtered = filtered
-        .map((product) => ({
-          ...product,
-          matchScore: needs.reduce((score, need) => score + (matchNeed(product, need) ? 1 : 0), 0)
-        }))
-        .filter((product) => product.matchScore > 0)
-        .sort((a, b) => b.matchScore - a.matchScore || a.price - b.price);
-    }
-  }
-
-  filtered = filtered.sort((a, b) => a.price - b.price).slice(0, 3);
-
-  if (filtered.length === 0) {
+  if (topMatches.length === 0 || topMatches[0].score < 5) {
     return {
       hasMatch: false,
       matches: [],
-      usedRelaxedMatch: false,
       text: buildNoMatchResponse({ budget, brand, needs })
     };
   }
@@ -349,114 +397,24 @@ function buildConsultationResult(products, filters) {
   if (brand) conditions.push(`hãng ${brand}`);
   if (needs.length > 0) conditions.push(`nhu cầu ${needs.map(needDisplayText).join(', ')}`);
 
-  const intro = usedRelaxedMatch
-    ? `Mình chưa thấy mẫu khớp 100% theo ${conditions.join(' + ')}, nhưng đây là 3 lựa chọn gần nhất:`
-    : `Mình gợi ý 3 mẫu phù hợp theo ${conditions.join(' + ')}:`;
+  const intro = conditions.length
+    ? `Mình gợi ý top 3 mẫu hợp với ${conditions.join(' + ')}:`
+    : 'Mình gợi ý 3 mẫu nổi bật cho bạn:';
 
-  const lines = filtered.map((product, index) => {
-    const reason = buildReasonForPhone(product, needs);
+  const lines = topMatches.map((product, index) => {
+    const reason = buildReasonForPhone(product, needs, budget);
     return `${index + 1}. ${product.name} (${product.brand}) - ${formatPriceVND(product.price)}\n   → ${reason}`;
   });
 
   return {
     hasMatch: true,
-    matches: filtered,
-    usedRelaxedMatch,
-    text: `${intro}\n${lines.join('\n')}\nBạn muốn mình chốt 1 mẫu tối ưu nhất theo nhu cầu của bạn không?`
+    matches: topMatches,
+    text: `${intro}\n${lines.join('\n')}\nBạn muốn mình lọc tiếp theo hãng hay theo pin/camera để chốt nhanh hơn không?`
   };
 }
 
 function buildClarifyReply() {
-  return 'Mình có thể tư vấn theo ngân sách (ví dụ: dưới 7 triệu), hãng (iPhone/Samsung/Xiaomi/Oppo/Vivo), hoặc nhu cầu (chơi game, chụp ảnh, pin trâu, học tập). Bạn muốn theo tiêu chí nào trước?';
-}
-
-function getConversationId(req) {
-  return req.header('x-chat-session') || req.ip || 'default';
-}
-
-function getConversationHistory(conversationId) {
-  if (!conversationStore.has(conversationId)) {
-    conversationStore.set(conversationId, []);
-  }
-
-  return conversationStore.get(conversationId);
-}
-
-function pushConversationMessage(conversationId, role, content) {
-  const history = getConversationHistory(conversationId);
-  history.push({ role, content });
-
-  if (history.length > 8) {
-    history.splice(0, history.length - 8);
-  }
-}
-
-function shouldTryAI(intent) {
-  return AI_ENABLED && Boolean(OPENAI_API_KEY) && (intent === 'consultation' || intent === 'clarify' || intent === 'faq');
-}
-
-function buildProductContextLines(products) {
-  return products.map((product) => {
-    const strengths = [];
-    if (product.recommendation?.suitable_for_gaming) strengths.push('gaming');
-    if (product.recommendation?.suitable_for_camera) strengths.push('camera');
-    if (product.recommendation?.suitable_for_battery) strengths.push('battery');
-    if (product.recommendation?.suitable_for_basic_use) strengths.push('student');
-
-    return `- ${product.name} | brand=${product.brand} | price=${product.price} | strengths=${strengths.join(',')}`;
-  });
-}
-
-async function generateAIReply({ userMessage, intent, ruleReply, consultationResult, products, conversationId }) {
-  const history = getConversationHistory(conversationId);
-  const shortlist = consultationResult?.matches?.length ? consultationResult.matches : products.slice(0, 8);
-  const productLines = buildProductContextLines(shortlist);
-
-  const systemPrompt = [
-    'Bạn là tư vấn viên bán điện thoại cho website demo.',
-    'Trả lời hoàn toàn bằng tiếng Việt tự nhiên, ngắn gọn, thân thiện.',
-    'Chỉ được tư vấn dựa trên danh sách sản phẩm được cung cấp. Không bịa model mới.',
-    'Nếu không đủ thông tin thì hỏi lại 1 câu follow-up rõ ràng.',
-    'Nếu không có sản phẩm phù hợp, trả lời lịch sự và gợi ý nới điều kiện.',
-    'Nếu có sản phẩm phù hợp, ưu tiên tối đa 3 mẫu và nêu lý do ngắn cho từng mẫu.',
-    `Intent nội bộ: ${intent}`,
-    `Rule-based draft: ${ruleReply}`,
-    'Danh sách sản phẩm tham chiếu:',
-    ...productLines
-  ].join('\n');
-
-  const messages = [
-    { role: 'system', content: systemPrompt },
-    ...history,
-    { role: 'user', content: userMessage }
-  ];
-
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: OPENAI_MODEL,
-      messages,
-      temperature: 0.4,
-      max_tokens: 350
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`OpenAI error ${response.status}`);
-  }
-
-  const data = await response.json();
-  const content = data?.choices?.[0]?.message?.content?.trim();
-
-  if (!content) {
-    throw new Error('Empty AI reply');
-  }
-
-  return content;
+  return 'Mình có thể tư vấn theo 3 tiêu chí: ngân sách, hãng và nhu cầu. Ví dụ bạn có thể nói: "dưới 7 triệu pin khỏe" hoặc "Samsung chụp ảnh đẹp". Bạn muốn ưu tiên tiêu chí nào trước?';
 }
 
 app.get('/api/phones', async (req, res) => {
@@ -676,62 +634,37 @@ app.post('/api/chat', async (req, res) => {
 
   const { intent, faqIntent, budget, brand, needs } = detectIntent(message);
   const products = await getChatbotProducts();
-  const conversationId = getConversationId(req);
-
   const consultationResult = buildConsultationResult(products, { budget, brand, needs: needs || [] });
 
-  let ruleReply =
-    'Mình chưa hiểu rõ lắm. Bạn thử nói theo dạng: dưới 7 triệu, hãng Samsung, hoặc nhu cầu chụp ảnh/pin trâu để mình tư vấn chính xác hơn nhé.';
+  let reply =
+    'Mình chưa hiểu rõ lắm. Bạn thử nói theo dạng: dưới 7 triệu, hãng Samsung, hoặc nhu cầu chụp ảnh/pin khỏe để mình tư vấn chính xác hơn nhé.';
 
   switch (intent) {
     case 'empty':
-      ruleReply = 'Bạn mô tả nhu cầu giúp mình nhé. Ví dụ: dưới 10 triệu, pin trâu, hoặc muốn iPhone.';
+      reply = 'Bạn mô tả nhu cầu giúp mình nhé. Ví dụ: dưới 10 triệu, pin khỏe, hoặc muốn iPhone.';
       break;
 
     case 'greeting':
-      ruleReply = 'Chào bạn 👋 Mình có thể tư vấn theo ngân sách, hãng và nhu cầu sử dụng. Bạn đang muốn tìm máy khoảng bao nhiêu tiền?';
+      reply = 'Chào bạn 👋 Mình có thể tư vấn theo ngân sách, hãng và nhu cầu sử dụng. Bạn đang muốn tìm máy khoảng bao nhiêu tiền?';
       break;
 
     case 'faq':
-      ruleReply = FAQ_RESPONSES[faqIntent];
+      reply = FAQ_RESPONSES[faqIntent];
       break;
 
     case 'consultation':
-      ruleReply = consultationResult.text;
+      reply = consultationResult.text;
       break;
 
     case 'clarify':
-      ruleReply = buildClarifyReply();
+      reply = buildClarifyReply();
       break;
 
     default:
       break;
   }
 
-  let finalReply = ruleReply;
-  let source = 'rule';
-
-  if (shouldTryAI(intent)) {
-    try {
-      finalReply = await generateAIReply({
-        userMessage: rawMessage,
-        intent,
-        ruleReply,
-        consultationResult,
-        products,
-        conversationId
-      });
-      source = 'ai';
-    } catch (error) {
-      source = 'rule-fallback';
-      finalReply = ruleReply;
-    }
-  }
-
-  pushConversationMessage(conversationId, 'user', rawMessage);
-  pushConversationMessage(conversationId, 'assistant', finalReply);
-
-  return res.json({ reply: finalReply, intent, source });
+  return res.json({ reply, intent, source: 'rule' });
 });
 
 app.get('/product/:id', (req, res) => {
