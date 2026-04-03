@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const Phone = require('./models/Phone');
-const { normalizeText, withRecommendation } = require('./utils/recommendation');
+const { normalizeText, withRecommendation, buildRecommendationAttributes } = require('./utils/recommendation');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -347,6 +347,132 @@ app.get('/api/phones', async (req, res) => {
   }
 });
 
+app.get('/api/admin/products', async (req, res) => {
+  try {
+    const products = await Phone.find({}).sort({ id: 1 });
+    return res.json(products);
+  } catch (error) {
+    return res.status(500).json({ message: 'Cannot load admin products right now.' });
+  }
+});
+
+app.post('/api/admin/products', async (req, res) => {
+  try {
+    const {
+      name,
+      brand,
+      price,
+      image,
+      description,
+      display,
+      processor,
+      ram,
+      storage,
+      battery,
+      camera
+    } = req.body;
+
+    if (!name || !brand || !price || !image || !description) {
+      return res.status(400).json({ message: 'Please provide required fields.' });
+    }
+
+    const maxPhone = await Phone.findOne().sort({ id: -1 }).lean();
+    const newId = maxPhone ? maxPhone.id + 1 : 1;
+
+    const newPhoneData = {
+      id: newId,
+      name: String(name).trim(),
+      brand: String(brand).trim(),
+      price: Number(price),
+      image: String(image).trim(),
+      description: String(description).trim(),
+      specifications: {
+        display: String(display || '').trim(),
+        processor: String(processor || '').trim(),
+        ram: String(ram || '').trim(),
+        storage: String(storage || '').trim(),
+        battery: String(battery || '').trim(),
+        camera: String(camera || '').trim()
+      }
+    };
+
+    newPhoneData.recommendation = buildRecommendationAttributes(newPhoneData);
+
+    const createdPhone = await Phone.create(newPhoneData);
+    return res.status(201).json(createdPhone);
+  } catch (error) {
+    return res.status(500).json({ message: 'Cannot add product right now.' });
+  }
+});
+
+app.put('/api/admin/products/:id', async (req, res) => {
+  try {
+    const phoneId = Number(req.params.id);
+
+    const existingPhone = await Phone.findOne({ id: phoneId });
+    if (!existingPhone) {
+      return res.status(404).json({ message: 'Product not found.' });
+    }
+
+    const {
+      name,
+      brand,
+      price,
+      image,
+      description,
+      display,
+      processor,
+      ram,
+      storage,
+      battery,
+      camera
+    } = req.body;
+
+    const updatedData = {
+      id: phoneId,
+      name: String(name || existingPhone.name).trim(),
+      brand: String(brand || existingPhone.brand).trim(),
+      price: Number(price || existingPhone.price),
+      image: String(image || existingPhone.image).trim(),
+      description: String(description || existingPhone.description).trim(),
+      specifications: {
+        display: String(display || existingPhone.specifications?.display || '').trim(),
+        processor: String(processor || existingPhone.specifications?.processor || '').trim(),
+        ram: String(ram || existingPhone.specifications?.ram || '').trim(),
+        storage: String(storage || existingPhone.specifications?.storage || '').trim(),
+        battery: String(battery || existingPhone.specifications?.battery || '').trim(),
+        camera: String(camera || existingPhone.specifications?.camera || '').trim()
+      }
+    };
+
+    updatedData.recommendation = buildRecommendationAttributes(updatedData);
+
+    const updatedPhone = await Phone.findOneAndUpdate({ id: phoneId }, updatedData, {
+      new: true,
+      runValidators: true
+    });
+
+    return res.json(updatedPhone);
+  } catch (error) {
+    return res.status(500).json({ message: 'Cannot update product right now.' });
+  }
+});
+
+app.delete('/api/admin/products/:id', async (req, res) => {
+  try {
+    const phoneId = Number(req.params.id);
+    const deletedPhone = await Phone.findOneAndDelete({ id: phoneId });
+
+    if (!deletedPhone) {
+      return res.status(404).json({ message: 'Product not found.' });
+    }
+
+    return res.json({ message: 'Product deleted successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Cannot delete product right now.' });
+  }
+});
+
 app.get('/api/brands', async (req, res) => {
   try {
     const brands = await Phone.distinct('brand');
@@ -412,6 +538,10 @@ app.post('/api/chat', async (req, res) => {
 
 app.get('/product/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'detail.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 app.get('*', (req, res) => {
