@@ -485,7 +485,27 @@ app.get('/api/phones', async (req, res) => {
 
     const phones = await Phone.find(query).sort({ price: 1 }).lean();
 
-    let normalized = phones.map((phone) => normalizePhoneData(withRecommendation(phone)));
+    let normalized =
+      phones.length > 0
+        ? phones.map((phone) => normalizePhoneData(withRecommendation(phone)))
+        : SAMPLE_PRODUCTS.map((phone) => normalizePhoneData(withRecommendation(phone)));
+
+    if (search.trim()) {
+      const searchText = normalizeText(search.trim());
+      normalized = normalized.filter((phone) => normalizeText(phone.name || '').includes(searchText));
+    }
+
+    if (brand.trim()) {
+      normalized = normalized.filter((phone) => normalizeText(phone.brand || '') === normalizeText(brand.trim()));
+    }
+
+    if (minPrice) {
+      normalized = normalized.filter((phone) => Number(phone.price) >= Number(minPrice));
+    }
+
+    if (maxPrice) {
+      normalized = normalized.filter((phone) => Number(phone.price) <= Number(maxPrice));
+    }
 
     const selectedCategory = String(category || '').trim().toLowerCase();
     if (selectedCategory === 'gaming') {
