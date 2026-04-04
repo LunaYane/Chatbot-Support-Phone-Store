@@ -8,6 +8,7 @@
     "dev": "node server.js",
     "seed": "node seed/phonesSeed.js",
     "ensure-admin": "node scripts/ensureAdmin.js",
+    "test": "node scripts/fullTest.js",
     "test:smoke": "node scripts/smokeTest.js",
     "test:full": "node scripts/fullTest.js"
   },

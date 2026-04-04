@@ -206,8 +206,10 @@ npm run test:smoke
 ### 6) Chạy full test (auth/role/crud/upload/chat)
 
 ```bash
-npm run test:full
+npm test
 ```
+
+(hoặc `npm run test:full`)
 
 ### 7) Mở trình duyệt
 
