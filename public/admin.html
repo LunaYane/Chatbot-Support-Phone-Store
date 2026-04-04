@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,7 @@
           <h1>Admin Product Management</h1>
           <a class="admin-link" href="/">Back to Store</a>
         </div>
-        <p>Simple and clean CRUD page for final project demo</p>
+        <p>CRUD sản phẩm + upload ảnh cho demo đồ án</p>
       </div>
     </header>
 
@@ -72,6 +72,15 @@
               <input id="image" type="url" required />
             </div>
 
+            <div class="field-group field-span-2 upload-box">
+              <label for="image-file">Hoặc upload ảnh</label>
+              <div class="upload-inline">
+                <input id="image-file" type="file" accept="image/*" />
+                <button type="button" class="btn-neutral" id="upload-image-btn">Upload</button>
+              </div>
+              <small>Ảnh sẽ lưu vào thư mục <code>public/uploads</code></small>
+            </div>
+
             <div class="field-group field-span-2">
               <label for="shortDescription">Short Description</label>
               <textarea id="shortDescription" rows="2" placeholder="Short text for card view"></textarea>
@@ -125,6 +134,8 @@
         </div>
       </section>
     </main>
+
+    <div id="toast-container" class="toast-container"></div>
 
     <script src="admin.js"></script>
   </body>

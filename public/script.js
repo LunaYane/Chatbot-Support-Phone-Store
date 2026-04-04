@@ -1,8 +1,27 @@
+const PAGE_SIZE = 12;
+let selectedCategory = '';
+let currentPage = 1;
+
 function formatPrice(price) {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND'
   }).format(price);
+}
+
+function showToast(message) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('toast-out');
+    setTimeout(() => toast.remove(), 220);
+  }, 2200);
 }
 
 function createPhoneCard(phone) {
@@ -17,11 +36,12 @@ function createPhoneCard(phone) {
           <div class="phone-price">${formatPrice(phone.price)}</div>
         </div>
       </a>
+      <div class="phone-actions">
+        <button type="button" class="btn-primary add-cart-btn" data-id="${phone.id}">Thêm giỏ hàng</button>
+      </div>
     </article>
   `;
 }
-
-let selectedCategory = '';
 
 function buildQueryString(filters) {
   const params = new URLSearchParams();
@@ -31,9 +51,11 @@ function buildQueryString(filters) {
   if (filters.minPrice) params.set('minPrice', filters.minPrice);
   if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
   if (filters.category) params.set('category', filters.category);
+  if (filters.sort) params.set('sort', filters.sort);
+  params.set('page', String(filters.page || 1));
+  params.set('limit', String(PAGE_SIZE));
 
-  const query = params.toString();
-  return query ? `?${query}` : '';
+  return `?${params.toString()}`;
 }
 
 function getFilters() {
@@ -42,26 +64,56 @@ function getFilters() {
     brand: document.getElementById('brand-filter').value,
     minPrice: document.getElementById('min-price').value,
     maxPrice: document.getElementById('max-price').value,
-    category: selectedCategory
+    category: selectedCategory,
+    sort: document.getElementById('sort-filter').value,
+    page: currentPage
   };
 }
 
-function renderResultCount(total) {
+function renderResultCount(total, page, totalPages) {
   const resultCountEl = document.getElementById('result-count');
-  resultCountEl.textContent = `Tìm thấy ${total} sản phẩm`;
+  resultCountEl.textContent = `Tìm thấy ${total} sản phẩm • Trang ${page}/${Math.max(1, totalPages)}`;
 }
 
-function renderPhones(phones) {
-  const phoneListEl = document.getElementById('phone-list');
+function renderPagination(page, totalPages) {
+  const paginationEl = document.getElementById('pagination');
+  if (!paginationEl) return;
 
-  if (!phones.length) {
-    phoneListEl.innerHTML = '<p class="empty-state">Không có sản phẩm phù hợp bộ lọc hiện tại.</p>';
-    renderResultCount(0);
+  if (totalPages <= 1) {
+    paginationEl.innerHTML = '';
     return;
   }
 
-  phoneListEl.innerHTML = phones.map(createPhoneCard).join('');
-  renderResultCount(phones.length);
+  const buttons = [];
+  buttons.push(`<button class="page-btn" data-page="${page - 1}" ${page <= 1 ? 'disabled' : ''}>‹</button>`);
+
+  const from = Math.max(1, page - 2);
+  const to = Math.min(totalPages, page + 2);
+  for (let p = from; p <= to; p += 1) {
+    buttons.push(`<button class="page-btn ${p === page ? 'active' : ''}" data-page="${p}">${p}</button>`);
+  }
+
+  buttons.push(`<button class="page-btn" data-page="${page + 1}" ${page >= totalPages ? 'disabled' : ''}>›</button>`);
+  paginationEl.innerHTML = buttons.join('');
+}
+
+let currentItems = [];
+
+function renderPhones(data) {
+  const phoneListEl = document.getElementById('phone-list');
+  const { items = [], total = 0, page = 1, totalPages = 1 } = data || {};
+  currentItems = items;
+
+  if (!items.length) {
+    phoneListEl.innerHTML = '<p class="empty-state">Không tìm thấy sản phẩm phù hợp bộ lọc hiện tại.</p>';
+    renderResultCount(0, 1, 1);
+    renderPagination(1, 1);
+    return;
+  }
+
+  phoneListEl.innerHTML = items.map(createPhoneCard).join('');
+  renderResultCount(total, page, totalPages);
+  renderPagination(page, totalPages);
 }
 
 async function loadBrands() {
@@ -85,16 +137,22 @@ async function loadBrands() {
 }
 
 async function loadPhones() {
+  const loadingStateEl = document.getElementById('loading-state');
   const phoneListEl = document.getElementById('phone-list');
   const filters = getFilters();
   const queryString = buildQueryString(filters);
 
+  loadingStateEl.classList.remove('hidden');
+  phoneListEl.innerHTML = '';
+
   try {
     const response = await fetch(`/api/phones${queryString}`);
-    const phones = await response.json();
-    renderPhones(phones);
+    const data = await response.json();
+    renderPhones(data);
   } catch (error) {
-    phoneListEl.innerHTML = '<p>Không thể tải sản phẩm lúc này. Vui lòng thử lại sau.</p>';
+    phoneListEl.innerHTML = '<p class="empty-state">Không thể tải sản phẩm lúc này. Vui lòng thử lại sau.</p>';
+  } finally {
+    loadingStateEl.classList.add('hidden');
   }
 }
 
@@ -103,48 +161,52 @@ function clearFilters() {
   document.getElementById('brand-filter').value = '';
   document.getElementById('min-price').value = '';
   document.getElementById('max-price').value = '';
+  document.getElementById('sort-filter').value = 'price_asc';
   selectedCategory = '';
+  currentPage = 1;
   loadPhones();
 }
 
 function syncSearchFromTopBar() {
   const topSearchInput = document.getElementById('top-search-input');
   const mainSearchInput = document.getElementById('search-input');
-
   if (!topSearchInput || !mainSearchInput) return;
 
   mainSearchInput.value = topSearchInput.value.trim();
-  const targetSection = document.getElementById('products');
-  if (targetSection) {
-    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  currentPage = 1;
+  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   loadPhones();
 }
 
 function applyQuickCategoryQuery(query, category) {
-  const mainSearchInput = document.getElementById('search-input');
-  if (!mainSearchInput) return;
-
-  mainSearchInput.value = (query || '').trim();
+  document.getElementById('search-input').value = (query || '').trim();
   document.getElementById('brand-filter').value = '';
   document.getElementById('min-price').value = '';
   document.getElementById('max-price').value = '';
   selectedCategory = category || '';
+  currentPage = 1;
 
-  const targetSection = document.getElementById('products');
-  if (targetSection) {
-    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
+  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   loadPhones();
 }
 
-document.getElementById('apply-filters').addEventListener('click', loadPhones);
+document.getElementById('apply-filters').addEventListener('click', () => {
+  currentPage = 1;
+  loadPhones();
+});
+
 document.getElementById('clear-filters').addEventListener('click', clearFilters);
+
 document.getElementById('search-input').addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
+    currentPage = 1;
     loadPhones();
   }
+});
+
+document.getElementById('sort-filter').addEventListener('change', () => {
+  currentPage = 1;
+  loadPhones();
 });
 
 const topSearchButton = document.getElementById('top-search-btn');
@@ -152,9 +214,7 @@ const topSearchInput = document.getElementById('top-search-input');
 if (topSearchButton && topSearchInput) {
   topSearchButton.addEventListener('click', syncSearchFromTopBar);
   topSearchInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-      syncSearchFromTopBar();
-    }
+    if (event.key === 'Enter') syncSearchFromTopBar();
   });
 }
 
@@ -163,11 +223,12 @@ categoryCards.forEach((card) => {
   const query = card.dataset.query || '';
   const category = card.dataset.category || '';
 
-  card.addEventListener('click', () => applyQuickCategoryQuery(query, category));
+  const trigger = () => applyQuickCategoryQuery(query, category);
+  card.addEventListener('click', trigger);
   card.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      applyQuickCategoryQuery(query, category);
+      trigger();
     }
   });
 
@@ -175,59 +236,51 @@ categoryCards.forEach((card) => {
   if (actionBtn) {
     actionBtn.addEventListener('click', (event) => {
       event.stopPropagation();
-      applyQuickCategoryQuery(query, category);
+      trigger();
     });
   }
 });
 
-const promoViewButton = document.getElementById('promo-view-btn');
-if (promoViewButton) {
-  promoViewButton.addEventListener('click', () => {
-    const targetSection = document.getElementById('products');
-    if (targetSection) {
-      targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
-}
+document.getElementById('pagination').addEventListener('click', (event) => {
+  const button = event.target.closest('.page-btn');
+  if (!button || button.disabled) return;
+
+  currentPage = Number(button.dataset.page) || 1;
+  loadPhones();
+});
+
+document.getElementById('phone-list').addEventListener('click', (event) => {
+  const button = event.target.closest('.add-cart-btn');
+  if (!button) return;
+
+  const id = Number(button.dataset.id);
+  const phone = currentItems.find((item) => item.id === id);
+  if (!phone || !window.CartStore) return;
+
+  window.CartStore.addToCart(phone, 1);
+  showToast(`Đã thêm ${phone.name} vào giỏ hàng`);
+});
 
 function openChatSupport() {
   if (typeof window.openSupportChat === 'function') {
     window.openSupportChat();
-    return;
   }
-
-  const chatbox = document.getElementById('chatbox');
-  const supportWidget = document.getElementById('floating-support');
-  if (chatbox) chatbox.classList.remove('hidden');
-  if (supportWidget) supportWidget.classList.add('hidden');
 }
 
-const promoChatButton = document.getElementById('promo-chat-btn');
-if (promoChatButton) {
-  promoChatButton.addEventListener('click', openChatSupport);
-}
+document.getElementById('promo-view-btn')?.addEventListener('click', () => {
+  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
-const supportChatLink = document.getElementById('support-chat-link');
-if (supportChatLink) {
-  supportChatLink.addEventListener('click', (event) => {
-    event.preventDefault();
-    openChatSupport();
-  });
-}
+document.getElementById('promo-chat-btn')?.addEventListener('click', openChatSupport);
 
-const siteHeader = document.getElementById('site-header');
-if (siteHeader) {
-  const updateHeaderOnScroll = () => {
-    if (window.scrollY > 8) {
-      siteHeader.classList.add('is-scrolled');
-    } else {
-      siteHeader.classList.remove('is-scrolled');
-    }
-  };
-
-  window.addEventListener('scroll', updateHeaderOnScroll);
-  updateHeaderOnScroll();
-}
+document.getElementById('site-header')?.classList.remove('is-scrolled');
+window.addEventListener('scroll', () => {
+  const header = document.getElementById('site-header');
+  if (!header) return;
+  if (window.scrollY > 8) header.classList.add('is-scrolled');
+  else header.classList.remove('is-scrolled');
+});
 
 loadBrands();
 loadPhones();
+if (window.CartStore) window.CartStore.refreshCartBadge();

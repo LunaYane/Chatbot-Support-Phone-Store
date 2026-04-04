@@ -9,10 +9,26 @@ const logoutBtnEl = document.getElementById('logout-btn');
 const authStatusEl = document.getElementById('auth-status');
 const editorCardEl = document.getElementById('editor-card');
 const actionsHeaderEl = document.getElementById('actions-header');
+const uploadImageBtnEl = document.getElementById('upload-image-btn');
 
 let adminToken = localStorage.getItem('adminToken') || '';
 let isAdmin = false;
 let cachedProducts = [];
+
+function showToast(message) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('toast-out');
+    setTimeout(() => toast.remove(), 220);
+  }, 2200);
+}
 
 function formatPrice(price) {
   return new Intl.NumberFormat('vi-VN', {
@@ -54,7 +70,7 @@ function parseSpecsInput() {
     }
     return parsed;
   } catch (error) {
-    throw new Error('Specs JSON is invalid. Please check format.');
+    throw new Error('Specs JSON không hợp lệ, vui lòng kiểm tra lại.');
   }
 }
 
@@ -244,6 +260,46 @@ async function logoutAdmin() {
   loadProducts();
 }
 
+async function uploadImageFile() {
+  if (!isAdmin) {
+    showToast('Bạn cần login admin để upload ảnh.');
+    return;
+  }
+
+  const input = document.getElementById('image-file');
+  const file = input.files?.[0];
+  if (!file) {
+    showToast('Vui lòng chọn file ảnh trước khi upload.');
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append('image', file);
+
+  try {
+    uploadImageBtnEl.disabled = true;
+    uploadImageBtnEl.textContent = 'Uploading...';
+
+    const response = await fetch('/api/upload/image', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: fd
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Upload failed');
+
+    document.getElementById('image').value = data.imageUrl;
+    showToast('Upload ảnh thành công. Đã điền URL vào form.');
+    input.value = '';
+  } catch (error) {
+    showToast(error.message || 'Không thể upload ảnh lúc này.');
+  } finally {
+    uploadImageBtnEl.disabled = false;
+    uploadImageBtnEl.textContent = 'Upload';
+  }
+}
+
 loginFormEl.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -252,24 +308,24 @@ loginFormEl.addEventListener('submit', async (event) => {
 
   try {
     await loginAdmin(username, password);
-    alert('Admin login successful.');
+    showToast('Admin login successful.');
     loginFormEl.reset();
     loadProducts();
   } catch (error) {
-    alert(error.message || 'Cannot login right now.');
+    showToast(error.message || 'Cannot login right now.');
   }
 });
 
 logoutBtnEl.addEventListener('click', async () => {
   await logoutAdmin();
-  alert('Logged out. You are now guest mode.');
+  showToast('Logged out. You are now guest mode.');
 });
 
 formEl.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   if (!isAdmin) {
-    alert('Only Admin can add/edit products.');
+    showToast('Only Admin can add/edit products.');
     return;
   }
 
@@ -279,22 +335,24 @@ formEl.addEventListener('submit', async (event) => {
 
     if (editingOriginalId) {
       await updateProduct(editingOriginalId, payload);
-      alert('Product updated successfully.');
+      showToast('Product updated successfully.');
     } else {
       await createProduct(payload);
-      alert('Product added successfully.');
+      showToast('Product added successfully.');
     }
 
     resetForm();
     loadProducts();
   } catch (error) {
-    alert(error.message || 'Cannot save product right now.');
+    showToast(error.message || 'Cannot save product right now.');
   }
 });
 
 cancelEditBtnEl.addEventListener('click', () => {
   resetForm();
 });
+
+uploadImageBtnEl?.addEventListener('click', uploadImageFile);
 
 tableBodyEl.addEventListener('click', async (event) => {
   if (!isAdmin) return;
@@ -306,9 +364,8 @@ tableBodyEl.addEventListener('click', async (event) => {
 
   if (target.classList.contains('btn-edit')) {
     const phone = cachedProducts.find((item) => String(item.id) === String(productId));
-
     if (!phone) {
-      alert('Product not found.');
+      showToast('Product not found.');
       return;
     }
 
@@ -324,10 +381,10 @@ tableBodyEl.addEventListener('click', async (event) => {
 
     try {
       await deleteProduct(productId);
-      alert('Product deleted successfully.');
+      showToast('Product deleted successfully.');
       loadProducts();
     } catch (error) {
-      alert(error.message || 'Cannot delete product right now.');
+      showToast(error.message || 'Cannot delete product right now.');
     }
   }
 });

@@ -17,29 +17,9 @@
         <nav class="main-nav" aria-label="Điều hướng chính">
           <ul class="nav-list">
             <li><a href="#">Trang chủ</a></li>
-            <li class="has-dropdown">
-              <a href="#products">Sản phẩm <span class="nav-arrow">▾</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#products">Sản phẩm nổi bật</a></li>
-                <li><a href="#categories">Theo nhu cầu</a></li>
-              </ul>
-            </li>
-            <li class="has-dropdown">
-              <a href="#categories">Thương hiệu <span class="nav-arrow">▾</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#products">Apple</a></li>
-                <li><a href="#products">Samsung</a></li>
-                <li><a href="#products">Xiaomi</a></li>
-              </ul>
-            </li>
+            <li><a href="#products">Sản phẩm</a></li>
+            <li><a href="#categories">Danh mục</a></li>
             <li><a href="#promo">Khuyến mãi</a></li>
-            <li class="has-dropdown">
-              <a href="#">Hỗ trợ khách hàng <span class="nav-arrow">▾</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#" id="support-chat-link">Chat tư vấn</a></li>
-                <li><a href="tel:19001234">Hotline</a></li>
-              </ul>
-            </li>
             <li><a href="/admin">Quản trị</a></li>
           </ul>
         </nav>
@@ -49,18 +29,12 @@
           <div class="header-search">
             <input id="top-search-input" type="text" placeholder="Tìm điện thoại..." />
           </div>
-          <button class="login-btn" type="button">Đăng nhập</button>
+          <a class="cart-button" href="/checkout" aria-label="Mở giỏ hàng">
+            🛒 Giỏ hàng <span id="cart-count">0</span>
+          </a>
         </div>
       </div>
     </header>
-
-    <section class="breadcrumb-wrap">
-      <div class="container breadcrumb">
-        <span>Trang chủ</span>
-        <span class="breadcrumb-sep">/</span>
-        <span class="active">Phone Store Demo</span>
-      </div>
-    </section>
 
     <main>
       <section id="categories" class="container section-gap">
@@ -106,35 +80,10 @@
             <p class="promo-label">Khuyến mãi điện thoại tháng này</p>
             <h2>Deal lớn iPhone / Samsung / Xiaomi - Săn giá tốt ngay hôm nay</h2>
             <p>Nhận tư vấn chọn máy theo ngân sách qua chatbot, giao diện nổi bật giúp demo trực quan và thuyết phục.</p>
-
-            <div class="promo-highlights">
-              <div class="promo-highlight-box">
-                <strong>Giảm đến 20%</strong>
-                <span>Áp dụng cho nhiều mẫu bán chạy</span>
-              </div>
-              <div class="promo-highlight-box">
-                <strong>Trả góp 0%</strong>
-                <span>Hỗ trợ hồ sơ nhanh, duyệt đơn giản</span>
-              </div>
-              <div class="promo-highlight-box">
-                <strong>Tư vấn chatbot</strong>
-                <span>Gợi ý máy theo nhu cầu sử dụng</span>
-              </div>
-              <div class="promo-highlight-box">
-                <strong>Giao nhanh nội thành</strong>
-                <span>Nhận máy sớm, kiểm tra trước khi thanh toán</span>
-              </div>
-            </div>
-
             <div class="promo-actions">
               <button id="promo-view-btn" type="button" class="btn-primary">Xem sản phẩm</button>
               <button id="promo-chat-btn" type="button" class="btn-secondary">Chat ngay</button>
             </div>
-          </div>
-          <div class="promo-mock" aria-hidden="true">
-            <div class="promo-chip">Flash Sale</div>
-            <div class="promo-chip">Hàng chính hãng</div>
-            <div class="promo-chip">Bảo hành 12 tháng</div>
           </div>
         </div>
       </section>
@@ -142,7 +91,7 @@
       <section id="products" class="container section-gap">
         <div class="section-head">
           <h2>Sản phẩm nổi bật</h2>
-          <p>Khu vực demo tìm kiếm, lọc và hiển thị danh sách sản phẩm.</p>
+          <p>Khu vực demo tìm kiếm, lọc, sắp xếp và phân trang.</p>
         </div>
 
         <div class="filters modern-filters">
@@ -168,35 +117,32 @@
             <input id="max-price" type="number" min="0" step="100000" placeholder="30000000" />
           </div>
 
+          <div class="filter-group">
+            <label for="sort-filter">Sắp xếp</label>
+            <select id="sort-filter">
+              <option value="price_asc">Giá tăng dần</option>
+              <option value="price_desc">Giá giảm dần</option>
+              <option value="name_asc">Tên A-Z</option>
+              <option value="name_desc">Tên Z-A</option>
+            </select>
+          </div>
+
           <div class="filter-actions">
             <button id="apply-filters" type="button">Áp dụng</button>
             <button id="clear-filters" type="button" class="btn-secondary">Xóa lọc</button>
           </div>
         </div>
 
-        <p id="result-count" class="result-count"></p>
+        <div class="list-topbar">
+          <p id="result-count" class="result-count"></p>
+          <a class="btn-secondary checkout-link" href="/checkout">Đi tới checkout</a>
+        </div>
+
+        <div id="loading-state" class="empty-state hidden">Đang tải sản phẩm...</div>
         <div id="phone-list" class="phone-grid"></div>
+        <div id="pagination" class="pagination"></div>
       </section>
     </main>
-
-    <footer class="site-footer">
-      <div class="container footer-grid">
-        <div>
-          <h4>Phone Store Demo</h4>
-          <p>Website demo cho đồ án: Chatbot thông minh hỗ trợ bán hàng điện thoại.</p>
-        </div>
-        <div>
-          <h4>Liên hệ</h4>
-          <p>Email: support@phonestore.demo</p>
-          <p>Hotline: 1900 1234</p>
-        </div>
-        <div>
-          <h4>Ghi chú</h4>
-          <p>Giao diện phục vụ thuyết trình môn học, không dùng thương hiệu thương mại thật.</p>
-        </div>
-      </div>
-      <p class="footer-copy">© 2026 Phone Store Demo - University Final Project</p>
-    </footer>
 
     <aside id="floating-support" class="floating-support" aria-label="Hỗ trợ mua hàng">
       <p class="support-title">Liên hệ ngay</p>
@@ -221,6 +167,9 @@
       </form>
     </section>
 
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="cart.js"></script>
     <script src="chat.js"></script>
     <script src="script.js"></script>
   </body>

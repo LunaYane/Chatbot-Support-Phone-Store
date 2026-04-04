@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,18 +10,17 @@
     <header class="hero">
       <div class="container">
         <h1>Phone Store Demo</h1>
-        <p>Product detail page</p>
+        <p>Trang chi tiết sản phẩm</p>
       </div>
     </header>
 
     <main class="container">
-      <a class="back-link" href="/">← Back to homepage</a>
+      <div class="detail-topbar">
+        <a class="back-link" href="/">← Quay lại trang chủ</a>
+        <a class="cart-button" href="/checkout">🛒 Giỏ hàng <span id="cart-count">0</span></a>
+      </div>
       <section id="product-detail"></section>
     </main>
-
-    <footer>
-      <p>© 2026 Phone Store Demo - University Final Project</p>
-    </footer>
 
     <button id="chat-toggle" class="chat-toggle" type="button">💬 Chat</button>
 
@@ -41,6 +40,9 @@
       </form>
     </section>
 
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="cart.js"></script>
     <script src="chat.js"></script>
     <script src="detail.js"></script>
   </body>
