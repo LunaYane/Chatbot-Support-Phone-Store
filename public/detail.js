@@ -21,8 +21,10 @@ function showToast(message) {
 }
 
 function getProductIdFromUrl() {
-  const parts = window.location.pathname.split('/');
-  return Number(parts[parts.length - 1]);
+  const path = String(window.location.pathname || '').replace(/\/+$/, '');
+  const parts = path.split('/').filter(Boolean);
+  const last = parts[parts.length - 1];
+  return Number(last);
 }
 
 function renderSpecifications(specs) {
@@ -47,7 +49,7 @@ function renderProductDetail(phone) {
         <h2 class="detail-name">${phone.name}</h2>
         <div class="detail-price">${formatPrice(phone.price)}</div>
 
-        <div class="phone-actions detail-actions">
+        <div class="product-actions" style="padding:0;margin:10px 0 14px;">
           <button type="button" class="btn-primary" id="add-detail-cart">Thêm vào giỏ hàng</button>
           <a class="btn-secondary" href="/checkout">Mua ngay</a>
         </div>

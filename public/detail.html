@@ -7,38 +7,44 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="topbar">
-      <div class="container topbar-inner">
-        <span>🚚 Miễn phí giao nhanh nội thành cho đơn từ 5 triệu</span>
-        <span>☎ Hotline: 1900 1234</span>
-      </div>
-    </div>
+    <header class="top-header">
+      <div class="container head-row">
+        <a class="logo" href="/">PHONE STORE</a>
 
-    <header class="site-header" id="site-header">
-      <div class="container header-inner">
-        <a class="brand-logo" href="/" aria-label="Trang chủ Phone Store">
-          <span class="brand-logo-dot"></span>
-          <span>Phone Store</span>
-        </a>
-        <div class="header-actions">
-          <a class="cart-button" href="/checkout">🛒 Giỏ hàng <span id="cart-count">0</span></a>
+        <div class="search-wrap">
+          <input id="top-search-input" type="text" placeholder="Tìm điện thoại..." />
+          <button id="top-search-btn" type="button" onclick="window.location.href='/'">Search</button>
+        </div>
+
+        <div class="head-actions">
+          <a class="head-icon" href="/checkout">🛒 <span id="cart-count">0</span></a>
         </div>
       </div>
     </header>
 
-    <main class="container section-gap">
+    <nav class="main-nav">
+      <div class="container nav-links">
+        <a href="/">Home</a>
+        <a href="/#products">Products</a>
+        <a href="/checkout">Checkout</a>
+      </div>
+    </nav>
+
+    <main class="container section">
       <div class="detail-topbar">
         <a class="back-link" href="/">← Quay lại trang chủ</a>
       </div>
-      <section id="product-detail"></section>
+      <section id="product-detail">
+        <p class="empty-state">Đang tải chi tiết sản phẩm...</p>
+      </section>
     </main>
 
-    <button id="chat-toggle" class="chat-toggle" type="button">💬 Chat</button>
+    <button id="chat-toggle" class="floating-support" type="button">💬 Chat tư vấn</button>
 
     <section id="chatbox" class="chatbox hidden" aria-label="Support chatbox">
       <header class="chatbox-header">
         <h3>Phone Store Assistant</h3>
-        <button id="chat-close" type="button" class="chat-close">✕</button>
+        <button id="chat-close" type="button">✕</button>
       </header>
       <div id="chat-messages" class="chat-messages">
         <div class="chat-message bot">Xin chào! Bạn cần tư vấn điện thoại nào hôm nay?</div>
