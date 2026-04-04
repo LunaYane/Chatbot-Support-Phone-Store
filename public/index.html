@@ -32,6 +32,11 @@
           <a class="cart-button" href="/checkout" aria-label="Mở giỏ hàng">
             🛒 Giỏ hàng <span id="cart-count">0</span>
           </a>
+          <div class="auth-actions" id="auth-actions">
+            <button class="btn-neutral" id="open-login-btn" type="button">Đăng nhập</button>
+            <button class="btn-neutral" id="open-register-btn" type="button">Đăng ký</button>
+            <button class="btn-neutral hidden" id="logout-auth-btn" type="button">Đăng xuất</button>
+          </div>
         </div>
       </div>
     </header>
@@ -165,6 +170,35 @@
         <input id="chat-input" type="text" placeholder="Nhập câu hỏi của bạn..." autocomplete="off" />
         <button type="submit">Gửi</button>
       </form>
+    </section>
+
+    <section id="auth-modal" class="auth-modal hidden" aria-label="Xác thực người dùng">
+      <div class="auth-modal-card">
+        <div class="auth-modal-head">
+          <h3 id="auth-modal-title">Đăng nhập</h3>
+          <button type="button" id="close-auth-modal" class="chat-close">✕</button>
+        </div>
+
+        <form id="auth-form" class="admin-form">
+          <div class="field-group" id="auth-fullname-wrap">
+            <label for="auth-fullname">Họ tên</label>
+            <input id="auth-fullname" type="text" />
+          </div>
+          <div class="field-group">
+            <label for="auth-email">Email</label>
+            <input id="auth-email" type="email" required />
+          </div>
+          <div class="field-group" id="auth-phone-wrap">
+            <label for="auth-phone">SĐT</label>
+            <input id="auth-phone" type="tel" />
+          </div>
+          <div class="field-group">
+            <label for="auth-password">Mật khẩu</label>
+            <input id="auth-password" type="password" required />
+          </div>
+          <button class="btn-primary" type="submit" id="auth-submit-btn">Đăng nhập</button>
+        </form>
+      </div>
     </section>
 
     <div id="toast-container" class="toast-container"></div>

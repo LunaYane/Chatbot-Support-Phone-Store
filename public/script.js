@@ -1,6 +1,8 @@
 const PAGE_SIZE = 12;
+const AUTH_STORAGE_KEY = 'phoneStoreAuth';
 let selectedCategory = '';
 let currentPage = 1;
+let authMode = 'login';
 
 function formatPrice(price) {
   return new Intl.NumberFormat('vi-VN', {
@@ -22,6 +24,132 @@ function showToast(message) {
     toast.classList.add('toast-out');
     setTimeout(() => toast.remove(), 220);
   }, 2200);
+}
+
+function getAuthState() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function setAuthState(data) {
+  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data));
+}
+
+function clearAuthState() {
+  localStorage.removeItem(AUTH_STORAGE_KEY);
+}
+
+function authHeaders() {
+  const state = getAuthState();
+  if (!state?.token) return {};
+  return { Authorization: `Bearer ${state.token}` };
+}
+
+async function verifyAuthSession() {
+  const state = getAuthState();
+  if (!state?.token) {
+    renderAuthActions(null);
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/auth/me', { headers: authHeaders() });
+    if (!response.ok) throw new Error('unauth');
+    const data = await response.json();
+    setAuthState({ token: state.token, user: data.user });
+    renderAuthActions(data.user);
+  } catch (error) {
+    clearAuthState();
+    renderAuthActions(null);
+  }
+}
+
+function renderAuthActions(user) {
+  const loginBtn = document.getElementById('open-login-btn');
+  const registerBtn = document.getElementById('open-register-btn');
+  const logoutBtn = document.getElementById('logout-auth-btn');
+
+  if (!loginBtn || !registerBtn || !logoutBtn) return;
+
+  if (user) {
+    loginBtn.classList.add('hidden');
+    registerBtn.classList.add('hidden');
+    logoutBtn.classList.remove('hidden');
+    logoutBtn.textContent = `Đăng xuất (${user.fullName.split(' ')[0]})`;
+  } else {
+    loginBtn.classList.remove('hidden');
+    registerBtn.classList.remove('hidden');
+    logoutBtn.classList.add('hidden');
+  }
+}
+
+function openAuthModal(mode = 'login') {
+  authMode = mode;
+  const modal = document.getElementById('auth-modal');
+  const title = document.getElementById('auth-modal-title');
+  const submit = document.getElementById('auth-submit-btn');
+  const fullWrap = document.getElementById('auth-fullname-wrap');
+  const phoneWrap = document.getElementById('auth-phone-wrap');
+
+  if (!modal || !title || !submit || !fullWrap || !phoneWrap) return;
+
+  const isRegister = mode === 'register';
+  title.textContent = isRegister ? 'Đăng ký tài khoản' : 'Đăng nhập';
+  submit.textContent = isRegister ? 'Tạo tài khoản' : 'Đăng nhập';
+  fullWrap.classList.toggle('hidden', !isRegister);
+  phoneWrap.classList.toggle('hidden', !isRegister);
+  modal.classList.remove('hidden');
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal')?.classList.add('hidden');
+  document.getElementById('auth-form')?.reset();
+}
+
+async function submitAuthForm(event) {
+  event.preventDefault();
+
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value.trim();
+
+  const payload =
+    authMode === 'register'
+      ? {
+          fullName: document.getElementById('auth-fullname').value.trim(),
+          email,
+          phone: document.getElementById('auth-phone').value.trim(),
+          password
+        }
+      : { email, password };
+
+  try {
+    const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Auth failed');
+
+    setAuthState({ token: data.token, user: data.user });
+    renderAuthActions(data.user);
+    closeAuthModal();
+    showToast(authMode === 'register' ? 'Đăng ký thành công!' : 'Đăng nhập thành công!');
+  } catch (error) {
+    showToast(error.message || 'Không thể xác thực lúc này.');
+  }
+}
+
+async function logoutAuth() {
+  clearAuthState();
+  renderAuthActions(null);
+  showToast('Đã đăng xuất.');
 }
 
 function createPhoneCard(phone) {
@@ -281,6 +409,16 @@ window.addEventListener('scroll', () => {
   else header.classList.remove('is-scrolled');
 });
 
+document.getElementById('open-login-btn')?.addEventListener('click', () => openAuthModal('login'));
+document.getElementById('open-register-btn')?.addEventListener('click', () => openAuthModal('register'));
+document.getElementById('close-auth-modal')?.addEventListener('click', closeAuthModal);
+document.getElementById('auth-form')?.addEventListener('submit', submitAuthForm);
+document.getElementById('logout-auth-btn')?.addEventListener('click', logoutAuth);
+document.getElementById('auth-modal')?.addEventListener('click', (event) => {
+  if (event.target.id === 'auth-modal') closeAuthModal();
+});
+
+verifyAuthSession();
 loadBrands();
 loadPhones();
 if (window.CartStore) window.CartStore.refreshCartBadge();

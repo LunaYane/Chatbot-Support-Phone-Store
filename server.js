@@ -8,6 +8,7 @@ const phoneRoutes = require('./routes/phoneRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const authRoutes = require('./routes/authRoutes');
 const { notFoundHandler, errorHandler } = require('./middlewares/errorHandler');
 
 const app = express();
@@ -23,6 +24,7 @@ app.use('/api', phoneRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', chatRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/product/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'detail.html'));

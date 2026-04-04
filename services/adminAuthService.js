@@ -35,10 +35,16 @@ function checkAdminSession(token, username) {
 
 function requireAdmin(req, res, next) {
   const token = req.header('x-admin-token') || '';
-  if (!token || !adminTokens.has(token)) {
-    return res.status(401).json({ message: 'Admin login required.' });
+
+  if (token && adminTokens.has(token)) {
+    return next();
   }
-  return next();
+
+  if (req.user?.role === 'admin') {
+    return next();
+  }
+
+  return res.status(401).json({ message: 'Admin login required.' });
 }
 
 module.exports = {
