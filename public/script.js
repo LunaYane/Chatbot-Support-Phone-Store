@@ -203,6 +203,43 @@ function renderResultCount(total, page, totalPages) {
   resultCountEl.textContent = `Tìm thấy ${total} sản phẩm • Trang ${page}/${Math.max(1, totalPages)}`;
 }
 
+function renderQuickBrands(brands = []) {
+  const wrap = document.getElementById('quick-brands');
+  if (!wrap) return;
+
+  wrap.innerHTML = brands
+    .slice(0, 8)
+    .map(
+      (brand) =>
+        `<button class="brand-chip" type="button" data-brand="${brand}">${brand}</button>`
+    )
+    .join('');
+}
+
+function renderTopArrival(items = []) {
+  const wrap = document.getElementById('top-arrival-grid');
+  if (!wrap) return;
+
+  const picked = [...items]
+    .sort((a, b) => Number(b.price) - Number(a.price))
+    .slice(0, 4)
+    .map(
+      (phone) => `
+      <article class="arrival-card">
+        <img src="${phone.image}" alt="${phone.name}" />
+        <div>
+          <span>${phone.brand}</span>
+          <h4>${phone.name}</h4>
+          <p>${formatPrice(phone.price)}</p>
+        </div>
+      </article>
+    `
+    )
+    .join('');
+
+  wrap.innerHTML = picked || '<p class="empty-state">Chưa có dữ liệu hiển thị.</p>';
+}
+
 function renderPagination(page, totalPages) {
   const paginationEl = document.getElementById('pagination');
   if (!paginationEl) return;
@@ -231,6 +268,7 @@ function renderPhones(data) {
   const phoneListEl = document.getElementById('phone-list');
   const { items = [], total = 0, page = 1, totalPages = 1 } = data || {};
   currentItems = items;
+  renderTopArrival(items);
 
   if (!items.length) {
     phoneListEl.innerHTML = '<p class="empty-state">Không tìm thấy sản phẩm phù hợp bộ lọc hiện tại.</p>';
@@ -259,8 +297,11 @@ async function loadBrands() {
       option.textContent = brand;
       brandFilterEl.appendChild(option);
     });
+
+    renderQuickBrands(brands);
   } catch (error) {
     brandFilterEl.innerHTML = '<option value="">Tất cả hãng</option>';
+    renderQuickBrands([]);
   }
 }
 
@@ -367,6 +408,16 @@ categoryCards.forEach((card) => {
       trigger();
     });
   }
+});
+
+document.getElementById('quick-brands')?.addEventListener('click', (event) => {
+  const button = event.target.closest('.brand-chip');
+  if (!button) return;
+
+  document.getElementById('brand-filter').value = button.dataset.brand || '';
+  currentPage = 1;
+  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  loadPhones();
 });
 
 document.getElementById('pagination').addEventListener('click', (event) => {

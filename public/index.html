@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <span>🚚 Miễn phí giao nhanh nội thành cho đơn từ 5 triệu</span>
+        <span>☎ Hotline: 1900 1234</span>
+      </div>
+    </div>
+
     <header class="site-header" id="site-header">
       <div class="container header-inner">
         <a class="brand-logo" href="/" aria-label="Trang chủ Phone Store">
@@ -16,10 +23,10 @@
 
         <nav class="main-nav" aria-label="Điều hướng chính">
           <ul class="nav-list">
-            <li><a href="#">Trang chủ</a></li>
+            <li><a href="#hero">Trang chủ</a></li>
             <li><a href="#products">Sản phẩm</a></li>
             <li><a href="#categories">Danh mục</a></li>
-            <li><a href="#promo">Khuyến mãi</a></li>
+            <li><a href="#top-arrival">Nổi bật</a></li>
             <li><a href="/admin">Quản trị</a></li>
           </ul>
         </nav>
@@ -29,9 +36,7 @@
           <div class="header-search">
             <input id="top-search-input" type="text" placeholder="Tìm điện thoại..." />
           </div>
-          <a class="cart-button" href="/checkout" aria-label="Mở giỏ hàng">
-            🛒 Giỏ hàng <span id="cart-count">0</span>
-          </a>
+          <a class="cart-button" href="/checkout" aria-label="Mở giỏ hàng"> 🛒 Giỏ hàng <span id="cart-count">0</span> </a>
           <div class="auth-actions" id="auth-actions">
             <button class="btn-neutral" id="open-login-btn" type="button">Đăng nhập</button>
             <button class="btn-neutral" id="open-register-btn" type="button">Đăng ký</button>
@@ -42,6 +47,42 @@
     </header>
 
     <main>
+      <section id="hero" class="container section-gap">
+        <div class="hero-banner">
+          <div>
+            <p class="hero-kicker">PHONE STORE 2026</p>
+            <h1>Website bán điện thoại thông minh cho đồ án thương mại điện tử</h1>
+            <p class="hero-sub">Đầy đủ trải nghiệm mua hàng: tìm kiếm/lọc/sắp xếp, chatbot tư vấn, giỏ hàng, checkout và quản trị sản phẩm.</p>
+            <div class="hero-actions">
+              <button id="promo-view-btn" type="button" class="btn-primary">Khám phá sản phẩm</button>
+              <button id="promo-chat-btn" type="button" class="btn-secondary">Nhờ chatbot tư vấn</button>
+            </div>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <strong>30+</strong>
+              <span>Mẫu điện thoại</span>
+            </div>
+            <div>
+              <strong>12</strong>
+              <span>Sản phẩm/trang</span>
+            </div>
+            <div>
+              <strong>24/7</strong>
+              <span>Hỗ trợ tư vấn</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container section-gap">
+        <div class="section-head">
+          <h2>Thương hiệu phổ biến</h2>
+          <p>Chọn nhanh thương hiệu để lọc sản phẩm theo nhu cầu.</p>
+        </div>
+        <div id="quick-brands" class="quick-brands"></div>
+      </section>
+
       <section id="categories" class="container section-gap">
         <div class="section-head">
           <h2>Danh mục nổi bật</h2>
@@ -79,23 +120,17 @@
         </div>
       </section>
 
-      <section id="promo" class="container section-gap">
-        <div class="promo-banner">
-          <div class="promo-content">
-            <p class="promo-label">Khuyến mãi điện thoại tháng này</p>
-            <h2>Deal lớn iPhone / Samsung / Xiaomi - Săn giá tốt ngay hôm nay</h2>
-            <p>Nhận tư vấn chọn máy theo ngân sách qua chatbot, giao diện nổi bật giúp demo trực quan và thuyết phục.</p>
-            <div class="promo-actions">
-              <button id="promo-view-btn" type="button" class="btn-primary">Xem sản phẩm</button>
-              <button id="promo-chat-btn" type="button" class="btn-secondary">Chat ngay</button>
-            </div>
-          </div>
+      <section id="top-arrival" class="container section-gap">
+        <div class="section-head">
+          <h2>Sản phẩm nổi bật theo giá</h2>
+          <p>Giao diện showcase kiểu e-commerce cho phần trình bày đồ án.</p>
         </div>
+        <div id="top-arrival-grid" class="top-arrival-grid"></div>
       </section>
 
       <section id="products" class="container section-gap">
         <div class="section-head">
-          <h2>Sản phẩm nổi bật</h2>
+          <h2>Toàn bộ sản phẩm</h2>
           <p>Khu vực demo tìm kiếm, lọc, sắp xếp và phân trang.</p>
         </div>
 
@@ -148,6 +183,27 @@
         <div id="pagination" class="pagination"></div>
       </section>
     </main>
+
+    <footer class="site-footer-main">
+      <div class="container footer-main-grid">
+        <div>
+          <h4>Phone Store Demo</h4>
+          <p>Đồ án TMĐT mô phỏng luồng mua điện thoại thực tế với chatbot và admin panel.</p>
+        </div>
+        <div>
+          <h4>Liên kết nhanh</h4>
+          <p><a href="#products">Sản phẩm</a></p>
+          <p><a href="/checkout">Checkout</a></p>
+          <p><a href="/admin">Quản trị</a></p>
+        </div>
+        <div>
+          <h4>Thông tin</h4>
+          <p>Email: support@phonestore.demo</p>
+          <p>Hotline: 1900 1234</p>
+          <p>TP.HCM, Việt Nam</p>
+        </div>
+      </div>
+    </footer>
 
     <aside id="floating-support" class="floating-support" aria-label="Hỗ trợ mua hàng">
       <p class="support-title">Liên hệ ngay</p>

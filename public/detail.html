@@ -7,17 +7,28 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="hero">
-      <div class="container">
-        <h1>Phone Store Demo</h1>
-        <p>Trang chi tiết sản phẩm</p>
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <span>🚚 Miễn phí giao nhanh nội thành cho đơn từ 5 triệu</span>
+        <span>☎ Hotline: 1900 1234</span>
+      </div>
+    </div>
+
+    <header class="site-header" id="site-header">
+      <div class="container header-inner">
+        <a class="brand-logo" href="/" aria-label="Trang chủ Phone Store">
+          <span class="brand-logo-dot"></span>
+          <span>Phone Store</span>
+        </a>
+        <div class="header-actions">
+          <a class="cart-button" href="/checkout">🛒 Giỏ hàng <span id="cart-count">0</span></a>
+        </div>
       </div>
     </header>
 
-    <main class="container">
+    <main class="container section-gap">
       <div class="detail-topbar">
         <a class="back-link" href="/">← Quay lại trang chủ</a>
-        <a class="cart-button" href="/checkout">🛒 Giỏ hàng <span id="cart-count">0</span></a>
       </div>
       <section id="product-detail"></section>
     </main>
@@ -26,17 +37,15 @@
 
     <section id="chatbox" class="chatbox hidden" aria-label="Support chatbox">
       <header class="chatbox-header">
-        <h3>Support Chat</h3>
+        <h3>Phone Store Assistant</h3>
         <button id="chat-close" type="button" class="chat-close">✕</button>
       </header>
-
       <div id="chat-messages" class="chat-messages">
-        <div class="chat-message bot">Hi! I am Phone Store Bot. Ask me about products, price, or brand.</div>
+        <div class="chat-message bot">Xin chào! Bạn cần tư vấn điện thoại nào hôm nay?</div>
       </div>
-
       <form id="chat-form" class="chat-form">
-        <input id="chat-input" type="text" placeholder="Type your message..." autocomplete="off" />
-        <button type="submit">Send</button>
+        <input id="chat-input" type="text" placeholder="Nhập câu hỏi..." autocomplete="off" />
+        <button type="submit">Gửi</button>
       </form>
     </section>
 
