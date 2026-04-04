@@ -209,7 +209,6 @@ function applySearchFromTop() {
   const topSearch = document.getElementById('top-search-input')?.value.trim() || '';
   document.getElementById('search-input').value = topSearch;
   currentPage = 1;
-  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
   loadPhones();
 }
 
