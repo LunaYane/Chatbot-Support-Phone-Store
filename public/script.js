@@ -1,8 +1,11 @@
 const PAGE_SIZE = 12;
 const AUTH_STORAGE_KEY = 'phoneStoreAuth';
+
 let selectedCategory = '';
 let currentPage = 1;
 let authMode = 'login';
+let allLoadedItems = [];
+let currentItems = [];
 
 function formatPrice(price) {
   return new Intl.NumberFormat('vi-VN', {
@@ -24,6 +27,190 @@ function showToast(message) {
     toast.classList.add('toast-out');
     setTimeout(() => toast.remove(), 220);
   }, 2200);
+}
+
+function createPhoneCard(phone) {
+  return `
+    <article class="product-card">
+      <img src="${phone.image}" alt="${phone.name}" class="product-image" />
+      <div class="product-content">
+        <h4>${phone.name}</h4>
+        <p class="brand">${phone.brand}</p>
+        <div class="price">${formatPrice(phone.price)}</div>
+      </div>
+      <div class="product-actions">
+        <a class="btn-secondary" href="/product/${phone.id}">View</a>
+        <button type="button" class="btn-primary add-cart-btn" data-id="${phone.id}">Add</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderResultCount(total, page, totalPages) {
+  const resultCountEl = document.getElementById('result-count');
+  if (!resultCountEl) return;
+  resultCountEl.textContent = `Found ${total} products • Page ${page}/${Math.max(1, totalPages)}`;
+}
+
+function renderPagination(page, totalPages) {
+  const paginationEl = document.getElementById('pagination');
+  if (!paginationEl) return;
+
+  if (totalPages <= 1) {
+    paginationEl.innerHTML = '';
+    return;
+  }
+
+  const buttons = [];
+  buttons.push(`<button class="page-btn" data-page="${page - 1}" ${page <= 1 ? 'disabled' : ''}>‹</button>`);
+
+  const from = Math.max(1, page - 2);
+  const to = Math.min(totalPages, page + 2);
+  for (let p = from; p <= to; p += 1) {
+    buttons.push(`<button class="page-btn ${p === page ? 'active' : ''}" data-page="${p}">${p}</button>`);
+  }
+
+  buttons.push(`<button class="page-btn" data-page="${page + 1}" ${page >= totalPages ? 'disabled' : ''}>›</button>`);
+  paginationEl.innerHTML = buttons.join('');
+}
+
+function renderTopArrival(items = []) {
+  const wrap = document.getElementById('top-arrival-grid');
+  if (!wrap) return;
+
+  const top = [...items]
+    .sort((a, b) => Number(b.price) - Number(a.price))
+    .slice(0, 4)
+    .map(createPhoneCard)
+    .join('');
+
+  wrap.innerHTML = top || '<p class="empty-state">No products</p>';
+}
+
+function renderRecommended(items = []) {
+  const wrap = document.getElementById('recommended-grid');
+  if (!wrap) return;
+
+  const rec = [...items]
+    .sort((a, b) => Number(a.price) - Number(b.price))
+    .slice(0, 8)
+    .map(createPhoneCard)
+    .join('');
+
+  wrap.innerHTML = rec || '<p class="empty-state">No products</p>';
+}
+
+function renderPhones(data) {
+  const phoneListEl = document.getElementById('phone-list');
+  const { items = [], total = 0, page = 1, totalPages = 1 } = data || {};
+  currentItems = items;
+
+  if (!items.length) {
+    phoneListEl.innerHTML = '<p class="empty-state">No products found.</p>';
+    renderResultCount(0, 1, 1);
+    renderPagination(1, 1);
+    return;
+  }
+
+  phoneListEl.innerHTML = items.map(createPhoneCard).join('');
+  renderResultCount(total, page, totalPages);
+  renderPagination(page, totalPages);
+}
+
+function buildQueryString(filters) {
+  const params = new URLSearchParams();
+  if (filters.search) params.set('search', filters.search);
+  if (filters.brand) params.set('brand', filters.brand);
+  if (filters.minPrice) params.set('minPrice', filters.minPrice);
+  if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+  if (filters.category) params.set('category', filters.category);
+  if (filters.sort) params.set('sort', filters.sort);
+  params.set('page', String(filters.page || 1));
+  params.set('limit', String(PAGE_SIZE));
+  return `?${params.toString()}`;
+}
+
+function getFilters() {
+  return {
+    search: document.getElementById('search-input')?.value.trim() || '',
+    brand: document.getElementById('brand-filter')?.value || '',
+    minPrice: document.getElementById('min-price')?.value || '',
+    maxPrice: document.getElementById('max-price')?.value || '',
+    category: selectedCategory,
+    sort: document.getElementById('sort-filter')?.value || 'price_asc',
+    page: currentPage
+  };
+}
+
+async function loadBrands() {
+  const brandFilterEl = document.getElementById('brand-filter');
+  if (!brandFilterEl) return;
+
+  try {
+    const response = await fetch('/api/brands');
+    const brands = await response.json();
+
+    brandFilterEl.innerHTML = '<option value="">All brand</option>';
+    brands.forEach((brand) => {
+      const option = document.createElement('option');
+      option.value = brand;
+      option.textContent = brand;
+      brandFilterEl.appendChild(option);
+    });
+  } catch (error) {
+    brandFilterEl.innerHTML = '<option value="">All brand</option>';
+  }
+}
+
+async function preloadAllItems() {
+  try {
+    const response = await fetch('/api/phones?page=1&limit=60&sort=price_asc');
+    const data = await response.json();
+    allLoadedItems = data.items || [];
+    renderTopArrival(allLoadedItems);
+    renderRecommended(allLoadedItems);
+  } catch (error) {
+    allLoadedItems = [];
+  }
+}
+
+async function loadPhones() {
+  const loadingStateEl = document.getElementById('loading-state');
+  const phoneListEl = document.getElementById('phone-list');
+  const filters = getFilters();
+  const queryString = buildQueryString(filters);
+
+  loadingStateEl?.classList.remove('hidden');
+  if (phoneListEl) phoneListEl.innerHTML = '';
+
+  try {
+    const response = await fetch(`/api/phones${queryString}`);
+    const data = await response.json();
+    renderPhones(data);
+  } catch (error) {
+    if (phoneListEl) phoneListEl.innerHTML = '<p class="empty-state">Cannot load products right now.</p>';
+  } finally {
+    loadingStateEl?.classList.add('hidden');
+  }
+}
+
+function clearFilters() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('brand-filter').value = '';
+  document.getElementById('min-price').value = '';
+  document.getElementById('max-price').value = '';
+  document.getElementById('sort-filter').value = 'price_asc';
+  selectedCategory = '';
+  currentPage = 1;
+  loadPhones();
+}
+
+function applySearchFromTop() {
+  const topSearch = document.getElementById('top-search-input')?.value.trim() || '';
+  document.getElementById('search-input').value = topSearch;
+  currentPage = 1;
+  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+  loadPhones();
 }
 
 function getAuthState() {
@@ -49,6 +236,20 @@ function authHeaders() {
   return { Authorization: `Bearer ${state.token}` };
 }
 
+function renderAuthActions(user) {
+  const loginBtn = document.getElementById('open-login-btn');
+  const logoutBtn = document.getElementById('logout-auth-btn');
+
+  if (!loginBtn || !logoutBtn) return;
+  if (user) {
+    loginBtn.classList.add('hidden');
+    logoutBtn.classList.remove('hidden');
+  } else {
+    loginBtn.classList.remove('hidden');
+    logoutBtn.classList.add('hidden');
+  }
+}
+
 async function verifyAuthSession() {
   const state = getAuthState();
   if (!state?.token) {
@@ -65,25 +266,6 @@ async function verifyAuthSession() {
   } catch (error) {
     clearAuthState();
     renderAuthActions(null);
-  }
-}
-
-function renderAuthActions(user) {
-  const loginBtn = document.getElementById('open-login-btn');
-  const registerBtn = document.getElementById('open-register-btn');
-  const logoutBtn = document.getElementById('logout-auth-btn');
-
-  if (!loginBtn || !registerBtn || !logoutBtn) return;
-
-  if (user) {
-    loginBtn.classList.add('hidden');
-    registerBtn.classList.add('hidden');
-    logoutBtn.classList.remove('hidden');
-    logoutBtn.textContent = `Đăng xuất (${user.fullName.split(' ')[0]})`;
-  } else {
-    loginBtn.classList.remove('hidden');
-    registerBtn.classList.remove('hidden');
-    logoutBtn.classList.add('hidden');
   }
 }
 
@@ -113,18 +295,18 @@ function closeAuthModal() {
 async function submitAuthForm(event) {
   event.preventDefault();
 
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value.trim();
-
   const payload =
     authMode === 'register'
       ? {
           fullName: document.getElementById('auth-fullname').value.trim(),
-          email,
+          email: document.getElementById('auth-email').value.trim(),
           phone: document.getElementById('auth-phone').value.trim(),
-          password
+          password: document.getElementById('auth-password').value.trim()
         }
-      : { email, password };
+      : {
+          email: document.getElementById('auth-email').value.trim(),
+          password: document.getElementById('auth-password').value.trim()
+        };
 
   try {
     const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
@@ -146,292 +328,46 @@ async function submitAuthForm(event) {
   }
 }
 
-async function logoutAuth() {
+function logoutAuth() {
   clearAuthState();
   renderAuthActions(null);
   showToast('Đã đăng xuất.');
 }
 
-function createPhoneCard(phone) {
-  return `
-    <article class="phone-card">
-      <a class="phone-link" href="/product/${phone.id}">
-        <img class="phone-image" src="${phone.image}" alt="${phone.name}" />
-        <div class="phone-content">
-          <div class="brand">${phone.brand}</div>
-          <h3 class="phone-name">${phone.name}</h3>
-          <p class="phone-desc">${phone.shortDescription || phone.description || ''}</p>
-          <div class="phone-price">${formatPrice(phone.price)}</div>
-        </div>
-      </a>
-      <div class="phone-actions">
-        <button type="button" class="btn-primary add-cart-btn" data-id="${phone.id}">Thêm giỏ hàng</button>
-      </div>
-    </article>
-  `;
-}
+document.getElementById('top-search-btn')?.addEventListener('click', applySearchFromTop);
+document.getElementById('top-search-input')?.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') applySearchFromTop();
+});
 
-function buildQueryString(filters) {
-  const params = new URLSearchParams();
-
-  if (filters.search) params.set('search', filters.search);
-  if (filters.brand) params.set('brand', filters.brand);
-  if (filters.minPrice) params.set('minPrice', filters.minPrice);
-  if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
-  if (filters.category) params.set('category', filters.category);
-  if (filters.sort) params.set('sort', filters.sort);
-  params.set('page', String(filters.page || 1));
-  params.set('limit', String(PAGE_SIZE));
-
-  return `?${params.toString()}`;
-}
-
-function getFilters() {
-  return {
-    search: document.getElementById('search-input').value.trim(),
-    brand: document.getElementById('brand-filter').value,
-    minPrice: document.getElementById('min-price').value,
-    maxPrice: document.getElementById('max-price').value,
-    category: selectedCategory,
-    sort: document.getElementById('sort-filter').value,
-    page: currentPage
-  };
-}
-
-function renderResultCount(total, page, totalPages) {
-  const resultCountEl = document.getElementById('result-count');
-  resultCountEl.textContent = `Tìm thấy ${total} sản phẩm • Trang ${page}/${Math.max(1, totalPages)}`;
-}
-
-function renderQuickBrands(brands = []) {
-  const wrap = document.getElementById('quick-brands');
-  if (!wrap) return;
-
-  wrap.innerHTML = brands
-    .slice(0, 8)
-    .map(
-      (brand) =>
-        `<button class="brand-chip" type="button" data-brand="${brand}">${brand}</button>`
-    )
-    .join('');
-}
-
-function renderTopArrival(items = []) {
-  const wrap = document.getElementById('top-arrival-grid');
-  if (!wrap) return;
-
-  const picked = [...items]
-    .sort((a, b) => Number(b.price) - Number(a.price))
-    .slice(0, 4)
-    .map(
-      (phone) => `
-      <article class="arrival-card">
-        <img src="${phone.image}" alt="${phone.name}" />
-        <div>
-          <span>${phone.brand}</span>
-          <h4>${phone.name}</h4>
-          <p>${formatPrice(phone.price)}</p>
-        </div>
-      </article>
-    `
-    )
-    .join('');
-
-  wrap.innerHTML = picked || '<p class="empty-state">Chưa có dữ liệu hiển thị.</p>';
-}
-
-function renderPagination(page, totalPages) {
-  const paginationEl = document.getElementById('pagination');
-  if (!paginationEl) return;
-
-  if (totalPages <= 1) {
-    paginationEl.innerHTML = '';
-    return;
-  }
-
-  const buttons = [];
-  buttons.push(`<button class="page-btn" data-page="${page - 1}" ${page <= 1 ? 'disabled' : ''}>‹</button>`);
-
-  const from = Math.max(1, page - 2);
-  const to = Math.min(totalPages, page + 2);
-  for (let p = from; p <= to; p += 1) {
-    buttons.push(`<button class="page-btn ${p === page ? 'active' : ''}" data-page="${p}">${p}</button>`);
-  }
-
-  buttons.push(`<button class="page-btn" data-page="${page + 1}" ${page >= totalPages ? 'disabled' : ''}>›</button>`);
-  paginationEl.innerHTML = buttons.join('');
-}
-
-let currentItems = [];
-
-function renderPhones(data) {
-  const phoneListEl = document.getElementById('phone-list');
-  const { items = [], total = 0, page = 1, totalPages = 1 } = data || {};
-  currentItems = items;
-  renderTopArrival(items);
-
-  if (!items.length) {
-    phoneListEl.innerHTML = '<p class="empty-state">Không tìm thấy sản phẩm phù hợp bộ lọc hiện tại.</p>';
-    renderResultCount(0, 1, 1);
-    renderPagination(1, 1);
-    return;
-  }
-
-  phoneListEl.innerHTML = items.map(createPhoneCard).join('');
-  renderResultCount(total, page, totalPages);
-  renderPagination(page, totalPages);
-}
-
-async function loadBrands() {
-  const brandFilterEl = document.getElementById('brand-filter');
-
-  try {
-    const response = await fetch('/api/brands');
-    const brands = await response.json();
-
-    brandFilterEl.innerHTML = '<option value="">Tất cả hãng</option>';
-
-    brands.forEach((brand) => {
-      const option = document.createElement('option');
-      option.value = brand;
-      option.textContent = brand;
-      brandFilterEl.appendChild(option);
-    });
-
-    renderQuickBrands(brands);
-  } catch (error) {
-    brandFilterEl.innerHTML = '<option value="">Tất cả hãng</option>';
-    renderQuickBrands([]);
-  }
-}
-
-async function loadPhones() {
-  const loadingStateEl = document.getElementById('loading-state');
-  const phoneListEl = document.getElementById('phone-list');
-  const filters = getFilters();
-  const queryString = buildQueryString(filters);
-
-  loadingStateEl.classList.remove('hidden');
-  phoneListEl.innerHTML = '';
-
-  try {
-    const response = await fetch(`/api/phones${queryString}`);
-    const data = await response.json();
-    renderPhones(data);
-  } catch (error) {
-    phoneListEl.innerHTML = '<p class="empty-state">Không thể tải sản phẩm lúc này. Vui lòng thử lại sau.</p>';
-  } finally {
-    loadingStateEl.classList.add('hidden');
-  }
-}
-
-function clearFilters() {
-  document.getElementById('search-input').value = '';
-  document.getElementById('brand-filter').value = '';
-  document.getElementById('min-price').value = '';
-  document.getElementById('max-price').value = '';
-  document.getElementById('sort-filter').value = 'price_asc';
-  selectedCategory = '';
-  currentPage = 1;
-  loadPhones();
-}
-
-function syncSearchFromTopBar() {
-  const topSearchInput = document.getElementById('top-search-input');
-  const mainSearchInput = document.getElementById('search-input');
-  if (!topSearchInput || !mainSearchInput) return;
-
-  mainSearchInput.value = topSearchInput.value.trim();
-  currentPage = 1;
-  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  loadPhones();
-}
-
-function applyQuickCategoryQuery(query, category) {
-  document.getElementById('search-input').value = (query || '').trim();
-  document.getElementById('brand-filter').value = '';
-  document.getElementById('min-price').value = '';
-  document.getElementById('max-price').value = '';
-  selectedCategory = category || '';
-  currentPage = 1;
-
-  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  loadPhones();
-}
-
-document.getElementById('apply-filters').addEventListener('click', () => {
+document.getElementById('apply-filters')?.addEventListener('click', () => {
   currentPage = 1;
   loadPhones();
 });
 
-document.getElementById('clear-filters').addEventListener('click', clearFilters);
+document.getElementById('clear-filters')?.addEventListener('click', clearFilters);
 
-document.getElementById('search-input').addEventListener('keydown', (event) => {
+document.getElementById('sort-filter')?.addEventListener('change', () => {
+  currentPage = 1;
+  loadPhones();
+});
+
+document.getElementById('search-input')?.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     currentPage = 1;
     loadPhones();
   }
 });
 
-document.getElementById('sort-filter').addEventListener('change', () => {
-  currentPage = 1;
-  loadPhones();
-});
-
-const topSearchButton = document.getElementById('top-search-btn');
-const topSearchInput = document.getElementById('top-search-input');
-if (topSearchButton && topSearchInput) {
-  topSearchButton.addEventListener('click', syncSearchFromTopBar);
-  topSearchInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') syncSearchFromTopBar();
-  });
-}
-
-const categoryCards = document.querySelectorAll('.category-card');
-categoryCards.forEach((card) => {
-  const query = card.dataset.query || '';
-  const category = card.dataset.category || '';
-
-  const trigger = () => applyQuickCategoryQuery(query, category);
-  card.addEventListener('click', trigger);
-  card.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      trigger();
-    }
-  });
-
-  const actionBtn = card.querySelector('.category-action');
-  if (actionBtn) {
-    actionBtn.addEventListener('click', (event) => {
-      event.stopPropagation();
-      trigger();
-    });
-  }
-});
-
-document.getElementById('quick-brands')?.addEventListener('click', (event) => {
-  const button = event.target.closest('.brand-chip');
-  if (!button) return;
-
-  document.getElementById('brand-filter').value = button.dataset.brand || '';
-  currentPage = 1;
-  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  loadPhones();
-});
-
-document.getElementById('pagination').addEventListener('click', (event) => {
+document.getElementById('pagination')?.addEventListener('click', (event) => {
   const button = event.target.closest('.page-btn');
   if (!button || button.disabled) return;
-
   currentPage = Number(button.dataset.page) || 1;
   loadPhones();
 });
 
-document.getElementById('phone-list').addEventListener('click', (event) => {
+document.getElementById('phone-list')?.addEventListener('click', (event) => {
   const button = event.target.closest('.add-cart-btn');
   if (!button) return;
-
   const id = Number(button.dataset.id);
   const phone = currentItems.find((item) => item.id === id);
   if (!phone || !window.CartStore) return;
@@ -440,24 +376,40 @@ document.getElementById('phone-list').addEventListener('click', (event) => {
   showToast(`Đã thêm ${phone.name} vào giỏ hàng`);
 });
 
-function openChatSupport() {
-  if (typeof window.openSupportChat === 'function') {
-    window.openSupportChat();
-  }
-}
+document.getElementById('top-arrival-grid')?.addEventListener('click', (event) => {
+  const button = event.target.closest('.add-cart-btn');
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  const phone = allLoadedItems.find((item) => item.id === id);
+  if (!phone || !window.CartStore) return;
 
-document.getElementById('promo-view-btn')?.addEventListener('click', () => {
-  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  window.CartStore.addToCart(phone, 1);
+  showToast(`Đã thêm ${phone.name} vào giỏ hàng`);
 });
 
-document.getElementById('promo-chat-btn')?.addEventListener('click', openChatSupport);
+document.getElementById('recommended-grid')?.addEventListener('click', (event) => {
+  const button = event.target.closest('.add-cart-btn');
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  const phone = allLoadedItems.find((item) => item.id === id);
+  if (!phone || !window.CartStore) return;
 
-document.getElementById('site-header')?.classList.remove('is-scrolled');
-window.addEventListener('scroll', () => {
-  const header = document.getElementById('site-header');
-  if (!header) return;
-  if (window.scrollY > 8) header.classList.add('is-scrolled');
-  else header.classList.remove('is-scrolled');
+  window.CartStore.addToCart(phone, 1);
+  showToast(`Đã thêm ${phone.name} vào giỏ hàng`);
+});
+
+document.querySelectorAll('.cat-card').forEach((card) => {
+  card.addEventListener('click', (event) => {
+    event.preventDefault();
+    selectedCategory = card.dataset.category || '';
+    currentPage = 1;
+    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+    loadPhones();
+  });
+});
+
+document.getElementById('promo-view-btn')?.addEventListener('click', () => {
+  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
 });
 
 document.getElementById('open-login-btn')?.addEventListener('click', () => openAuthModal('login'));
@@ -469,7 +421,12 @@ document.getElementById('auth-modal')?.addEventListener('click', (event) => {
   if (event.target.id === 'auth-modal') closeAuthModal();
 });
 
+document.getElementById('promo-chat-btn')?.addEventListener('click', () => {
+  if (typeof window.openSupportChat === 'function') window.openSupportChat();
+});
+
 verifyAuthSession();
 loadBrands();
+preloadAllItems();
 loadPhones();
 if (window.CartStore) window.CartStore.refreshCartBadge();

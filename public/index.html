@@ -7,236 +7,140 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="topbar">
-      <div class="container topbar-inner">
-        <span>🚚 Miễn phí giao nhanh nội thành cho đơn từ 5 triệu</span>
-        <span>☎ Hotline: 1900 1234</span>
-      </div>
-    </div>
+    <header class="top-header">
+      <div class="container head-row">
+        <a class="logo" href="/">PHONE STORE</a>
 
-    <header class="site-header" id="site-header">
-      <div class="container header-inner">
-        <a class="brand-logo" href="/" aria-label="Trang chủ Phone Store">
-          <span class="brand-logo-dot"></span>
-          <span>Phone Store</span>
-        </a>
+        <div class="search-wrap">
+          <input id="top-search-input" type="text" placeholder="Tìm điện thoại..." />
+          <button id="top-search-btn" type="button">Search</button>
+        </div>
 
-        <nav class="main-nav" aria-label="Điều hướng chính">
-          <ul class="nav-list">
-            <li><a href="#hero">Trang chủ</a></li>
-            <li><a href="#products">Sản phẩm</a></li>
-            <li><a href="#categories">Danh mục</a></li>
-            <li><a href="#top-arrival">Nổi bật</a></li>
-            <li><a href="/admin">Quản trị</a></li>
-          </ul>
-        </nav>
-
-        <div class="header-actions">
-          <button id="top-search-btn" class="search-icon-btn" type="button" aria-label="Tìm kiếm">🔍</button>
-          <div class="header-search">
-            <input id="top-search-input" type="text" placeholder="Tìm điện thoại..." />
-          </div>
-          <a class="cart-button" href="/checkout" aria-label="Mở giỏ hàng"> 🛒 Giỏ hàng <span id="cart-count">0</span> </a>
-          <div class="auth-actions" id="auth-actions">
-            <button class="btn-neutral" id="open-login-btn" type="button">Đăng nhập</button>
-            <button class="btn-neutral" id="open-register-btn" type="button">Đăng ký</button>
-            <button class="btn-neutral hidden" id="logout-auth-btn" type="button">Đăng xuất</button>
-          </div>
+        <div class="head-actions">
+          <a href="/checkout" class="head-icon">🛒 <span id="cart-count">0</span></a>
+          <button class="head-icon" id="open-login-btn" type="button">👤</button>
+          <button class="head-icon hidden" id="logout-auth-btn" type="button">↩</button>
         </div>
       </div>
     </header>
 
+    <nav class="main-nav">
+      <div class="container nav-links">
+        <a href="#home-banner">Home</a>
+        <a href="#top-arrival">Shop</a>
+        <a href="#products">Products</a>
+        <a href="#categories">Category</a>
+        <a href="/admin">Admin</a>
+      </div>
+    </nav>
+
     <main>
-      <section id="hero" class="container section-gap">
-        <div class="hero-banner">
-          <div>
-            <p class="hero-kicker">PHONE STORE 2026</p>
-            <h1>Website bán điện thoại thông minh cho đồ án thương mại điện tử</h1>
-            <p class="hero-sub">Đầy đủ trải nghiệm mua hàng: tìm kiếm/lọc/sắp xếp, chatbot tư vấn, giỏ hàng, checkout và quản trị sản phẩm.</p>
-            <div class="hero-actions">
-              <button id="promo-view-btn" type="button" class="btn-primary">Khám phá sản phẩm</button>
-              <button id="promo-chat-btn" type="button" class="btn-secondary">Nhờ chatbot tư vấn</button>
-            </div>
-          </div>
-          <div class="hero-stats">
-            <div>
-              <strong>30+</strong>
-              <span>Mẫu điện thoại</span>
-            </div>
-            <div>
-              <strong>12</strong>
-              <span>Sản phẩm/trang</span>
-            </div>
-            <div>
-              <strong>24/7</strong>
-              <span>Hỗ trợ tư vấn</span>
-            </div>
-          </div>
+      <section id="home-banner" class="home-banner">
+        <div class="container">
+          <h2>best collection for<br />mobile lovers</h2>
+          <p>
+            Discover smartphones that redefine performance and style<br />
+            Find your perfect phone with modern design and smart features
+          </p>
+          <button id="promo-view-btn" class="btn-primary" type="button">Shop Now</button>
         </div>
       </section>
 
-      <section class="container section-gap">
-        <div class="section-head">
-          <h2>Thương hiệu phổ biến</h2>
-          <p>Chọn nhanh thương hiệu để lọc sản phẩm theo nhu cầu.</p>
-        </div>
-        <div id="quick-brands" class="quick-brands"></div>
+      <section class="container features">
+        <article class="feature-box">
+          <h4>Free Shipping</h4>
+          <p>Order over 5,000,000đ</p>
+        </article>
+        <article class="feature-box">
+          <h4>Money Returns</h4>
+          <p>7 days return policy</p>
+        </article>
+        <article class="feature-box">
+          <h4>24/7 Support</h4>
+          <p>Chatbot + hotline support</p>
+        </article>
       </section>
 
-      <section id="categories" class="container section-gap">
-        <div class="section-head">
-          <h2>Danh mục nổi bật</h2>
-          <p>Gợi ý nhanh theo nhu cầu phổ biến của khách hàng.</p>
-        </div>
+      <section id="top-arrival" class="container section">
+        <h2 class="section-title">top new arrival</h2>
+        <div id="top-arrival-grid" class="product-grid"></div>
+      </section>
 
+      <section id="categories" class="container section">
+        <h2 class="section-title">shop by category</h2>
         <div class="category-grid">
-          <article class="category-card" data-category="brand" data-query="" tabindex="0">
-            <div class="category-icon" aria-hidden="true">🏷️</div>
-            <h3>Điện thoại theo hãng</h3>
-            <p>Dễ so sánh nhanh theo thương hiệu quen thuộc và tầm giá phù hợp.</p>
-            <button class="category-action" type="button">Xem theo hãng</button>
-          </article>
-
-          <article class="category-card" data-category="gaming" data-query="" tabindex="0">
-            <div class="category-icon" aria-hidden="true">🎮</div>
-            <h3>Điện thoại chơi game</h3>
-            <p>Tập trung vào hiệu năng, tản nhiệt và màn hình mượt cho game thủ.</p>
-            <button class="category-action" type="button">Khám phá gaming</button>
-          </article>
-
-          <article class="category-card" data-category="camera" data-query="" tabindex="0">
-            <div class="category-icon" aria-hidden="true">📸</div>
-            <h3>Điện thoại chụp ảnh đẹp</h3>
-            <p>Gợi ý máy có camera tốt cho quay chụp, selfie và sáng tạo nội dung.</p>
-            <button class="category-action" type="button">Tư vấn camera</button>
-          </article>
-
-          <article class="category-card" data-category="battery" data-query="" tabindex="0">
-            <div class="category-icon" aria-hidden="true">🔋</div>
-            <h3>Điện thoại pin trâu</h3>
-            <p>Ưu tiên dung lượng pin lớn, sạc nhanh và dùng bền cả ngày dài.</p>
-            <button class="category-action" type="button">Xem máy pin khỏe</button>
-          </article>
+          <a class="cat-card" data-category="brand" href="#products"><span>By Brand</span></a>
+          <a class="cat-card" data-category="gaming" href="#products"><span>Gaming</span></a>
+          <a class="cat-card" data-category="camera" href="#products"><span>Camera</span></a>
+          <a class="cat-card" data-category="battery" href="#products"><span>Battery</span></a>
+          <a class="cat-card" data-category="" href="#products"><span>All Phones</span></a>
+          <a class="cat-card" data-category="brand" href="#products"><span>Best Sellers</span></a>
         </div>
       </section>
 
-      <section id="top-arrival" class="container section-gap">
-        <div class="section-head">
-          <h2>Sản phẩm nổi bật theo giá</h2>
-          <p>Giao diện showcase kiểu e-commerce cho phần trình bày đồ án.</p>
-        </div>
-        <div id="top-arrival-grid" class="top-arrival-grid"></div>
+      <section class="container section">
+        <div class="ads-banner">FLASH SALE - Giảm đến 20% cho các mẫu bán chạy</div>
       </section>
 
-      <section id="products" class="container section-gap">
-        <div class="section-head">
-          <h2>Toàn bộ sản phẩm</h2>
-          <p>Khu vực demo tìm kiếm, lọc, sắp xếp và phân trang.</p>
+      <section class="container section">
+        <h2 class="section-title">recommended for you</h2>
+        <div id="recommended-grid" class="product-grid"></div>
+      </section>
+
+      <section id="products" class="container section">
+        <h2 class="section-title">all products</h2>
+
+        <div class="filters">
+          <input id="search-input" type="text" placeholder="Tìm sản phẩm..." />
+          <select id="brand-filter"><option value="">All brand</option></select>
+          <input id="min-price" type="number" placeholder="Min price" />
+          <input id="max-price" type="number" placeholder="Max price" />
+          <select id="sort-filter">
+            <option value="price_asc">Price Low - High</option>
+            <option value="price_desc">Price High - Low</option>
+            <option value="name_asc">Name A-Z</option>
+            <option value="name_desc">Name Z-A</option>
+          </select>
+          <button id="apply-filters" class="btn-primary" type="button">Apply</button>
+          <button id="clear-filters" class="btn-secondary" type="button">Clear</button>
         </div>
 
-        <div class="filters modern-filters">
-          <div class="filter-group filter-search">
-            <label for="search-input">Tìm theo tên sản phẩm</label>
-            <input id="search-input" type="text" placeholder="Ví dụ: iPhone, Galaxy..." />
-          </div>
-
-          <div class="filter-group">
-            <label for="brand-filter">Hãng</label>
-            <select id="brand-filter">
-              <option value="">Tất cả hãng</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="min-price">Giá từ (VND)</label>
-            <input id="min-price" type="number" min="0" step="100000" placeholder="0" />
-          </div>
-
-          <div class="filter-group">
-            <label for="max-price">Giá đến (VND)</label>
-            <input id="max-price" type="number" min="0" step="100000" placeholder="30000000" />
-          </div>
-
-          <div class="filter-group">
-            <label for="sort-filter">Sắp xếp</label>
-            <select id="sort-filter">
-              <option value="price_asc">Giá tăng dần</option>
-              <option value="price_desc">Giá giảm dần</option>
-              <option value="name_asc">Tên A-Z</option>
-              <option value="name_desc">Tên Z-A</option>
-            </select>
-          </div>
-
-          <div class="filter-actions">
-            <button id="apply-filters" type="button">Áp dụng</button>
-            <button id="clear-filters" type="button" class="btn-secondary">Xóa lọc</button>
-          </div>
-        </div>
-
-        <div class="list-topbar">
-          <p id="result-count" class="result-count"></p>
-          <a class="btn-secondary checkout-link" href="/checkout">Đi tới checkout</a>
-        </div>
-
-        <div id="loading-state" class="empty-state hidden">Đang tải sản phẩm...</div>
-        <div id="phone-list" class="phone-grid"></div>
+        <p id="result-count" class="result-count"></p>
+        <div id="loading-state" class="empty-state hidden">Loading...</div>
+        <div id="phone-list" class="product-grid"></div>
         <div id="pagination" class="pagination"></div>
       </section>
     </main>
 
-    <footer class="site-footer-main">
-      <div class="container footer-main-grid">
-        <div>
-          <h4>Phone Store Demo</h4>
-          <p>Đồ án TMĐT mô phỏng luồng mua điện thoại thực tế với chatbot và admin panel.</p>
-        </div>
-        <div>
-          <h4>Liên kết nhanh</h4>
-          <p><a href="#products">Sản phẩm</a></p>
-          <p><a href="/checkout">Checkout</a></p>
-          <p><a href="/admin">Quản trị</a></p>
-        </div>
-        <div>
-          <h4>Thông tin</h4>
-          <p>Email: support@phonestore.demo</p>
-          <p>Hotline: 1900 1234</p>
-          <p>TP.HCM, Việt Nam</p>
-        </div>
-      </div>
-    </footer>
+    <footer class="footer">© 2026 Phone Store Demo</footer>
 
-    <aside id="floating-support" class="floating-support" aria-label="Hỗ trợ mua hàng">
-      <p class="support-title">Liên hệ ngay</p>
-      <p class="support-subtitle">Tư vấn mua điện thoại nhanh</p>
-      <a href="tel:19001234" class="support-hotline">📞 Hotline: 1900 1234</a>
-      <button id="support-open-chat" type="button" class="support-chat-btn">💬 Mở chat tư vấn</button>
+    <aside id="floating-support" class="floating-support">
+      <p>💬 Need help?</p>
+      <button id="support-open-chat" type="button">Open Chat</button>
     </aside>
 
-    <section id="chatbox" class="chatbox hidden" aria-label="Support chatbox">
+    <section id="chatbox" class="chatbox hidden">
       <header class="chatbox-header">
         <h3>Phone Store Assistant</h3>
-        <button id="chat-close" type="button" class="chat-close">✕</button>
+        <button id="chat-close" type="button">✕</button>
       </header>
-
       <div id="chat-messages" class="chat-messages">
         <div class="chat-message bot">Xin chào! Mình có thể tư vấn theo hãng, tầm giá và nhu cầu sử dụng của bạn.</div>
       </div>
-
       <form id="chat-form" class="chat-form">
         <input id="chat-input" type="text" placeholder="Nhập câu hỏi của bạn..." autocomplete="off" />
         <button type="submit">Gửi</button>
       </form>
     </section>
 
-    <section id="auth-modal" class="auth-modal hidden" aria-label="Xác thực người dùng">
+    <section id="auth-modal" class="auth-modal hidden">
       <div class="auth-modal-card">
         <div class="auth-modal-head">
           <h3 id="auth-modal-title">Đăng nhập</h3>
-          <button type="button" id="close-auth-modal" class="chat-close">✕</button>
+          <button type="button" id="close-auth-modal">✕</button>
         </div>
-
-        <form id="auth-form" class="admin-form">
-          <div class="field-group" id="auth-fullname-wrap">
+        <form id="auth-form" class="auth-form">
+          <div class="field-group hidden" id="auth-fullname-wrap">
             <label for="auth-fullname">Họ tên</label>
             <input id="auth-fullname" type="text" />
           </div>
@@ -244,7 +148,7 @@
             <label for="auth-email">Email</label>
             <input id="auth-email" type="email" required />
           </div>
-          <div class="field-group" id="auth-phone-wrap">
+          <div class="field-group hidden" id="auth-phone-wrap">
             <label for="auth-phone">SĐT</label>
             <input id="auth-phone" type="tel" />
           </div>
@@ -253,6 +157,7 @@
             <input id="auth-password" type="password" required />
           </div>
           <button class="btn-primary" type="submit" id="auth-submit-btn">Đăng nhập</button>
+          <button class="btn-secondary" type="button" id="open-register-btn">Đăng ký</button>
         </form>
       </div>
     </section>
