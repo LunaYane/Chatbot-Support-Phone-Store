@@ -1,36 +1,50 @@
 const { normalizeText } = require('../utils/recommendation');
 
 const FAQ_RESPONSES = {
-  openingHours: 'Cửa hàng mở cửa từ 08:30 đến 21:30 mỗi ngày (Thứ 2 - Chủ nhật).',
+  openingHours: 'Shop mở cửa từ 08:30 đến 21:30 hằng ngày nha bạn.',
   warranty:
-    'Hầu hết sản phẩm được bảo hành chính hãng 12 tháng. Bạn mang máy + hóa đơn đến cửa hàng để được hỗ trợ nhanh.',
+    'Bên mình bảo hành chính hãng 12 tháng (tùy mẫu có thể dài hơn). Khi cần hỗ trợ bạn chỉ cần mang máy + hóa đơn là được.',
   promotions:
-    'Hiện có ưu đãi giảm đến 10% cho một số model và hỗ trợ freeship nội thành. Bạn muốn mình gợi ý mẫu đang có giá tốt không?',
+    'Hiện shop có nhiều mẫu đang giảm giá nhẹ + hỗ trợ freeship nội thành. Bạn muốn mình lọc nhanh mẫu đang giá tốt không?',
   contact:
-    'Bạn có thể liên hệ hotline 0909 123 456, email support@phonestoredemo.vn hoặc đến 123 Lê Lợi, Quận 1, TP.HCM.'
+    'Bạn liên hệ hotline 0909 123 456 hoặc ghé 123 Lê Lợi, Quận 1, TP.HCM nhé.'
 };
 
 const BRAND_KEYWORDS = {
   Apple: ['apple', 'iphone', 'ios'],
   Samsung: ['samsung', 'galaxy'],
-  Xiaomi: ['xiaomi', 'redmi', 'mi'],
-  OPPO: ['oppo'],
+  Xiaomi: ['xiaomi', 'redmi', 'poco', 'mi'],
+  OPPO: ['oppo', 'find x'],
   vivo: ['vivo'],
-  Google: ['google', 'pixel']
+  Google: ['google', 'pixel'],
+  OnePlus: ['oneplus'],
+  ASUS: ['asus', 'rog']
 };
 
 const NEED_KEYWORDS = {
-  gaming: ['choi game', 'gaming', 'pubg', 'lien quan', 'fps'],
-  camera: ['chup anh', 'camera dep', 'camera', 'selfie', 'quay phim'],
-  battery: ['pin trau', 'pin lau', 'dung lau', 'battery', 'it sac'],
-  student: ['hoc tap', 'sinh vien', 'co ban', 'van phong', 'gia re']
+  gaming: ['choi game', 'gaming', 'pubg', 'lien quan', 'fps', 'hieu nang', 'chip manh'],
+  camera: ['chup anh', 'camera dep', 'camera', 'selfie', 'quay phim', 'chan dung'],
+  battery: ['pin trau', 'pin lau', 'dung lau', 'battery', 'it sac', 'on dinh ca ngay'],
+  student: ['hoc tap', 'sinh vien', 'co ban', 'van phong', 'gia re', 'de dung'],
+  premium: ['cao cap', 'flagship', 'xin', 'dep sang', 'xuat sac']
 };
 
 const UNDER_BUDGET_KEYWORDS = ['duoi', 'toi da', 'khong qua', 'it hon', 'under', 'max'];
-const AROUND_BUDGET_KEYWORDS = ['tam', 'khoang', 'gan', 'around'];
+const AROUND_BUDGET_KEYWORDS = ['tam', 'khoang', 'gan', 'around', 'cung tam'];
 
 function formatPriceVND(amount) {
   return `${new Intl.NumberFormat('vi-VN').format(amount)}đ`;
+}
+
+function humanizeNeed(need) {
+  const map = {
+    gaming: 'chơi game mượt',
+    camera: 'chụp ảnh đẹp',
+    battery: 'pin bền',
+    student: 'học tập / dùng cơ bản',
+    premium: 'trải nghiệm cao cấp'
+  };
+  return map[need] || need;
 }
 
 function detectFaqIntent(message) {
@@ -57,7 +71,7 @@ function detectNeeds(message) {
 }
 
 function extractBudgetNumber(message) {
-  const millionMatch = message.match(/(\d+[\.,]?\d*)\s*(tr|trieu|m|million)/);
+  const millionMatch = message.match(/(\d+[\.,]?\d*)\s*(tr|trieu|cu|củ|m|million)/);
   if (millionMatch) return Math.round(parseFloat(millionMatch[1].replace(',', '.')) * 1000000);
 
   const thousandMatch = message.match(/(\d+[\.,]?\d*)\s*(k|nghin|thousand)/);
@@ -79,7 +93,7 @@ function detectBudget(message) {
     return { type: 'under', min: 0, max: value, text: `dưới ${formatPriceVND(value)}` };
   }
 
-  const spread = Math.max(1000000, Math.round(value * 0.2));
+  const spread = Math.max(1200000, Math.round(value * 0.22));
   return {
     type: isAround ? 'around' : 'around',
     min: Math.max(0, value - spread),
@@ -94,8 +108,12 @@ function detectIntent(message) {
   const faqIntent = detectFaqIntent(message);
   if (faqIntent) return { intent: 'faq', faqIntent };
 
-  if (['xin chao', 'hello', 'hi', 'chao'].includes(message) || message.includes('xin chao')) {
+  if (['xin chao', 'hello', 'hi', 'chao', 'alo'].includes(message) || message.includes('xin chao')) {
     return { intent: 'greeting' };
+  }
+
+  if (message.includes('so sanh') || message.includes('nen mua') || message.includes('chon giua')) {
+    return { intent: 'comparison' };
   }
 
   const budget = detectBudget(message);
@@ -111,39 +129,54 @@ function matchNeed(phone, need) {
   if (need === 'camera') return phone.recommendation?.suitable_for_camera;
   if (need === 'battery') return phone.recommendation?.suitable_for_battery;
   if (need === 'student') return phone.recommendation?.suitable_for_basic_use;
+  if (need === 'premium') return Number(phone.price || 0) >= 20000000;
   return false;
-}
-
-function needDisplayText(need) {
-  const map = { gaming: 'chơi game', camera: 'chụp ảnh đẹp', battery: 'pin khỏe', student: 'học tập / sinh viên' };
-  return map[need] || need;
 }
 
 function scoreProduct(phone, filters) {
   const { budget, brand, needs } = filters;
   let score = 0;
 
-  if (brand && normalizeText(phone.brand) === normalizeText(brand)) score += 35;
+  if (brand && normalizeText(phone.brand) === normalizeText(brand)) score += 38;
 
   if (budget) {
     if (budget.type === 'under') {
-      if (phone.price <= budget.max) score += 30;
-      else score -= 40;
+      if (phone.price <= budget.max) {
+        score += 28;
+        score += Math.max(0, Math.round((budget.max - phone.price) / 1500000));
+      } else {
+        score -= 45;
+      }
     } else {
       const center = Math.round((budget.min + budget.max) / 2);
       const distance = Math.abs(phone.price - center);
-      if (phone.price >= budget.min && phone.price <= budget.max) score += 25;
-      score += Math.max(0, 15 - Math.round(distance / 1000000));
+      if (phone.price >= budget.min && phone.price <= budget.max) score += 26;
+      score += Math.max(0, 15 - Math.round(distance / 1400000));
     }
   }
 
   if (needs.length > 0) {
     needs.forEach((need) => {
-      score += matchNeed(phone, need) ? 20 : -8;
+      score += matchNeed(phone, need) ? 18 : -7;
     });
   }
 
   return score;
+}
+
+function buildNaturalLine(product, idx) {
+  return `${idx + 1}) ${product.name} (${product.brand}) – ${formatPriceVND(product.price)}`;
+}
+
+function buildNoMatchReply(filters) {
+  const parts = [];
+  if (filters.brand) parts.push(`hãng ${filters.brand}`);
+  if (filters.budget) parts.push(filters.budget.text);
+  if (filters.needs?.length) parts.push(`nhu cầu ${filters.needs.map(humanizeNeed).join(', ')}`);
+
+  const condition = parts.length ? parts.join(' + ') : 'nhu cầu hiện tại';
+
+  return `Mình tìm theo ${condition} nhưng chưa ra mẫu thật sự ổn. Bạn muốn mình nới thêm ~1-2 triệu hoặc đổi hãng để có lựa chọn ngon hơn không?`;
 }
 
 function buildConsultationResult(products, filters) {
@@ -155,9 +188,7 @@ function buildConsultationResult(products, filters) {
 
   if (budget?.type === 'under') {
     const underBudgetList = candidates.filter((product) => Number(product.price) <= Number(budget.max));
-    if (underBudgetList.length > 0) {
-      candidates = underBudgetList;
-    }
+    if (underBudgetList.length > 0) candidates = underBudgetList;
   }
 
   const scored = candidates
@@ -167,24 +198,28 @@ function buildConsultationResult(products, filters) {
     .slice(0, 3);
 
   if (!scored.length || scored[0].score < 5) {
-    return 'Xin lỗi bạn, hiện chưa có mẫu thật sự phù hợp. Bạn thử tăng nhẹ ngân sách hoặc đổi hãng để mình gợi ý tốt hơn nhé.';
+    return buildNoMatchReply(filters);
   }
 
   const conditions = [];
   if (budget) conditions.push(budget.text);
   if (brand) conditions.push(`hãng ${brand}`);
-  if (needs.length) conditions.push(`nhu cầu ${needs.map(needDisplayText).join(', ')}`);
+  if (needs.length) conditions.push(needs.map(humanizeNeed).join(', '));
 
   const intro = conditions.length
-    ? `Mình gợi ý top 3 mẫu hợp với ${conditions.join(' + ')}:`
-    : 'Mình gợi ý 3 mẫu nổi bật cho bạn:';
+    ? `Ok, mình lọc nhanh theo ${conditions.join(' + ')} và thấy mấy máy này khá hợp:`
+    : 'Mình lọc nhanh và thấy mấy mẫu này đang rất đáng mua:';
 
-  const lines = scored.map((p, i) => `${i + 1}. ${p.name} (${p.brand}) - ${formatPriceVND(p.price)}`);
-  return `${intro}\n${lines.join('\n')}\nBạn muốn mình lọc sâu hơn theo pin/camera hay hãng cụ thể không?`;
+  const lines = scored.map(buildNaturalLine).join('\n');
+  return `${intro}\n${lines}\nBạn thích mình chốt theo hướng nào trước: camera, pin hay hiệu năng game?`;
+}
+
+function buildComparisonReply() {
+  return 'Mình so sánh được nhé 👌 Bạn gửi giúp mình 2-3 mẫu cụ thể (ví dụ: iPhone 16 vs S25) + nhu cầu chính, mình sẽ chốt ưu/nhược điểm dễ hiểu luôn.';
 }
 
 function buildClarifyReply() {
-  return 'Mình có thể tư vấn theo ngân sách, hãng và nhu cầu. Ví dụ: "iphone dưới 20 triệu" hoặc "Samsung pin khỏe".';
+  return 'Mình tư vấn tự nhiên theo kiểu mua thật luôn nha 😄 Bạn chỉ cần nói ngắn gọn kiểu: “tầm 15 củ, ưu tiên pin + camera” là mình gợi ý ngay.';
 }
 
 function buildChatReply(rawMessage, products) {
@@ -192,21 +227,23 @@ function buildChatReply(rawMessage, products) {
   const { intent, faqIntent, budget, brand, needs } = detectIntent(message);
 
   let reply =
-    'Mình chưa hiểu rõ lắm. Bạn thử nói theo dạng: dưới 7 triệu, hãng Samsung, hoặc nhu cầu chụp ảnh/pin khỏe nhé.';
+    'Mình chưa bắt đúng ý lắm. Bạn thử nói kiểu: “dưới 12 triệu”, “iphone chụp đẹp”, hoặc “máy game tầm 15 củ” nhé.';
 
   if (intent === 'empty') {
-    reply = 'Bạn mô tả nhu cầu giúp mình nhé. Ví dụ: dưới 10 triệu, pin khỏe, hoặc muốn iPhone.';
+    reply = 'Bạn cứ nói nhu cầu tự nhiên nha, ví dụ: “mình cần máy pin trâu tầm 10 triệu”.';
   } else if (intent === 'greeting') {
-    reply = 'Chào bạn 👋 Mình có thể tư vấn theo ngân sách, hãng và nhu cầu sử dụng. Bạn đang muốn tìm máy khoảng bao nhiêu tiền?';
+    reply = 'Hello bạn 👋 Mình tư vấn nhanh theo ngân sách + hãng + nhu cầu. Bạn đang muốn mua tầm bao nhiêu tiền?';
   } else if (intent === 'faq') {
     reply = FAQ_RESPONSES[faqIntent];
+  } else if (intent === 'comparison') {
+    reply = buildComparisonReply();
   } else if (intent === 'consultation') {
     reply = buildConsultationResult(products, { budget, brand, needs: needs || [] });
   } else if (intent === 'clarify') {
     reply = buildClarifyReply();
   }
 
-  return { reply, intent, source: 'db-rule' };
+  return { reply, intent, source: 'db-rule-v2' };
 }
 
 module.exports = { buildChatReply };
