@@ -208,6 +208,13 @@ function clearFilters() {
 function applySearchFromTop() {
   const topSearch = document.getElementById('top-search-input')?.value.trim() || '';
   document.getElementById('search-input').value = topSearch;
+
+  // Reset các filter dễ gây "không thấy kết quả" khi search nhanh từ header
+  document.getElementById('brand-filter').value = '';
+  document.getElementById('min-price').value = '';
+  document.getElementById('max-price').value = '';
+  selectedCategory = '';
+
   currentPage = 1;
   loadPhones();
 }
