@@ -32,12 +32,14 @@ function showToast(message) {
 function createPhoneCard(phone) {
   return `
     <article class="product-card">
-      <img src="${phone.image}" alt="${phone.name}" class="product-image" onerror="this.onerror=null;this.src='/images/phone-placeholder.svg';" />
-      <div class="product-content">
-        <h4>${phone.name}</h4>
-        <p class="brand">${phone.brand}</p>
-        <div class="price">${formatPrice(phone.price)}</div>
-      </div>
+      <a class="product-link" href="/product/${phone.id}">
+        <img src="${phone.image}" alt="${phone.name}" class="product-image" onerror="this.onerror=null;this.src='/images/phone-placeholder.svg';" />
+        <div class="product-content">
+          <h4>${phone.name}</h4>
+          <p class="brand">${phone.brand}</p>
+          <div class="price">${formatPrice(phone.price)}</div>
+        </div>
+      </a>
       <div class="product-actions">
         <a class="btn-secondary" href="/product/${phone.id}">View</a>
         <button type="button" class="btn-primary add-cart-btn" data-id="${phone.id}">Add</button>
@@ -391,6 +393,7 @@ document.getElementById('phone-list')?.addEventListener('click', (event) => {
 document.getElementById('top-arrival-grid')?.addEventListener('click', (event) => {
   const button = event.target.closest('.add-cart-btn');
   if (!button) return;
+  event.preventDefault();
   const id = Number(button.dataset.id);
   const phone = allLoadedItems.find((item) => item.id === id);
   if (!phone || !window.CartStore) return;
@@ -402,6 +405,7 @@ document.getElementById('top-arrival-grid')?.addEventListener('click', (event) =
 document.getElementById('recommended-grid')?.addEventListener('click', (event) => {
   const button = event.target.closest('.add-cart-btn');
   if (!button) return;
+  event.preventDefault();
   const id = Number(button.dataset.id);
   const phone = allLoadedItems.find((item) => item.id === id);
   if (!phone || !window.CartStore) return;
