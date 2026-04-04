@@ -28,37 +28,58 @@ function getProductIdFromUrl() {
 }
 
 function renderSpecifications(specs) {
+  const rows = [
+    ['Màn hình', specs.display || '-'],
+    ['Chip xử lý', specs.processor || '-'],
+    ['RAM', specs.ram || '-'],
+    ['Bộ nhớ', specs.storage || '-'],
+    ['Pin', specs.battery || '-'],
+    ['Camera', specs.camera || '-']
+  ];
+
   return `
-    <ul class="spec-list">
-      <li><strong>Display:</strong> ${specs.display || '-'}</li>
-      <li><strong>Processor:</strong> ${specs.processor || '-'}</li>
-      <li><strong>RAM:</strong> ${specs.ram || '-'}</li>
-      <li><strong>Storage:</strong> ${specs.storage || '-'}</li>
-      <li><strong>Battery:</strong> ${specs.battery || '-'}</li>
-      <li><strong>Camera:</strong> ${specs.camera || '-'}</li>
-    </ul>
+    <div class="spec-grid">
+      ${rows
+        .map(
+          ([label, value]) => `
+        <div class="spec-item">
+          <span>${label}</span>
+          <strong>${value}</strong>
+        </div>
+      `
+        )
+        .join('')}
+    </div>
   `;
 }
 
 function renderProductDetail(phone) {
   return `
     <article class="detail-card">
-      <img class="detail-image" src="${phone.image}" alt="${phone.name}" onerror="this.onerror=null;this.src='/images/phone-placeholder.svg';" />
+      <div class="detail-media">
+        <img class="detail-image" src="${phone.image}" alt="${phone.name}" onerror="this.onerror=null;this.src='/images/phone-placeholder.svg';" />
+      </div>
       <div class="detail-content">
-        <div class="brand">${phone.brand}</div>
-        <h2 class="detail-name">${phone.name}</h2>
-        <div class="detail-price">${formatPrice(phone.price)}</div>
+        <div class="detail-head">
+          <div class="brand">${phone.brand}</div>
+          <h2 class="detail-name">${phone.name}</h2>
+          <div class="detail-price">${formatPrice(phone.price)}</div>
+        </div>
 
-        <div class="product-actions" style="padding:0;margin:10px 0 14px;">
+        <div class="detail-actions">
           <button type="button" class="btn-primary" id="add-detail-cart">Thêm vào giỏ hàng</button>
           <a class="btn-secondary" href="/checkout">Mua ngay</a>
         </div>
 
-        <h3>Thông số kỹ thuật</h3>
-        ${renderSpecifications(phone.specifications || {})}
+        <section class="detail-block">
+          <h3>Thông số kỹ thuật</h3>
+          ${renderSpecifications(phone.specifications || {})}
+        </section>
 
-        <h3>Mô tả</h3>
-        <p class="detail-description">${phone.fullDescription || phone.description || ''}</p>
+        <section class="detail-block">
+          <h3>Mô tả</h3>
+          <p class="detail-description">${phone.fullDescription || phone.description || ''}</p>
+        </section>
       </div>
     </article>
   `;
