@@ -571,20 +571,27 @@ body {
   border-radius: 8px;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 0.9fr 1.1fr;
+  max-width: 980px;
+  margin: 0 auto;
 }
 
 .detail-image {
   width: 100%;
-  min-height: 340px;
-  max-height: 420px;
+  min-height: 280px;
+  max-height: 360px;
   object-fit: contain;
   background: #ffffff;
-  padding: 14px;
+  padding: 12px;
 }
 
 .detail-content {
-  padding: 16px;
+  padding: 14px;
+}
+
+.detail-name {
+  margin: 6px 0;
+  font-size: 1.45rem;
 }
 
 .detail-price {
@@ -702,14 +709,14 @@ body {
   }
 
   .product-grid,
-  .category-grid,
-  .detail-card {
+  .category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .detail-card,
   .filters,
   .checkout-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 }
 
