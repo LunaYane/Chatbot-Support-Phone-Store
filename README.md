@@ -118,9 +118,11 @@ Chatbot-Support-Phone-Store/
 │   ├── phoneRoutes.js
 │   └── uploadRoutes.js
 ├── services/
-│   ├── adminAuthService.js
+│   ├── authService.js
 │   ├── chatService.js
 │   └── phoneService.js
+├── scripts/
+│   └── ensureAdmin.js
 ├── utils/
 │   ├── httpError.js
 │   └── recommendation.js
@@ -150,15 +152,18 @@ Chatbot-Support-Phone-Store/
 - `GET /api/phones/:id`
 - `POST /api/chat`
 
+### Auth
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+
 ### Admin
 
-- `POST /api/admin/login`
-- `GET /api/admin/session`
-- `POST /api/admin/logout`
 - `GET /api/admin/products`
-- `POST /api/admin/products`
-- `PUT /api/admin/products/:id`
-- `DELETE /api/admin/products/:id`
+- `POST /api/admin/products` (admin only)
+- `PUT /api/admin/products/:id` (admin only)
+- `DELETE /api/admin/products/:id` (admin only)
 
 ### Upload
 
@@ -180,13 +185,19 @@ npm install
 npm run seed
 ```
 
-### 3) Chạy server
+### 3) Tạo tài khoản admin mặc định
+
+```bash
+npm run ensure-admin
+```
+
+### 4) Chạy server
 
 ```bash
 npm start
 ```
 
-### 4) Mở trình duyệt
+### 5) Mở trình duyệt
 
 - Home: `http://localhost:3001`
 - Detail: `http://localhost:3001/product/1`
@@ -201,8 +212,9 @@ Mặc định trong code:
 
 - `PORT=3001`
 - `MONGO_URI=mongodb://localhost:27017/phone-store-demo`
-- `ADMIN_USERNAME=admin`
+- `ADMIN_EMAIL=admin@phonestore.demo`
 - `ADMIN_PASSWORD=admin123`
+- `ADMIN_NAME=Store Admin`
 
 Bạn có thể override bằng biến môi trường khi chạy.
 
@@ -217,8 +229,9 @@ Bạn có thể override bằng biến môi trường khi chạy.
 3. Deploy service Node.js trên Render/Railway
 4. Set env vars:
    - `MONGO_URI`
-   - `ADMIN_USERNAME`
+   - `ADMIN_EMAIL`
    - `ADMIN_PASSWORD`
+   - `ADMIN_NAME`
 5. Build/start:
    - Build: `npm install`
    - Start: `npm start`
