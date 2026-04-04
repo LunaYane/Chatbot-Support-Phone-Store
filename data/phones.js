@@ -1,158 +1,247 @@
 const phones = [
   {
     id: 1,
-    name: 'iPhone 15 Pro',
+    name: 'iPhone 16 Pro Max',
     brand: 'Apple',
-    price: 28990000,
-    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1000&q=80',
-    description: 'Flagship iPhone with A17 Pro chip, premium titanium design, and excellent camera quality.',
+    price: 34990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-pro-max-1.jpg',
+    shortDescription: 'Flagship iPhone mới nhất với chip A18 Pro và camera zoom mạnh.',
+    fullDescription:
+      'iPhone 16 Pro Max hướng tới người dùng cao cấp với hiệu năng đầu bảng, quay video chuyên nghiệp và pin cực bền.',
+    description:
+      'iPhone 16 Pro Max hướng tới người dùng cao cấp với hiệu năng đầu bảng, quay video chuyên nghiệp và pin cực bền.',
+    tags: ['flagship', 'ios', 'camera', 'premium'],
     specifications: {
-      display: '6.1-inch Super Retina XDR OLED',
-      processor: 'Apple A17 Pro',
+      display: '6.9-inch LTPO Super Retina XDR OLED 120Hz',
+      processor: 'Apple A18 Pro',
       ram: '8 GB',
       storage: '256 GB',
-      battery: '3274 mAh',
-      camera: '48MP + 12MP + 12MP'
+      battery: '4685 mAh',
+      camera: '48MP + 48MP + 12MP'
     }
   },
   {
     id: 2,
-    name: 'Galaxy S24 Ultra',
-    brand: 'Samsung',
-    price: 27990000,
-    image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=1000&q=80',
-    description: 'Large AMOLED display, S Pen support, and powerful performance for work and entertainment.',
+    name: 'iPhone 16 Pro',
+    brand: 'Apple',
+    price: 30990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-pro-1.jpg',
+    shortDescription: 'Bản Pro nhỏ gọn, hiệu năng mạnh và camera cao cấp.',
+    fullDescription: 'iPhone 16 Pro phù hợp người thích máy gọn tay nhưng vẫn muốn sức mạnh flagship mới nhất của Apple.',
+    description: 'iPhone 16 Pro phù hợp người thích máy gọn tay nhưng vẫn muốn sức mạnh flagship mới nhất của Apple.',
+    tags: ['flagship', 'ios', 'compact'],
     specifications: {
-      display: '6.8-inch Dynamic AMOLED 2X',
-      processor: 'Snapdragon 8 Gen 3 for Galaxy',
-      ram: '12 GB',
+      display: '6.3-inch LTPO Super Retina XDR OLED 120Hz',
+      processor: 'Apple A18 Pro',
+      ram: '8 GB',
       storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '200MP + 12MP + 50MP + 10MP'
+      battery: '3582 mAh',
+      camera: '48MP + 48MP + 12MP'
     }
   },
   {
     id: 3,
-    name: 'Xiaomi 14',
-    brand: 'Xiaomi',
-    price: 17990000,
-    image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=1000&q=80',
-    description: 'High-value flagship with smooth performance, great display, and fast charging.',
+    name: 'Samsung Galaxy S25 Ultra',
+    brand: 'Samsung',
+    price: 33990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s25-ultra-1.jpg',
+    shortDescription: 'Flagship Android mạnh nhất của Samsung năm nay.',
+    fullDescription: 'Galaxy S25 Ultra nổi bật với AI, bút S Pen, camera zoom xa và màn hình siêu sáng.',
+    description: 'Galaxy S25 Ultra nổi bật với AI, bút S Pen, camera zoom xa và màn hình siêu sáng.',
+    tags: ['flagship', 'android', 'ai', 'zoom'],
     specifications: {
-      display: '6.36-inch AMOLED 120Hz',
-      processor: 'Snapdragon 8 Gen 3',
+      display: '6.9-inch Dynamic AMOLED 2X 120Hz',
+      processor: 'Snapdragon 8 Elite for Galaxy',
       ram: '12 GB',
       storage: '256 GB',
-      battery: '4610 mAh',
-      camera: '50MP + 50MP + 50MP'
+      battery: '5000 mAh',
+      camera: '200MP + 50MP + 50MP + 12MP'
     }
   },
   {
     id: 4,
-    name: 'OPPO Reno11',
-    brand: 'OPPO',
-    price: 10990000,
-    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1000&q=80',
-    description: 'Stylish design, strong portrait camera, and reliable battery for daily use.',
+    name: 'Samsung Galaxy S25+',
+    brand: 'Samsung',
+    price: 25990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s25-plus-1.jpg',
+    shortDescription: 'Cân bằng giữa màn hình lớn, pin tốt và hiệu năng mạnh.',
+    fullDescription: 'Galaxy S25+ là lựa chọn lý tưởng cho người cần flagship Android ổn định để dùng lâu dài.',
+    description: 'Galaxy S25+ là lựa chọn lý tưởng cho người cần flagship Android ổn định để dùng lâu dài.',
+    tags: ['flagship', 'android', 'big-screen'],
     specifications: {
-      display: '6.7-inch AMOLED 120Hz',
-      processor: 'MediaTek Dimensity 7050',
-      ram: '8 GB',
+      display: '6.7-inch Dynamic AMOLED 2X 120Hz',
+      processor: 'Snapdragon 8 Elite for Galaxy',
+      ram: '12 GB',
       storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '50MP + 8MP + 32MP'
+      battery: '4900 mAh',
+      camera: '50MP + 10MP + 12MP'
     }
   },
   {
     id: 5,
-    name: 'vivo V30',
-    brand: 'vivo',
-    price: 12990000,
-    image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=1000&q=80',
-    description: 'Slim phone with bright display, good selfie camera, and smooth multitasking.',
+    name: 'Google Pixel 9 Pro XL',
+    brand: 'Google',
+    price: 28990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-pro-xl-1.jpg',
+    shortDescription: 'Pixel cao cấp cho nhu cầu camera và AI.',
+    fullDescription: 'Pixel 9 Pro XL cho trải nghiệm Android thuần, camera đẹp và nhiều tính năng AI mới.',
+    description: 'Pixel 9 Pro XL cho trải nghiệm Android thuần, camera đẹp và nhiều tính năng AI mới.',
+    tags: ['pixel', 'camera', 'ai'],
     specifications: {
-      display: '6.78-inch AMOLED 120Hz',
-      processor: 'Snapdragon 7 Gen 3',
-      ram: '12 GB',
+      display: '6.8-inch LTPO OLED 120Hz',
+      processor: 'Google Tensor G4',
+      ram: '16 GB',
       storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '50MP + 50MP + 50MP'
+      battery: '5060 mAh',
+      camera: '50MP + 48MP + 48MP'
     }
   },
   {
     id: 6,
-    name: 'Google Pixel 8',
+    name: 'Google Pixel 9',
     brand: 'Google',
-    price: 18990000,
-    image: 'https://images.unsplash.com/photo-1605236453806-6ff36851218e?auto=format&fit=crop&w=1000&q=80',
-    description: 'Clean Android experience with strong AI features and excellent computational photography.',
+    price: 20990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-1.jpg',
+    shortDescription: 'Máy Pixel nhỏ gọn, chụp ảnh đẹp, dùng mượt.',
+    fullDescription: 'Pixel 9 phù hợp người thích Android sạch, cập nhật nhanh và camera point-and-shoot chất lượng.',
+    description: 'Pixel 9 phù hợp người thích Android sạch, cập nhật nhanh và camera point-and-shoot chất lượng.',
+    tags: ['pixel', 'compact', 'camera'],
     specifications: {
-      display: '6.2-inch OLED 120Hz',
-      processor: 'Google Tensor G3',
-      ram: '8 GB',
+      display: '6.3-inch OLED 120Hz',
+      processor: 'Google Tensor G4',
+      ram: '12 GB',
       storage: '128 GB',
-      battery: '4575 mAh',
-      camera: '50MP + 12MP'
+      battery: '4700 mAh',
+      camera: '50MP + 48MP'
     }
   },
   {
     id: 7,
-    name: 'iPhone 15',
-    brand: 'Apple',
-    price: 21990000,
-    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1000&q=80',
-    description: 'Balanced iPhone model with great cameras and smooth iOS experience.',
+    name: 'Xiaomi 15 Ultra',
+    brand: 'Xiaomi',
+    price: 31990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-15-ultra-1.jpg',
+    shortDescription: 'Flagship camera phone hợp tác Leica.',
+    fullDescription: 'Xiaomi 15 Ultra tập trung mạnh vào camera tele và hiệu năng cao cho cả game lẫn sáng tạo nội dung.',
+    description: 'Xiaomi 15 Ultra tập trung mạnh vào camera tele và hiệu năng cao cho cả game lẫn sáng tạo nội dung.',
+    tags: ['leica', 'camera', 'flagship'],
     specifications: {
-      display: '6.1-inch Super Retina XDR OLED',
-      processor: 'Apple A16 Bionic',
-      ram: '6 GB',
-      storage: '128 GB',
-      battery: '3349 mAh',
-      camera: '48MP + 12MP'
+      display: '6.73-inch LTPO AMOLED 120Hz',
+      processor: 'Snapdragon 8 Elite',
+      ram: '16 GB',
+      storage: '512 GB',
+      battery: '5410 mAh',
+      camera: '50MP + 50MP + 50MP + 200MP'
     }
   },
   {
     id: 8,
-    name: 'iPhone 14 Plus',
-    brand: 'Apple',
-    price: 19990000,
-    image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=1000&q=80',
-    description: 'Large display iPhone with long battery life and dual camera system.',
+    name: 'Xiaomi 15',
+    brand: 'Xiaomi',
+    price: 21990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-15-1.jpg',
+    shortDescription: 'Flagship gọn nhẹ, hiệu năng mạnh, pin ngon.',
+    fullDescription: 'Xiaomi 15 là máy cao cấp nhỏ gọn hiếm hoi với chip mới và thời lượng pin rất tốt.',
+    description: 'Xiaomi 15 là máy cao cấp nhỏ gọn hiếm hoi với chip mới và thời lượng pin rất tốt.',
+    tags: ['flagship', 'compact', 'value'],
     specifications: {
-      display: '6.7-inch Super Retina XDR OLED',
-      processor: 'Apple A15 Bionic',
-      ram: '6 GB',
-      storage: '128 GB',
-      battery: '4323 mAh',
-      camera: '12MP + 12MP'
+      display: '6.36-inch OLED 120Hz',
+      processor: 'Snapdragon 8 Elite',
+      ram: '12 GB',
+      storage: '256 GB',
+      battery: '5400 mAh',
+      camera: '50MP + 50MP + 50MP'
     }
   },
   {
     id: 9,
-    name: 'Galaxy S24',
-    brand: 'Samsung',
-    price: 21990000,
-    image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&w=1000&q=80',
-    description: 'Compact flagship from Samsung with premium performance and camera.',
+    name: 'OnePlus 13',
+    brand: 'OnePlus',
+    price: 23990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/oneplus/oneplus-13-1.jpg',
+    shortDescription: 'Flagship hiệu năng cao, sạc nhanh, pin lớn.',
+    fullDescription: 'OnePlus 13 phù hợp game thủ và người dùng thích máy mượt, ít lỗi, pin trâu.',
+    description: 'OnePlus 13 phù hợp game thủ và người dùng thích máy mượt, ít lỗi, pin trâu.',
+    tags: ['gaming', 'flagship', 'fast-charge'],
     specifications: {
-      display: '6.2-inch Dynamic AMOLED 2X',
-      processor: 'Exynos 2400',
-      ram: '8 GB',
+      display: '6.82-inch LTPO AMOLED 120Hz',
+      processor: 'Snapdragon 8 Elite',
+      ram: '12 GB',
       storage: '256 GB',
-      battery: '4000 mAh',
-      camera: '50MP + 12MP + 10MP'
+      battery: '6000 mAh',
+      camera: '50MP + 50MP + 50MP'
     }
   },
   {
     id: 10,
-    name: 'Galaxy A55 5G',
-    brand: 'Samsung',
-    price: 9990000,
-    image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=1000&q=80',
-    description: 'Popular mid-range phone with premium metal frame and great battery life.',
+    name: 'OPPO Find X8 Pro',
+    brand: 'OPPO',
+    price: 27990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/oppo/oppo-find-x8-pro-1.jpg',
+    shortDescription: 'Flagship OPPO mới, camera mạnh, thiết kế đẹp.',
+    fullDescription: 'Find X8 Pro nhắm tới người dùng cao cấp yêu cầu camera và trải nghiệm sử dụng mượt mà.',
+    description: 'Find X8 Pro nhắm tới người dùng cao cấp yêu cầu camera và trải nghiệm sử dụng mượt mà.',
+    tags: ['flagship', 'camera', 'premium'],
     specifications: {
-      display: '6.6-inch Super AMOLED 120Hz',
-      processor: 'Exynos 1480',
+      display: '6.82-inch LTPO AMOLED 120Hz',
+      processor: 'MediaTek Dimensity 9400',
+      ram: '16 GB',
+      storage: '512 GB',
+      battery: '5910 mAh',
+      camera: '50MP + 50MP + 50MP + 50MP'
+    }
+  },
+  {
+    id: 11,
+    name: 'vivo X200 Pro',
+    brand: 'vivo',
+    price: 27990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/vivo/vivo-x200-pro-1.jpg',
+    shortDescription: 'Flagship vivo nổi bật camera ZEISS.',
+    fullDescription: 'vivo X200 Pro là lựa chọn mạnh cho người thích chụp chân dung và quay video chất lượng cao.',
+    description: 'vivo X200 Pro là lựa chọn mạnh cho người thích chụp chân dung và quay video chất lượng cao.',
+    tags: ['zeiss', 'camera', 'flagship'],
+    specifications: {
+      display: '6.78-inch LTPO AMOLED 120Hz',
+      processor: 'MediaTek Dimensity 9400',
+      ram: '16 GB',
+      storage: '512 GB',
+      battery: '6000 mAh',
+      camera: '50MP + 200MP + 50MP'
+    }
+  },
+  {
+    id: 12,
+    name: 'ASUS ROG Phone 9 Pro',
+    brand: 'ASUS',
+    price: 29990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/asus/asus-rog-phone-9-pro-1.jpg',
+    shortDescription: 'Gaming phone cao cấp cho game thủ hardcore.',
+    fullDescription: 'ROG Phone 9 Pro tối ưu tản nhiệt, trigger gaming và pin lớn để chơi game lâu.',
+    description: 'ROG Phone 9 Pro tối ưu tản nhiệt, trigger gaming và pin lớn để chơi game lâu.',
+    tags: ['gaming', 'high-performance'],
+    specifications: {
+      display: '6.78-inch AMOLED 165Hz',
+      processor: 'Snapdragon 8 Elite',
+      ram: '16 GB',
+      storage: '512 GB',
+      battery: '5800 mAh',
+      camera: '50MP + 13MP + 32MP'
+    }
+  },
+  {
+    id: 13,
+    name: 'Samsung Galaxy A56 5G',
+    brand: 'Samsung',
+    price: 10990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-a56-1.jpg',
+    shortDescription: 'Tầm trung hot, màn đẹp, pin tốt, camera ổn.',
+    fullDescription: 'Galaxy A56 5G phù hợp số đông người dùng cần thương hiệu mạnh và trải nghiệm ổn định.',
+    description: 'Galaxy A56 5G phù hợp số đông người dùng cần thương hiệu mạnh và trải nghiệm ổn định.',
+    tags: ['midrange', 'popular', 'value'],
+    specifications: {
+      display: '6.7-inch Super AMOLED 120Hz',
+      processor: 'Exynos 1580',
       ram: '8 GB',
       storage: '256 GB',
       battery: '5000 mAh',
@@ -160,323 +249,136 @@ const phones = [
     }
   },
   {
-    id: 11,
-    name: 'Xiaomi 13T Pro',
+    id: 14,
+    name: 'Xiaomi Redmi Note 14 Pro+',
     brand: 'Xiaomi',
-    price: 13990000,
-    image: 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?auto=format&fit=crop&w=1000&q=80',
-    description: 'Strong performance and Leica-tuned camera in a value flagship package.',
-    specifications: {
-      display: '6.67-inch AMOLED 144Hz',
-      processor: 'MediaTek Dimensity 9200+',
-      ram: '12 GB',
-      storage: '512 GB',
-      battery: '5000 mAh',
-      camera: '50MP + 50MP + 12MP'
-    }
-  },
-  {
-    id: 12,
-    name: 'Redmi Note 13 Pro+',
-    brand: 'Xiaomi',
-    price: 10990000,
-    image: 'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?auto=format&fit=crop&w=1000&q=80',
-    description: 'Curved display phone with 200MP camera and fast charging.',
+    price: 9990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-note14-pro-plus-1.jpg',
+    shortDescription: 'Mid-range mạnh trong tầm giá dưới 10 triệu.',
+    fullDescription: 'Redmi Note 14 Pro+ có màn đẹp, sạc nhanh và camera độ phân giải cao phù hợp sinh viên.',
+    description: 'Redmi Note 14 Pro+ có màn đẹp, sạc nhanh và camera độ phân giải cao phù hợp sinh viên.',
+    tags: ['midrange', 'fast-charge', 'student'],
     specifications: {
       display: '6.67-inch AMOLED 120Hz',
-      processor: 'MediaTek Dimensity 7200 Ultra',
-      ram: '12 GB',
-      storage: '512 GB',
-      battery: '5000 mAh',
+      processor: 'Snapdragon 7s Gen 3',
+      ram: '8 GB',
+      storage: '256 GB',
+      battery: '5110 mAh',
       camera: '200MP + 8MP + 2MP'
     }
   },
   {
-    id: 13,
-    name: 'OPPO Find X7',
-    brand: 'OPPO',
-    price: 20990000,
-    image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=1000&q=80',
-    description: 'Premium OPPO phone with flagship camera and elegant design.',
-    specifications: {
-      display: '6.78-inch AMOLED 120Hz',
-      processor: 'MediaTek Dimensity 9300',
-      ram: '12 GB',
-      storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '50MP + 50MP + 64MP'
-    }
-  },
-  {
-    id: 14,
-    name: 'OPPO A79 5G',
-    brand: 'OPPO',
-    price: 7290000,
-    image: 'https://images.unsplash.com/photo-1605236453806-6ff36851218e?auto=format&fit=crop&w=1000&q=80',
-    description: 'Budget 5G smartphone suitable for daily social, study, and streaming needs.',
-    specifications: {
-      display: '6.72-inch LCD 90Hz',
-      processor: 'MediaTek Dimensity 6020',
-      ram: '8 GB',
-      storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '50MP + 2MP'
-    }
-  },
-  {
     id: 15,
-    name: 'vivo X100',
-    brand: 'vivo',
-    price: 20990000,
-    image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=1000&q=80',
-    description: 'Camera-focused flagship with ZEISS optics and smooth display.',
+    name: 'realme GT 7 Pro',
+    brand: 'realme',
+    price: 16990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/realme/realme-gt7-pro-1.jpg',
+    shortDescription: 'Flagship killer hiệu năng cao trong tầm giá tốt.',
+    fullDescription: 'realme GT 7 Pro cân bằng tốt giữa hiệu năng, pin và mức giá dễ tiếp cận hơn flagship truyền thống.',
+    description: 'realme GT 7 Pro cân bằng tốt giữa hiệu năng, pin và mức giá dễ tiếp cận hơn flagship truyền thống.',
+    tags: ['performance', 'value', 'gaming'],
     specifications: {
-      display: '6.78-inch AMOLED 120Hz',
-      processor: 'MediaTek Dimensity 9300',
+      display: '6.78-inch LTPO AMOLED 120Hz',
+      processor: 'Snapdragon 8 Elite',
       ram: '12 GB',
       storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '50MP + 64MP + 50MP'
+      battery: '6500 mAh',
+      camera: '50MP + 50MP + 8MP'
     }
   },
   {
     id: 16,
-    name: 'vivo Y100 5G',
-    brand: 'vivo',
-    price: 7990000,
-    image: 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?auto=format&fit=crop&w=1000&q=80',
-    description: 'Affordable 5G phone with slim design and good battery backup.',
+    name: 'Nothing Phone (3a) Pro',
+    brand: 'Nothing',
+    price: 12990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/nothing/nothing-phone-3a-pro-1.jpg',
+    shortDescription: 'Thiết kế độc đáo, giao diện tối giản, hiệu năng ổn.',
+    fullDescription: 'Nothing Phone (3a) Pro phù hợp người thích sự khác biệt trong thiết kế và trải nghiệm Android gọn gàng.',
+    description: 'Nothing Phone (3a) Pro phù hợp người thích sự khác biệt trong thiết kế và trải nghiệm Android gọn gàng.',
+    tags: ['design', 'midrange', 'unique'],
     specifications: {
-      display: '6.67-inch AMOLED 120Hz',
-      processor: 'Snapdragon 4 Gen 2',
-      ram: '8 GB',
+      display: '6.77-inch AMOLED 120Hz',
+      processor: 'Snapdragon 7s Gen 3',
+      ram: '12 GB',
       storage: '256 GB',
       battery: '5000 mAh',
-      camera: '50MP + 2MP'
+      camera: '50MP + 50MP + 8MP'
     }
   },
   {
     id: 17,
-    name: 'Google Pixel 8 Pro',
-    brand: 'Google',
-    price: 24990000,
-    image: 'https://images.unsplash.com/photo-1610945264803-c22b62d2a7b3?auto=format&fit=crop&w=1000&q=80',
-    description: 'Google flagship with top camera AI features and pure Android updates.',
+    name: 'iPhone 16',
+    brand: 'Apple',
+    price: 22990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-1.jpg',
+    shortDescription: 'iPhone mới dễ tiếp cận, hiệu năng tốt, camera nâng cấp.',
+    fullDescription: 'iPhone 16 là lựa chọn hợp lý cho người muốn vào hệ sinh thái Apple với mức giá cân bằng.',
+    description: 'iPhone 16 là lựa chọn hợp lý cho người muốn vào hệ sinh thái Apple với mức giá cân bằng.',
+    tags: ['ios', 'mainstream', 'popular'],
     specifications: {
-      display: '6.7-inch LTPO OLED 120Hz',
-      processor: 'Google Tensor G3',
-      ram: '12 GB',
+      display: '6.1-inch Super Retina XDR OLED',
+      processor: 'Apple A18',
+      ram: '8 GB',
       storage: '128 GB',
-      battery: '5050 mAh',
-      camera: '50MP + 48MP + 48MP'
+      battery: '3561 mAh',
+      camera: '48MP + 12MP'
     }
   },
   {
     id: 18,
-    name: 'Google Pixel 7a',
-    brand: 'Google',
-    price: 10990000,
-    image: 'https://images.unsplash.com/photo-1598327106026-d9521da673d1?auto=format&fit=crop&w=1000&q=80',
-    description: 'Mid-range Pixel with excellent camera performance and clean software.',
+    name: 'iPhone 16 Plus',
+    brand: 'Apple',
+    price: 25990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-plus-1.jpg',
+    shortDescription: 'Màn lớn, pin tốt, phù hợp người dùng iOS thích giải trí.',
+    fullDescription: 'iPhone 16 Plus phù hợp người cần màn hình lớn và pin bền nhưng không cần bản Pro.',
+    description: 'iPhone 16 Plus phù hợp người cần màn hình lớn và pin bền nhưng không cần bản Pro.',
+    tags: ['ios', 'big-screen', 'battery'],
     specifications: {
-      display: '6.1-inch OLED 90Hz',
-      processor: 'Google Tensor G2',
+      display: '6.7-inch Super Retina XDR OLED',
+      processor: 'Apple A18',
       ram: '8 GB',
       storage: '128 GB',
-      battery: '4385 mAh',
-      camera: '64MP + 13MP'
+      battery: '4674 mAh',
+      camera: '48MP + 12MP'
     }
   },
   {
     id: 19,
-    name: 'OnePlus 12',
-    brand: 'OnePlus',
-    price: 21990000,
-    image: 'https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&w=1000&q=80',
-    description: 'Fast and fluid flagship with strong battery and rapid charging.',
+    name: 'HONOR Magic7 Pro',
+    brand: 'HONOR',
+    price: 24990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/honor/honor-magic7-pro-1.jpg',
+    shortDescription: 'Flagship mới với màn đẹp, pin bền và camera mạnh.',
+    fullDescription: 'HONOR Magic7 Pro mang lại trải nghiệm cao cấp, tập trung AI và nhiếp ảnh trên di động.',
+    description: 'HONOR Magic7 Pro mang lại trải nghiệm cao cấp, tập trung AI và nhiếp ảnh trên di động.',
+    tags: ['flagship', 'ai', 'camera'],
     specifications: {
-      display: '6.82-inch LTPO AMOLED 120Hz',
-      processor: 'Snapdragon 8 Gen 3',
-      ram: '16 GB',
+      display: '6.8-inch LTPO OLED 120Hz',
+      processor: 'Snapdragon 8 Elite',
+      ram: '12 GB',
       storage: '512 GB',
-      battery: '5400 mAh',
-      camera: '50MP + 64MP + 48MP'
+      battery: '5850 mAh',
+      camera: '50MP + 200MP + 50MP'
     }
   },
   {
     id: 20,
-    name: 'OnePlus Nord CE 4',
-    brand: 'OnePlus',
-    price: 8990000,
-    image: 'https://images.unsplash.com/photo-1600086827875-a63b01f1335c?auto=format&fit=crop&w=1000&q=80',
-    description: 'Solid daily phone with big battery and smooth OxygenOS experience.',
-    specifications: {
-      display: '6.7-inch AMOLED 120Hz',
-      processor: 'Snapdragon 7 Gen 3',
-      ram: '8 GB',
-      storage: '256 GB',
-      battery: '5500 mAh',
-      camera: '50MP + 8MP'
-    }
-  },
-  {
-    id: 21,
-    name: 'realme GT 6',
-    brand: 'realme',
-    price: 12990000,
-    image: 'https://images.unsplash.com/photo-1610792516307-ea5acd9c3b00?auto=format&fit=crop&w=1000&q=80',
-    description: 'Performance-focused phone with bright display and fast charging.',
-    specifications: {
-      display: '6.78-inch AMOLED 120Hz',
-      processor: 'Snapdragon 8s Gen 3',
-      ram: '12 GB',
-      storage: '256 GB',
-      battery: '5500 mAh',
-      camera: '50MP + 8MP'
-    }
-  },
-  {
-    id: 22,
-    name: 'realme 12 Pro+',
-    brand: 'realme',
-    price: 10990000,
-    image: 'https://images.unsplash.com/photo-1567581935884-3349723552ca?auto=format&fit=crop&w=1000&q=80',
-    description: 'Stylish mid-range phone with periscope camera and premium look.',
-    specifications: {
-      display: '6.7-inch AMOLED 120Hz',
-      processor: 'Snapdragon 7s Gen 2',
-      ram: '12 GB',
-      storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '50MP + 64MP + 8MP'
-    }
-  },
-  {
-    id: 23,
-    name: 'Nokia G42 5G',
-    brand: 'Nokia',
-    price: 5990000,
-    image: 'https://images.unsplash.com/photo-1533228876829-65c94e7b5025?auto=format&fit=crop&w=1000&q=80',
-    description: 'Durable and affordable 5G phone with clean Android experience.',
-    specifications: {
-      display: '6.56-inch LCD 90Hz',
-      processor: 'Snapdragon 480+',
-      ram: '6 GB',
-      storage: '128 GB',
-      battery: '5000 mAh',
-      camera: '50MP + 2MP + 2MP'
-    }
-  },
-  {
-    id: 24,
-    name: 'Nokia X30',
-    brand: 'Nokia',
-    price: 9990000,
-    image: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1000&q=80',
-    description: 'Eco-friendly design phone with OLED display and stable performance.',
-    specifications: {
-      display: '6.43-inch AMOLED 90Hz',
-      processor: 'Snapdragon 695',
-      ram: '8 GB',
-      storage: '256 GB',
-      battery: '4200 mAh',
-      camera: '50MP + 13MP'
-    }
-  },
-  {
-    id: 25,
-    name: 'Sony Xperia 1 V',
-    brand: 'Sony',
+    name: 'Huawei Pura 70 Ultra',
+    brand: 'Huawei',
     price: 26990000,
-    image: 'https://images.unsplash.com/photo-1525598912003-663126343e1f?auto=format&fit=crop&w=1000&q=80',
-    description: 'Premium multimedia phone with 4K display and pro camera controls.',
-    specifications: {
-      display: '6.5-inch 4K OLED 120Hz',
-      processor: 'Snapdragon 8 Gen 2',
-      ram: '12 GB',
-      storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '48MP + 12MP + 12MP'
-    }
-  },
-  {
-    id: 26,
-    name: 'ASUS ROG Phone 8',
-    brand: 'ASUS',
-    price: 24990000,
-    image: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=1000&q=80',
-    description: 'Gaming powerhouse with advanced cooling and ultra-smooth display.',
-    specifications: {
-      display: '6.78-inch AMOLED 165Hz',
-      processor: 'Snapdragon 8 Gen 3',
-      ram: '16 GB',
-      storage: '512 GB',
-      battery: '5500 mAh',
-      camera: '50MP + 13MP + 32MP'
-    }
-  },
-  {
-    id: 27,
-    name: 'Honor Magic6 Pro',
-    brand: 'Honor',
-    price: 22990000,
-    image: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=1000&q=80',
-    description: 'Flagship with powerful camera zoom and premium curved display.',
+    image: 'https://fdn2.gsmarena.com/vv/pics/huawei/huawei-pura70-ultra-1.jpg',
+    shortDescription: 'Camera flagship độc đáo, thiết kế cao cấp.',
+    fullDescription: 'Pura 70 Ultra nổi bật camera cảm biến lớn và chất ảnh ấn tượng, phù hợp người mê nhiếp ảnh.',
+    description: 'Pura 70 Ultra nổi bật camera cảm biến lớn và chất ảnh ấn tượng, phù hợp người mê nhiếp ảnh.',
+    tags: ['camera', 'flagship', 'premium'],
     specifications: {
       display: '6.8-inch LTPO OLED 120Hz',
-      processor: 'Snapdragon 8 Gen 3',
-      ram: '12 GB',
+      processor: 'Kirin 9010',
+      ram: '16 GB',
       storage: '512 GB',
-      battery: '5600 mAh',
-      camera: '50MP + 180MP + 50MP'
-    }
-  },
-  {
-    id: 28,
-    name: 'Huawei Pura 70',
-    brand: 'Huawei',
-    price: 19990000,
-    image: 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=1000&q=80',
-    description: 'Elegant flagship with strong camera processing and premium build.',
-    specifications: {
-      display: '6.6-inch OLED 120Hz',
-      processor: 'Kirin 9000S1',
-      ram: '12 GB',
-      storage: '256 GB',
-      battery: '4900 mAh',
-      camera: '50MP + 13MP + 12MP'
-    }
-  },
-  {
-    id: 29,
-    name: 'Motorola Edge 50 Pro',
-    brand: 'Motorola',
-    price: 11990000,
-    image: 'https://images.unsplash.com/photo-1585060544812-6b45742d762f?auto=format&fit=crop&w=1000&q=80',
-    description: 'Slim and stylish phone with fast charging and vivid pOLED display.',
-    specifications: {
-      display: '6.7-inch pOLED 144Hz',
-      processor: 'Snapdragon 7 Gen 3',
-      ram: '12 GB',
-      storage: '256 GB',
-      battery: '4500 mAh',
-      camera: '50MP + 13MP + 10MP'
-    }
-  },
-  {
-    id: 30,
-    name: 'Infinix Note 40 Pro',
-    brand: 'Infinix',
-    price: 7490000,
-    image: 'https://images.unsplash.com/photo-1574672280600-4aec8453f2b4?auto=format&fit=crop&w=1000&q=80',
-    description: 'Affordable phone with curved AMOLED display and decent performance.',
-    specifications: {
-      display: '6.78-inch AMOLED 120Hz',
-      processor: 'MediaTek Helio G99 Ultimate',
-      ram: '8 GB',
-      storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '108MP + 2MP + 2MP'
+      battery: '5200 mAh',
+      camera: '50MP + 50MP + 40MP'
     }
   }
 ];
