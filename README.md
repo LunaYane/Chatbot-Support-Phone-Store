@@ -203,7 +203,13 @@ npm start
 npm run test:smoke
 ```
 
-### 6) Mở trình duyệt
+### 6) Chạy full test (auth/role/crud/upload/chat)
+
+```bash
+npm run test:full
+```
+
+### 7) Mở trình duyệt
 
 - Home: `http://localhost:3001`
 - Detail: `http://localhost:3001/product/1`
