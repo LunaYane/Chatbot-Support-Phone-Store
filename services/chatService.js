@@ -148,7 +148,19 @@ function scoreProduct(phone, filters) {
 
 function buildConsultationResult(products, filters) {
   const { budget, brand, needs } = filters;
-  const scored = products
+
+  let candidates = brand
+    ? products.filter((product) => normalizeText(product.brand) === normalizeText(brand))
+    : products;
+
+  if (budget?.type === 'under') {
+    const underBudgetList = candidates.filter((product) => Number(product.price) <= Number(budget.max));
+    if (underBudgetList.length > 0) {
+      candidates = underBudgetList;
+    }
+  }
+
+  const scored = candidates
     .map((product) => ({ ...product, score: scoreProduct(product, filters) }))
     .filter((product) => product.score > -20)
     .sort((a, b) => b.score - a.score || a.price - b.price)

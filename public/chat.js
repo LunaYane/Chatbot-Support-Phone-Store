@@ -6,8 +6,9 @@ const chatMessages = document.getElementById('chat-messages');
 
 const supportWidget = document.getElementById('floating-support');
 const supportOpenChatBtn = document.getElementById('support-open-chat');
+const chatToggleBtn = document.getElementById('chat-toggle');
 
-if (chatbox && chatCloseBtn && chatForm && chatInput && chatMessages && supportWidget && supportOpenChatBtn) {
+if (chatbox && chatCloseBtn && chatForm && chatInput && chatMessages) {
   function addMessage(text, role) {
     const messageEl = document.createElement('div');
     messageEl.className = `chat-message ${role}`;
@@ -19,19 +20,19 @@ if (chatbox && chatCloseBtn && chatForm && chatInput && chatMessages && supportW
 
   function openSupportChat() {
     chatbox.classList.remove('hidden');
-    supportWidget.classList.add('hidden');
+    if (supportWidget) supportWidget.classList.add('hidden');
     chatInput.focus();
   }
 
   function closeSupportChat() {
     chatbox.classList.add('hidden');
-    supportWidget.classList.remove('hidden');
+    if (supportWidget) supportWidget.classList.remove('hidden');
   }
 
   window.openSupportChat = openSupportChat;
 
-  supportOpenChatBtn.addEventListener('click', openSupportChat);
-
+  supportOpenChatBtn?.addEventListener('click', openSupportChat);
+  chatToggleBtn?.addEventListener('click', openSupportChat);
   chatCloseBtn.addEventListener('click', closeSupportChat);
 
   chatForm.addEventListener('submit', async (event) => {
