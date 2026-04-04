@@ -41,40 +41,40 @@ const phones = [
   },
   {
     id: 3,
-    name: 'Samsung Galaxy S25 Ultra',
+    name: 'Samsung Galaxy Z Fold6',
     brand: 'Samsung',
-    price: 33990000,
-    image: 'https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s25-ultra-1.jpg',
-    shortDescription: 'Flagship Android mạnh nhất của Samsung năm nay.',
-    fullDescription: 'Galaxy S25 Ultra nổi bật với AI, bút S Pen, camera zoom xa và màn hình siêu sáng.',
-    description: 'Galaxy S25 Ultra nổi bật với AI, bút S Pen, camera zoom xa và màn hình siêu sáng.',
-    tags: ['flagship', 'android', 'ai', 'zoom'],
+    price: 39990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-fold6-1.jpg',
+    shortDescription: 'Điện thoại gập cao cấp cho trải nghiệm đa nhiệm flagship.',
+    fullDescription: 'Galaxy Z Fold6 phù hợp người dùng cần màn hình lớn dạng tablet, đa nhiệm mạnh và trải nghiệm cao cấp.',
+    description: 'Galaxy Z Fold6 phù hợp người dùng cần màn hình lớn dạng tablet, đa nhiệm mạnh và trải nghiệm cao cấp.',
+    tags: ['foldable', 'flagship', 'premium'],
     specifications: {
-      display: '6.9-inch Dynamic AMOLED 2X 120Hz',
-      processor: 'Snapdragon 8 Elite for Galaxy',
+      display: '7.6-inch Dynamic LTPO AMOLED 2X 120Hz',
+      processor: 'Snapdragon 8 Gen 3 for Galaxy',
       ram: '12 GB',
       storage: '256 GB',
-      battery: '5000 mAh',
-      camera: '200MP + 50MP + 50MP + 12MP'
+      battery: '4400 mAh',
+      camera: '50MP + 10MP + 12MP'
     }
   },
   {
     id: 4,
-    name: 'Samsung Galaxy S25+',
+    name: 'Samsung Galaxy Z Flip6',
     brand: 'Samsung',
-    price: 25990000,
-    image: 'https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s25-plus-1.jpg',
-    shortDescription: 'Cân bằng giữa màn hình lớn, pin tốt và hiệu năng mạnh.',
-    fullDescription: 'Galaxy S25+ là lựa chọn lý tưởng cho người cần flagship Android ổn định để dùng lâu dài.',
-    description: 'Galaxy S25+ là lựa chọn lý tưởng cho người cần flagship Android ổn định để dùng lâu dài.',
-    tags: ['flagship', 'android', 'big-screen'],
+    price: 26990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-flip6-1.jpg',
+    shortDescription: 'Smartphone gập vỏ sò thời trang, cấu hình mạnh.',
+    fullDescription: 'Galaxy Z Flip6 phù hợp người dùng trẻ thích thiết kế gập độc đáo, camera ổn và hiệu năng cao cấp.',
+    description: 'Galaxy Z Flip6 phù hợp người dùng trẻ thích thiết kế gập độc đáo, camera ổn và hiệu năng cao cấp.',
+    tags: ['foldable', 'style', 'flagship'],
     specifications: {
-      display: '6.7-inch Dynamic AMOLED 2X 120Hz',
-      processor: 'Snapdragon 8 Elite for Galaxy',
+      display: '6.7-inch Dynamic LTPO AMOLED 2X 120Hz',
+      processor: 'Snapdragon 8 Gen 3 for Galaxy',
       ram: '12 GB',
       storage: '256 GB',
-      battery: '4900 mAh',
-      camera: '50MP + 10MP + 12MP'
+      battery: '4000 mAh',
+      camera: '50MP + 12MP'
     }
   },
   {
@@ -117,21 +117,21 @@ const phones = [
   },
   {
     id: 7,
-    name: 'Xiaomi 15 Ultra',
+    name: 'Xiaomi 14 Ultra',
     brand: 'Xiaomi',
-    price: 31990000,
-    image: 'https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-15-ultra-1.jpg',
-    shortDescription: 'Flagship camera phone hợp tác Leica.',
-    fullDescription: 'Xiaomi 15 Ultra tập trung mạnh vào camera tele và hiệu năng cao cho cả game lẫn sáng tạo nội dung.',
-    description: 'Xiaomi 15 Ultra tập trung mạnh vào camera tele và hiệu năng cao cho cả game lẫn sáng tạo nội dung.',
+    price: 27990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-14-ultra-1.jpg',
+    shortDescription: 'Flagship camera phone Leica rất hot ở phân khúc cao cấp.',
+    fullDescription: 'Xiaomi 14 Ultra nổi bật với camera Leica mạnh, hiệu năng cao và màn hình đẹp cho nhu cầu sáng tạo nội dung.',
+    description: 'Xiaomi 14 Ultra nổi bật với camera Leica mạnh, hiệu năng cao và màn hình đẹp cho nhu cầu sáng tạo nội dung.',
     tags: ['leica', 'camera', 'flagship'],
     specifications: {
       display: '6.73-inch LTPO AMOLED 120Hz',
-      processor: 'Snapdragon 8 Elite',
+      processor: 'Snapdragon 8 Gen 3',
       ram: '16 GB',
       storage: '512 GB',
-      battery: '5410 mAh',
-      camera: '50MP + 50MP + 50MP + 200MP'
+      battery: '5000 mAh',
+      camera: '50MP + 50MP + 50MP + 50MP'
     }
   },
   {
@@ -174,21 +174,21 @@ const phones = [
   },
   {
     id: 10,
-    name: 'OPPO Find X8 Pro',
+    name: 'OPPO Find X8',
     brand: 'OPPO',
-    price: 27990000,
-    image: 'https://fdn2.gsmarena.com/vv/pics/oppo/oppo-find-x8-pro-1.jpg',
-    shortDescription: 'Flagship OPPO mới, camera mạnh, thiết kế đẹp.',
-    fullDescription: 'Find X8 Pro nhắm tới người dùng cao cấp yêu cầu camera và trải nghiệm sử dụng mượt mà.',
-    description: 'Find X8 Pro nhắm tới người dùng cao cấp yêu cầu camera và trải nghiệm sử dụng mượt mà.',
+    price: 22990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/oppo/oppo-find-x8-1.jpg',
+    shortDescription: 'Flagship OPPO mới với thiết kế đẹp và camera chất lượng.',
+    fullDescription: 'Find X8 phù hợp người muốn flagship cân bằng giữa camera, pin và hiệu năng cao.',
+    description: 'Find X8 phù hợp người muốn flagship cân bằng giữa camera, pin và hiệu năng cao.',
     tags: ['flagship', 'camera', 'premium'],
     specifications: {
-      display: '6.82-inch LTPO AMOLED 120Hz',
+      display: '6.59-inch LTPO AMOLED 120Hz',
       processor: 'MediaTek Dimensity 9400',
-      ram: '16 GB',
-      storage: '512 GB',
-      battery: '5910 mAh',
-      camera: '50MP + 50MP + 50MP + 50MP'
+      ram: '12 GB',
+      storage: '256 GB',
+      battery: '5630 mAh',
+      camera: '50MP + 50MP + 50MP'
     }
   },
   {
@@ -250,21 +250,21 @@ const phones = [
   },
   {
     id: 14,
-    name: 'Xiaomi Redmi Note 14 Pro+',
+    name: 'Xiaomi POCO F6 Pro',
     brand: 'Xiaomi',
-    price: 9990000,
-    image: 'https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-note14-pro-plus-1.jpg',
-    shortDescription: 'Mid-range mạnh trong tầm giá dưới 10 triệu.',
-    fullDescription: 'Redmi Note 14 Pro+ có màn đẹp, sạc nhanh và camera độ phân giải cao phù hợp sinh viên.',
-    description: 'Redmi Note 14 Pro+ có màn đẹp, sạc nhanh và camera độ phân giải cao phù hợp sinh viên.',
-    tags: ['midrange', 'fast-charge', 'student'],
+    price: 11990000,
+    image: 'https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-poco-f6-pro-1.jpg',
+    shortDescription: 'Hiệu năng cao trong tầm giá, rất hợp game thủ sinh viên.',
+    fullDescription: 'POCO F6 Pro tập trung sức mạnh chip, màn đẹp và sạc nhanh để tối ưu trải nghiệm chơi game/giải trí.',
+    description: 'POCO F6 Pro tập trung sức mạnh chip, màn đẹp và sạc nhanh để tối ưu trải nghiệm chơi game/giải trí.',
+    tags: ['midrange', 'gaming', 'value'],
     specifications: {
       display: '6.67-inch AMOLED 120Hz',
-      processor: 'Snapdragon 7s Gen 3',
-      ram: '8 GB',
+      processor: 'Snapdragon 8 Gen 2',
+      ram: '12 GB',
       storage: '256 GB',
-      battery: '5110 mAh',
-      camera: '200MP + 8MP + 2MP'
+      battery: '5000 mAh',
+      camera: '50MP + 8MP + 2MP'
     }
   },
   {
