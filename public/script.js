@@ -217,6 +217,10 @@ function applySearchFromTop() {
 
   currentPage = 1;
   loadPhones();
+
+  // Cuộn thẳng tới khu vực list sản phẩm (không smooth để đỡ chóng mặt)
+  const target = document.getElementById('products');
+  if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
 }
 
 function getAuthState() {
@@ -361,6 +365,8 @@ document.getElementById('search-input')?.addEventListener('keydown', (event) => 
   if (event.key === 'Enter') {
     currentPage = 1;
     loadPhones();
+    const target = document.getElementById('products');
+    if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
   }
 });
 
