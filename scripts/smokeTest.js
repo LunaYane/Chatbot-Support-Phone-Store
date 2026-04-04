@@ -1,5 +1,60 @@
 /* eslint-disable no-console */
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
+const { spawn } = require('child_process');
+
+const TEST_PORT = Number(process.env.TEST_PORT || 3130);
+const BASE_URL = process.env.BASE_URL || `http://127.0.0.1:${TEST_PORT}`;
+
+let serverProcess = null;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForServer(url, timeoutMs = 20000) {
+  const startedAt = Date.now();
+
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      const response = await fetch(`${url}/api/phones?page=1&limit=1`);
+      if (response.ok) return true;
+    } catch (error) {
+      // keep waiting
+    }
+
+    await sleep(500);
+  }
+
+  return false;
+}
+
+async function startServerIfNeeded() {
+  if (process.env.BASE_URL) {
+    const ok = await waitForServer(BASE_URL, 4000);
+    if (!ok) {
+      throw new Error(`Cannot reach BASE_URL=${BASE_URL}. Please check your running server.`);
+    }
+    return;
+  }
+
+  serverProcess = spawn('node', ['server.js'], {
+    env: { ...process.env, PORT: String(TEST_PORT) },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+
+  serverProcess.stdout.on('data', () => {});
+  serverProcess.stderr.on('data', () => {});
+
+  const ok = await waitForServer(BASE_URL, 25000);
+  if (!ok) {
+    throw new Error('Smoke test could not start local server automatically.');
+  }
+}
+
+function stopServer() {
+  if (serverProcess && !serverProcess.killed) {
+    serverProcess.kill();
+  }
+}
 
 async function check(name, fn) {
   try {
@@ -21,6 +76,8 @@ async function expectStatus(url, expectedStatus, options = {}) {
 }
 
 async function run() {
+  await startServerIfNeeded();
+
   const results = [];
 
   results.push(
@@ -81,7 +138,11 @@ async function run() {
   }
 }
 
-run().catch((error) => {
-  console.error('Smoke test failed unexpectedly:', error.message);
-  process.exitCode = 1;
-});
+run()
+  .catch((error) => {
+    console.error(`Smoke test failed unexpectedly: ${error.message}`);
+    process.exitCode = 1;
+  })
+  .finally(() => {
+    stopServer();
+  });
