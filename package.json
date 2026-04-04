@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "seed": "node seed/phonesSeed.js"
+    "seed": "node seed/phonesSeed.js",
+    "ensure-admin": "node scripts/ensureAdmin.js"
   },
   "keywords": [
     "nodejs",

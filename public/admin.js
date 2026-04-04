@@ -4,14 +4,12 @@ const submitBtnEl = document.getElementById('submit-btn');
 const cancelEditBtnEl = document.getElementById('cancel-edit');
 const tableBodyEl = document.getElementById('admin-product-list');
 const countEl = document.getElementById('admin-count');
-const loginFormEl = document.getElementById('login-form');
-const logoutBtnEl = document.getElementById('logout-btn');
 const authStatusEl = document.getElementById('auth-status');
 const editorCardEl = document.getElementById('editor-card');
 const actionsHeaderEl = document.getElementById('actions-header');
 const uploadImageBtnEl = document.getElementById('upload-image-btn');
 
-let adminToken = localStorage.getItem('adminToken') || '';
+const AUTH_STORAGE_KEY = 'phoneStoreAuth';
 let isAdmin = false;
 let cachedProducts = [];
 
@@ -37,24 +35,32 @@ function formatPrice(price) {
   }).format(price);
 }
 
-function authHeaders() {
-  if (!adminToken) return {};
-  return { 'x-admin-token': adminToken };
+function getAuthState() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    return null;
+  }
 }
 
-function setAdminMode(enabled, username = 'Admin') {
+function authHeaders() {
+  const state = getAuthState();
+  if (!state?.token) return {};
+  return { Authorization: `Bearer ${state.token}` };
+}
+
+function setAdminMode(enabled, displayName = '') {
   isAdmin = enabled;
 
   if (enabled) {
-    authStatusEl.textContent = `Current role: ${username} (full access)`;
+    authStatusEl.textContent = `Đăng nhập với quyền Admin: ${displayName}`;
     editorCardEl.classList.remove('hidden');
     actionsHeaderEl.classList.remove('hidden');
-    logoutBtnEl.classList.remove('hidden');
   } else {
-    authStatusEl.textContent = 'Current role: Guest (view only)';
+    authStatusEl.textContent = 'Bạn không có quyền admin. Chỉ admin mới được thêm/sửa/xóa sản phẩm.';
     editorCardEl.classList.add('hidden');
     actionsHeaderEl.classList.add('hidden');
-    logoutBtnEl.classList.add('hidden');
     resetForm();
   }
 }
@@ -65,9 +71,7 @@ function parseSpecsInput() {
 
   try {
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') {
-      throw new Error('Invalid specs JSON');
-    }
+    if (!parsed || typeof parsed !== 'object') throw new Error('Invalid specs JSON');
     return parsed;
   } catch (error) {
     throw new Error('Specs JSON không hợp lệ, vui lòng kiểm tra lại.');
@@ -75,8 +79,6 @@ function parseSpecsInput() {
 }
 
 function getFormData() {
-  const specs = parseSpecsInput();
-
   return {
     id: Number(document.getElementById('id').value),
     name: document.getElementById('name').value.trim(),
@@ -85,7 +87,7 @@ function getFormData() {
     image: document.getElementById('image').value.trim(),
     shortDescription: document.getElementById('shortDescription').value.trim(),
     fullDescription: document.getElementById('fullDescription').value.trim(),
-    specs,
+    specs: parseSpecsInput(),
     tags: document.getElementById('tags').value.trim()
   };
 }
@@ -132,9 +134,9 @@ function renderProducts(products) {
       const actionCell = isAdmin
         ? `
           <td>
-            <div class="table-actions">
-              <button type="button" class="btn-small btn-edit" data-id="${phone.id}">Edit</button>
-              <button type="button" class="btn-small btn-delete" data-id="${phone.id}">Delete</button>
+            <div class="head-actions">
+              <button type="button" class="btn-secondary btn-edit" data-id="${phone.id}">Edit</button>
+              <button type="button" class="btn-secondary btn-delete" data-id="${phone.id}">Delete</button>
             </div>
           </td>
         `
@@ -168,13 +170,9 @@ async function loadProducts() {
 async function createProduct(payload) {
   const response = await fetch('/api/admin/products', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders()
-    },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(payload)
   });
-
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to create product');
 }
@@ -182,13 +180,9 @@ async function createProduct(payload) {
 async function updateProduct(originalId, payload) {
   const response = await fetch(`/api/admin/products/${originalId}`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders()
-    },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(payload)
   });
-
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to update product');
 }
@@ -198,71 +192,35 @@ async function deleteProduct(id) {
     method: 'DELETE',
     headers: authHeaders()
   });
-
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to delete product');
 }
 
-async function loginAdmin(username, password) {
-  const response = await fetch('/api/admin/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
-  });
-
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Login failed');
-
-  adminToken = data.token;
-  localStorage.setItem('adminToken', adminToken);
-  setAdminMode(true, data.username || 'Admin');
-}
-
-async function checkSession() {
-  if (!adminToken) {
+async function verifyRole() {
+  const state = getAuthState();
+  if (!state?.token) {
     setAdminMode(false);
     return;
   }
 
   try {
-    const response = await fetch('/api/admin/session', {
-      headers: authHeaders()
-    });
-
+    const response = await fetch('/api/auth/me', { headers: authHeaders() });
     const data = await response.json();
 
-    if (!data.isAdmin) {
-      adminToken = '';
-      localStorage.removeItem('adminToken');
+    if (!response.ok || !data?.user) {
       setAdminMode(false);
       return;
     }
 
-    setAdminMode(true, data.username || 'Admin');
+    setAdminMode(data.user.role === 'admin', data.user.fullName || data.user.email || 'Admin');
   } catch (error) {
     setAdminMode(false);
   }
 }
 
-async function logoutAdmin() {
-  try {
-    await fetch('/api/admin/logout', {
-      method: 'POST',
-      headers: authHeaders()
-    });
-  } catch (error) {
-    // ignore
-  }
-
-  adminToken = '';
-  localStorage.removeItem('adminToken');
-  setAdminMode(false);
-  loadProducts();
-}
-
 async function uploadImageFile() {
   if (!isAdmin) {
-    showToast('Bạn cần login admin để upload ảnh.');
+    showToast('Chỉ admin mới được upload ảnh.');
     return;
   }
 
@@ -300,32 +258,11 @@ async function uploadImageFile() {
   }
 }
 
-loginFormEl.addEventListener('submit', async (event) => {
-  event.preventDefault();
-
-  const username = document.getElementById('admin-username').value.trim();
-  const password = document.getElementById('admin-password').value.trim();
-
-  try {
-    await loginAdmin(username, password);
-    showToast('Admin login successful.');
-    loginFormEl.reset();
-    loadProducts();
-  } catch (error) {
-    showToast(error.message || 'Cannot login right now.');
-  }
-});
-
-logoutBtnEl.addEventListener('click', async () => {
-  await logoutAdmin();
-  showToast('Logged out. You are now guest mode.');
-});
-
 formEl.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   if (!isAdmin) {
-    showToast('Only Admin can add/edit products.');
+    showToast('Chỉ admin được thêm/sửa sản phẩm.');
     return;
   }
 
@@ -359,7 +296,6 @@ tableBodyEl.addEventListener('click', async (event) => {
 
   const target = event.target;
   const productId = target.dataset.id;
-
   if (!productId) return;
 
   if (target.classList.contains('btn-edit')) {
@@ -389,5 +325,5 @@ tableBodyEl.addEventListener('click', async (event) => {
   }
 });
 
-checkSession();
+verifyRole();
 loadProducts();
