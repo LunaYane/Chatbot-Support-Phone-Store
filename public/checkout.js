@@ -1,3 +1,6 @@
+const AUTH_STORAGE_KEY = 'phoneStoreAuth';
+let checkoutUser = null;
+
 function formatPrice(price) {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -18,6 +21,76 @@ function showToast(message) {
     toast.classList.add('toast-out');
     setTimeout(() => toast.remove(), 220);
   }, 2200);
+}
+
+function getAuthState() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function authHeaders() {
+  const state = getAuthState();
+  if (!state?.token) return {};
+  return { Authorization: `Bearer ${state.token}` };
+}
+
+async function ensureCheckoutAuth() {
+  const statusEl = document.getElementById('checkout-auth-status');
+  const formEl = document.getElementById('checkout-form');
+  const state = getAuthState();
+
+  if (!state?.token) {
+    checkoutUser = null;
+    if (statusEl) {
+      statusEl.innerHTML = 'Bạn cần đăng nhập để thanh toán. <a class="back-link" href="/">Về trang chủ để đăng nhập</a>';
+    }
+    if (formEl) {
+      formEl.querySelectorAll('input, textarea, button').forEach((el) => {
+        el.disabled = true;
+      });
+    }
+    return false;
+  }
+
+  try {
+    const response = await fetch('/api/auth/me', { headers: authHeaders() });
+    if (!response.ok) throw new Error('unauth');
+
+    const data = await response.json();
+    checkoutUser = data.user;
+
+    if (statusEl) {
+      statusEl.textContent = `Đang thanh toán với tài khoản: ${checkoutUser.fullName} (${checkoutUser.email})`;
+    }
+
+    if (formEl) {
+      formEl.querySelectorAll('input, textarea, button').forEach((el) => {
+        el.disabled = false;
+      });
+    }
+
+    const nameInput = document.getElementById('customer-name');
+    if (nameInput && !nameInput.value.trim()) {
+      nameInput.value = checkoutUser.fullName || '';
+    }
+
+    return true;
+  } catch (error) {
+    checkoutUser = null;
+    if (statusEl) {
+      statusEl.innerHTML = 'Phiên đăng nhập đã hết hạn. <a class="back-link" href="/">Về trang chủ đăng nhập lại</a>';
+    }
+    if (formEl) {
+      formEl.querySelectorAll('input, textarea, button').forEach((el) => {
+        el.disabled = true;
+      });
+    }
+    return false;
+  }
 }
 
 function renderSummary() {
@@ -89,8 +162,14 @@ document.getElementById('checkout-items').addEventListener('click', (event) => {
   renderCheckoutItems();
 });
 
-document.getElementById('checkout-form').addEventListener('submit', (event) => {
+document.getElementById('checkout-form').addEventListener('submit', async (event) => {
   event.preventDefault();
+
+  const isAuthed = await ensureCheckoutAuth();
+  if (!isAuthed) {
+    showToast('Bạn cần đăng nhập trước khi thanh toán.');
+    return;
+  }
 
   const name = document.getElementById('customer-name').value.trim();
   const phone = document.getElementById('customer-phone').value.trim();
@@ -119,4 +198,5 @@ document.getElementById('checkout-form').addEventListener('submit', (event) => {
 });
 
 renderCheckoutItems();
+ensureCheckoutAuth();
 if (window.CartStore) window.CartStore.refreshCartBadge();
