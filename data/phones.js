@@ -380,6 +380,576 @@ const phones = [
       battery: '5200 mAh',
       camera: '50MP + 50MP + 40MP'
     }
+  },
+  {
+    id: 21,
+    name: 'Samsung Galaxy A55 5G',
+    brand: 'Samsung',
+    price: 9490000,
+    image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Tầm trung quốc dân, màn đẹp và pin khỏe.',
+    fullDescription: 'Galaxy A55 phù hợp học tập, làm việc và giải trí hằng ngày với màn AMOLED và pin bền.',
+    description: 'Galaxy A55 phù hợp học tập, làm việc và giải trí hằng ngày với màn AMOLED và pin bền.',
+    tags: ['midrange', 'popular', 'battery'],
+    specifications: {
+      display: '6.6-inch Super AMOLED 120Hz',
+      processor: 'Exynos 1480',
+      ram: '8 GB',
+      storage: '128 GB',
+      battery: '5000 mAh',
+      camera: '50MP + 12MP + 5MP'
+    }
+  },
+  {
+    id: 22,
+    name: 'Samsung Galaxy S24 FE',
+    brand: 'Samsung',
+    price: 14990000,
+    image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Fan Edition cấu hình mạnh, giá dễ chịu.',
+    fullDescription: 'S24 FE là lựa chọn hợp lý cho người muốn hiệu năng gần flagship nhưng tối ưu chi phí.',
+    description: 'S24 FE là lựa chọn hợp lý cho người muốn hiệu năng gần flagship nhưng tối ưu chi phí.',
+    tags: ['fan-edition', 'performance', 'value'],
+    specifications: {
+      display: '6.7-inch Dynamic AMOLED 2X 120Hz',
+      processor: 'Exynos 2400e',
+      ram: '8 GB',
+      storage: '256 GB',
+      battery: '4700 mAh',
+      camera: '50MP + 8MP + 12MP'
+    }
+  },
+  {
+    id: 23,
+    name: 'Xiaomi 14T Pro',
+    brand: 'Xiaomi',
+    price: 15990000,
+    image: 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Hiệu năng mạnh, camera tốt, sạc siêu nhanh.',
+    fullDescription: 'Xiaomi 14T Pro phù hợp game thủ và người thích chụp ảnh với mức giá cạnh tranh.',
+    description: 'Xiaomi 14T Pro phù hợp game thủ và người thích chụp ảnh với mức giá cạnh tranh.',
+    tags: ['performance', 'fast-charge', 'camera'],
+    specifications: {
+      display: '6.67-inch AMOLED 144Hz',
+      processor: 'Dimensity 9300+',
+      ram: '12 GB',
+      storage: '256 GB',
+      battery: '5000 mAh',
+      camera: '50MP + 50MP + 12MP'
+    }
+  },
+  {
+    id: 24,
+    name: 'Xiaomi Redmi Note 13 Pro',
+    brand: 'Xiaomi',
+    price: 7490000,
+    image: 'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Giá mềm, màn đẹp, camera ổn cho sinh viên.',
+    fullDescription: 'Redmi Note 13 Pro cân bằng tốt cho người cần máy bền, chụp ảnh ổn và pin lâu.',
+    description: 'Redmi Note 13 Pro cân bằng tốt cho người cần máy bền, chụp ảnh ổn và pin lâu.',
+    tags: ['student', 'midrange', 'value'],
+    specifications: {
+      display: '6.67-inch AMOLED 120Hz',
+      processor: 'Snapdragon 7s Gen 2',
+      ram: '8 GB',
+      storage: '256 GB',
+      battery: '5100 mAh',
+      camera: '200MP + 8MP + 2MP'
+    }
+  },
+  {
+    id: 25,
+    name: 'OPPO Reno12 Pro',
+    brand: 'OPPO',
+    price: 13990000,
+    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Thiết kế mỏng nhẹ, camera chân dung đẹp.',
+    fullDescription: 'Reno12 Pro phù hợp người thích máy đẹp, chụp ảnh chân dung ổn và dùng mượt.',
+    description: 'Reno12 Pro phù hợp người thích máy đẹp, chụp ảnh chân dung ổn và dùng mượt.',
+    tags: ['camera', 'style', 'midrange'],
+    specifications: {
+      display: '6.7-inch AMOLED 120Hz',
+      processor: 'Dimensity 7300',
+      ram: '12 GB',
+      storage: '256 GB',
+      battery: '5000 mAh',
+      camera: '50MP + 8MP + 50MP'
+    }
+  },
+  {
+    id: 26,
+    name: 'vivo V40',
+    brand: 'vivo',
+    price: 12990000,
+    image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Màn đẹp, selfie ngon, pin bền.',
+    fullDescription: 'vivo V40 là lựa chọn tốt cho người hay chụp ảnh và cần pin dùng lâu cả ngày.',
+    description: 'vivo V40 là lựa chọn tốt cho người hay chụp ảnh và cần pin dùng lâu cả ngày.',
+    tags: ['selfie', 'camera', 'battery'],
+    specifications: {
+      display: '6.78-inch AMOLED 120Hz',
+      processor: 'Snapdragon 7 Gen 3',
+      ram: '12 GB',
+      storage: '256 GB',
+      battery: '5500 mAh',
+      camera: '50MP + 50MP'
+    }
+  },
+  {
+    id: 27,
+    name: 'Google Pixel 8a',
+    brand: 'Google',
+    price: 12990000,
+    image: 'https://images.unsplash.com/photo-1605236453806-6ff36851218e?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Pixel giá tốt, chụp ảnh đẹp, Android thuần.',
+    fullDescription: 'Pixel 8a phù hợp người yêu Android gọn gàng và thích chụp ảnh point-and-shoot.',
+    description: 'Pixel 8a phù hợp người yêu Android gọn gàng và thích chụp ảnh point-and-shoot.',
+    tags: ['pixel', 'camera', 'value'],
+    specifications: {
+      display: '6.1-inch OLED 120Hz',
+      processor: 'Google Tensor G3',
+      ram: '8 GB',
+      storage: '128 GB',
+      battery: '4492 mAh',
+      camera: '64MP + 13MP'
+    }
+  },
+  {
+    id: 28,
+    name: 'OnePlus Nord 4',
+    brand: 'OnePlus',
+    price: 10990000,
+    image: 'https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Máy tầm trung mượt, pin trâu, sạc nhanh.',
+    fullDescription: 'Nord 4 cho trải nghiệm ổn định, giao diện nhẹ và hiệu năng tốt trong tầm giá.',
+    description: 'Nord 4 cho trải nghiệm ổn định, giao diện nhẹ và hiệu năng tốt trong tầm giá.',
+    tags: ['midrange', 'battery', 'fast-charge'],
+    specifications: {
+      display: '6.74-inch AMOLED 120Hz',
+      processor: 'Snapdragon 7+ Gen 3',
+      ram: '8 GB',
+      storage: '256 GB',
+      battery: '5500 mAh',
+      camera: '50MP + 8MP'
+    }
+  },
+  {
+    id: 29,
+    name: 'HONOR 200 Pro',
+    brand: 'HONOR',
+    price: 13990000,
+    image: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Chụp chân dung đẹp, màn hình sáng, pin tốt.',
+    fullDescription: 'HONOR 200 Pro hướng tới người dùng thích camera portrait và thiết kế cao cấp.',
+    description: 'HONOR 200 Pro hướng tới người dùng thích camera portrait và thiết kế cao cấp.',
+    tags: ['camera', 'portrait', 'midrange'],
+    specifications: {
+      display: '6.78-inch OLED 120Hz',
+      processor: 'Snapdragon 8s Gen 3',
+      ram: '12 GB',
+      storage: '512 GB',
+      battery: '5200 mAh',
+      camera: '50MP + 50MP + 12MP'
+    }
+  },
+  {
+    id: 30,
+    name: 'Huawei Nova 13 Pro',
+    brand: 'Huawei',
+    price: 14990000,
+    image: 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Máy đẹp, selfie tốt, pin bền.',
+    fullDescription: 'Nova 13 Pro phù hợp người dùng trẻ, cần ngoại hình đẹp và camera selfie chất lượng.',
+    description: 'Nova 13 Pro phù hợp người dùng trẻ, cần ngoại hình đẹp và camera selfie chất lượng.',
+    tags: ['selfie', 'style', 'midrange'],
+    specifications: {
+      display: '6.76-inch OLED 120Hz',
+      processor: 'Kirin 9010 Lite',
+      ram: '12 GB',
+      storage: '256 GB',
+      battery: '5000 mAh',
+      camera: '50MP + 12MP + 8MP'
+    }
+  },
+  {
+    id: 31,
+    name: 'ASUS Zenfone 11 Ultra',
+    brand: 'ASUS',
+    price: 23990000,
+    image: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Flagship Android mượt, pin khỏe, camera ổn.',
+    fullDescription: 'Zenfone 11 Ultra cân bằng giữa hiệu năng mạnh, màn đẹp và pin tốt cho người dùng cao cấp.',
+    description: 'Zenfone 11 Ultra cân bằng giữa hiệu năng mạnh, màn đẹp và pin tốt cho người dùng cao cấp.',
+    tags: ['flagship', 'performance', 'battery'],
+    specifications: {
+      display: '6.78-inch AMOLED 144Hz',
+      processor: 'Snapdragon 8 Gen 3',
+      ram: '12 GB',
+      storage: '256 GB',
+      battery: '5500 mAh',
+      camera: '50MP + 13MP + 32MP'
+    }
+  },
+  {
+    id: 32,
+    name: 'iPhone 15',
+    brand: 'Apple',
+    price: 18990000,
+    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'iPhone đời gần mới, tối ưu giá/hiệu năng.',
+    fullDescription: 'iPhone 15 vẫn rất mạnh cho đa số nhu cầu, camera tốt và pin ổn định.',
+    description: 'iPhone 15 vẫn rất mạnh cho đa số nhu cầu, camera tốt và pin ổn định.',
+    tags: ['ios', 'value', 'popular'],
+    specifications: {
+      display: '6.1-inch Super Retina XDR OLED',
+      processor: 'Apple A16 Bionic',
+      ram: '6 GB',
+      storage: '128 GB',
+      battery: '3349 mAh',
+      camera: '48MP + 12MP'
+    }
+  },
+  {
+    id: 33,
+    name: 'iPhone 15 Plus',
+    brand: 'Apple',
+    price: 21990000,
+    image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Màn lớn, pin trâu, phù hợp giải trí.',
+    fullDescription: 'iPhone 15 Plus thích hợp người dùng iOS muốn pin lâu và màn hình to dễ xem phim/chơi game.',
+    description: 'iPhone 15 Plus thích hợp người dùng iOS muốn pin lâu và màn hình to dễ xem phim/chơi game.',
+    tags: ['ios', 'battery', 'big-screen'],
+    specifications: {
+      display: '6.7-inch Super Retina XDR OLED',
+      processor: 'Apple A16 Bionic',
+      ram: '6 GB',
+      storage: '128 GB',
+      battery: '4383 mAh',
+      camera: '48MP + 12MP'
+    }
+  },
+  {
+    id: 34,
+    name: 'MacBook Air M3 13',
+    brand: 'Apple',
+    price: 27990000,
+    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Laptop mỏng nhẹ, pin lâu, làm việc văn phòng cực ổn.',
+    fullDescription: 'MacBook Air M3 phù hợp sinh viên và dân văn phòng cần laptop nhẹ, mượt, ổn định.',
+    description: 'MacBook Air M3 phù hợp sinh viên và dân văn phòng cần laptop nhẹ, mượt, ổn định.',
+    tags: ['laptop', 'ultrabook', 'student'],
+    specifications: {
+      display: '13.6-inch Liquid Retina',
+      processor: 'Apple M3',
+      ram: '8 GB',
+      storage: '256 GB SSD',
+      battery: '18 hours',
+      camera: '1080p FaceTime HD'
+    }
+  },
+  {
+    id: 35,
+    name: 'MacBook Pro M3 14',
+    brand: 'Apple',
+    price: 42990000,
+    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Laptop cao cấp cho dev, design, dựng video.',
+    fullDescription: 'MacBook Pro 14 inch M3 cho hiệu năng mạnh, màn hình đẹp và pin bền cho công việc nặng.',
+    description: 'MacBook Pro 14 inch M3 cho hiệu năng mạnh, màn hình đẹp và pin bền cho công việc nặng.',
+    tags: ['laptop', 'pro', 'creator'],
+    specifications: {
+      display: '14.2-inch Liquid Retina XDR',
+      processor: 'Apple M3 Pro',
+      ram: '18 GB',
+      storage: '512 GB SSD',
+      battery: '22 hours',
+      camera: '1080p FaceTime HD'
+    }
+  },
+  {
+    id: 36,
+    name: 'ASUS ROG Zephyrus G16',
+    brand: 'ASUS',
+    price: 46990000,
+    image: 'https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Gaming laptop mỏng nhẹ, hiệu năng khủng.',
+    fullDescription: 'ROG Zephyrus G16 phù hợp game thủ và creator cần GPU mạnh nhưng vẫn cần thiết kế gọn.',
+    description: 'ROG Zephyrus G16 phù hợp game thủ và creator cần GPU mạnh nhưng vẫn cần thiết kế gọn.',
+    tags: ['laptop', 'gaming', 'creator'],
+    specifications: {
+      display: '16-inch OLED 240Hz',
+      processor: 'Intel Core Ultra 9',
+      ram: '32 GB',
+      storage: '1 TB SSD',
+      battery: '90Wh',
+      camera: '1080p IR Camera'
+    }
+  },
+  {
+    id: 37,
+    name: 'ASUS Vivobook S 15 OLED',
+    brand: 'ASUS',
+    price: 21990000,
+    image: 'https://images.unsplash.com/photo-1593642634443-44adaa06623a?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Laptop OLED đẹp, học tập và văn phòng tốt.',
+    fullDescription: 'Vivobook S 15 OLED cho chất lượng hiển thị tốt, phù hợp học tập, làm việc và giải trí.',
+    description: 'Vivobook S 15 OLED cho chất lượng hiển thị tốt, phù hợp học tập, làm việc và giải trí.',
+    tags: ['laptop', 'oled', 'office'],
+    specifications: {
+      display: '15.6-inch OLED 120Hz',
+      processor: 'Intel Core Ultra 7',
+      ram: '16 GB',
+      storage: '512 GB SSD',
+      battery: '75Wh',
+      camera: '1080p Camera'
+    }
+  },
+  {
+    id: 38,
+    name: 'Dell XPS 14',
+    brand: 'Dell',
+    price: 41990000,
+    image: 'https://images.unsplash.com/photo-1522199710521-72d69614c702?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Ultrabook cao cấp, màn đẹp, build cứng cáp.',
+    fullDescription: 'Dell XPS 14 phù hợp người dùng chuyên nghiệp cần laptop sang trọng và hiệu năng tốt.',
+    description: 'Dell XPS 14 phù hợp người dùng chuyên nghiệp cần laptop sang trọng và hiệu năng tốt.',
+    tags: ['laptop', 'premium', 'ultrabook'],
+    specifications: {
+      display: '14.5-inch OLED 120Hz',
+      processor: 'Intel Core Ultra 7',
+      ram: '16 GB',
+      storage: '1 TB SSD',
+      battery: '69.5Wh',
+      camera: '1080p Camera'
+    }
+  },
+  {
+    id: 39,
+    name: 'Dell Inspiron 14 Plus',
+    brand: 'Dell',
+    price: 24990000,
+    image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Laptop đa dụng cho học tập, làm việc, chỉnh ảnh nhẹ.',
+    fullDescription: 'Inspiron 14 Plus là mẫu laptop cân bằng tốt cho sinh viên và dân văn phòng.',
+    description: 'Inspiron 14 Plus là mẫu laptop cân bằng tốt cho sinh viên và dân văn phòng.',
+    tags: ['laptop', 'office', 'student'],
+    specifications: {
+      display: '14-inch 2.2K',
+      processor: 'Intel Core Ultra 5',
+      ram: '16 GB',
+      storage: '512 GB SSD',
+      battery: '64Wh',
+      camera: '1080p Camera'
+    }
+  },
+  {
+    id: 40,
+    name: 'HP Spectre x360 14',
+    brand: 'HP',
+    price: 35990000,
+    image: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Laptop 2-in-1 cao cấp, linh hoạt cho công việc.',
+    fullDescription: 'Spectre x360 phù hợp người cần laptop đẹp, mỏng nhẹ và có thể xoay gập dùng bút cảm ứng.',
+    description: 'Spectre x360 phù hợp người cần laptop đẹp, mỏng nhẹ và có thể xoay gập dùng bút cảm ứng.',
+    tags: ['laptop', '2-in-1', 'premium'],
+    specifications: {
+      display: '14-inch OLED Touch',
+      processor: 'Intel Core Ultra 7',
+      ram: '16 GB',
+      storage: '1 TB SSD',
+      battery: '68Wh',
+      camera: '9MP IR Camera'
+    }
+  },
+  {
+    id: 41,
+    name: 'HP Victus 16',
+    brand: 'HP',
+    price: 23990000,
+    image: 'https://images.unsplash.com/photo-1629131726692-1accd0c53ce0?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Gaming laptop giá tốt, hiệu năng ổn.',
+    fullDescription: 'HP Victus 16 đáp ứng tốt nhu cầu game phổ thông, học tập và làm việc nặng.',
+    description: 'HP Victus 16 đáp ứng tốt nhu cầu game phổ thông, học tập và làm việc nặng.',
+    tags: ['laptop', 'gaming', 'value'],
+    specifications: {
+      display: '16.1-inch 144Hz',
+      processor: 'Intel Core i7-14650HX',
+      ram: '16 GB',
+      storage: '1 TB SSD',
+      battery: '83Wh',
+      camera: '1080p Camera'
+    }
+  },
+  {
+    id: 42,
+    name: 'Lenovo Legion 5i',
+    brand: 'Lenovo',
+    price: 31990000,
+    image: 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Gaming laptop quốc dân, tản tốt, hiệu năng mạnh.',
+    fullDescription: 'Legion 5i được đánh giá cao ở độ ổn định khi chơi game và làm việc đồ họa.',
+    description: 'Legion 5i được đánh giá cao ở độ ổn định khi chơi game và làm việc đồ họa.',
+    tags: ['laptop', 'gaming', 'performance'],
+    specifications: {
+      display: '16-inch WQXGA 165Hz',
+      processor: 'Intel Core i7-14650HX',
+      ram: '16 GB',
+      storage: '1 TB SSD',
+      battery: '80Wh',
+      camera: '1080p Camera'
+    }
+  },
+  {
+    id: 43,
+    name: 'Lenovo Yoga Pro 7',
+    brand: 'Lenovo',
+    price: 28990000,
+    image: 'https://images.unsplash.com/photo-1611078489935-0cb964de46d6?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Laptop mỏng nhẹ, màn đẹp, pin ổn cho dân sáng tạo.',
+    fullDescription: 'Yoga Pro 7 hướng tới người dùng cần máy nhẹ mà vẫn đủ sức cho công việc sáng tạo nội dung.',
+    description: 'Yoga Pro 7 hướng tới người dùng cần máy nhẹ mà vẫn đủ sức cho công việc sáng tạo nội dung.',
+    tags: ['laptop', 'creator', 'ultrabook'],
+    specifications: {
+      display: '14.5-inch 3K 120Hz',
+      processor: 'AMD Ryzen 7 8845HS',
+      ram: '32 GB',
+      storage: '1 TB SSD',
+      battery: '73Wh',
+      camera: '1080p Camera'
+    }
+  },
+  {
+    id: 44,
+    name: 'Acer Nitro V 15',
+    brand: 'Acer',
+    price: 20990000,
+    image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Gaming laptop dễ tiếp cận cho sinh viên.',
+    fullDescription: 'Nitro V 15 phù hợp người cần laptop chơi game tầm trung và làm việc đa tác vụ.',
+    description: 'Nitro V 15 phù hợp người cần laptop chơi game tầm trung và làm việc đa tác vụ.',
+    tags: ['laptop', 'gaming', 'student'],
+    specifications: {
+      display: '15.6-inch FHD 144Hz',
+      processor: 'Intel Core i5-13420H',
+      ram: '16 GB',
+      storage: '512 GB SSD',
+      battery: '57Wh',
+      camera: '720p Camera'
+    }
+  },
+  {
+    id: 45,
+    name: 'Acer Swift Go 14',
+    brand: 'Acer',
+    price: 19990000,
+    image: 'https://images.unsplash.com/photo-1587614382346-4ec70e388b28?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Ultrabook mỏng nhẹ, màn OLED đẹp.',
+    fullDescription: 'Swift Go 14 phù hợp cho dân văn phòng và sinh viên thích máy gọn nhẹ, pin khá.',
+    description: 'Swift Go 14 phù hợp cho dân văn phòng và sinh viên thích máy gọn nhẹ, pin khá.',
+    tags: ['laptop', 'ultrabook', 'office'],
+    specifications: {
+      display: '14-inch OLED 90Hz',
+      processor: 'Intel Core Ultra 5',
+      ram: '16 GB',
+      storage: '512 GB SSD',
+      battery: '65Wh',
+      camera: '1440p Camera'
+    }
+  },
+  {
+    id: 46,
+    name: 'MSI Katana 15',
+    brand: 'MSI',
+    price: 27990000,
+    image: 'https://images.unsplash.com/photo-1640955014216-75201056c829?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Gaming laptop hiệu năng cao, giá hợp lý.',
+    fullDescription: 'MSI Katana 15 cho trải nghiệm game mượt và khả năng nâng cấp tốt trong tương lai.',
+    description: 'MSI Katana 15 cho trải nghiệm game mượt và khả năng nâng cấp tốt trong tương lai.',
+    tags: ['laptop', 'gaming', 'performance'],
+    specifications: {
+      display: '15.6-inch FHD 144Hz',
+      processor: 'Intel Core i7-13620H',
+      ram: '16 GB',
+      storage: '1 TB SSD',
+      battery: '53.5Wh',
+      camera: '720p Camera'
+    }
+  },
+  {
+    id: 47,
+    name: 'MSI Prestige 14 AI Studio',
+    brand: 'MSI',
+    price: 33990000,
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Laptop mỏng nhẹ cho công việc sáng tạo chuyên sâu.',
+    fullDescription: 'Prestige 14 AI Studio phù hợp designer và content creator cần hiệu năng AI/đồ họa tốt.',
+    description: 'Prestige 14 AI Studio phù hợp designer và content creator cần hiệu năng AI/đồ họa tốt.',
+    tags: ['laptop', 'creator', 'ai'],
+    specifications: {
+      display: '14-inch QHD+',
+      processor: 'Intel Core Ultra 7',
+      ram: '32 GB',
+      storage: '1 TB SSD',
+      battery: '72Wh',
+      camera: '1080p IR Camera'
+    }
+  },
+  {
+    id: 48,
+    name: 'LG Gram 16',
+    brand: 'LG',
+    price: 31990000,
+    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Laptop siêu nhẹ, pin tốt, màn lớn.',
+    fullDescription: 'LG Gram 16 là lựa chọn tối ưu cho người hay di chuyển nhưng vẫn muốn màn hình rộng.',
+    description: 'LG Gram 16 là lựa chọn tối ưu cho người hay di chuyển nhưng vẫn muốn màn hình rộng.',
+    tags: ['laptop', 'lightweight', 'office'],
+    specifications: {
+      display: '16-inch WQXGA',
+      processor: 'Intel Core Ultra 7',
+      ram: '16 GB',
+      storage: '1 TB SSD',
+      battery: '80Wh',
+      camera: '1080p Camera'
+    }
+  },
+  {
+    id: 49,
+    name: 'Razer Blade 14',
+    brand: 'Razer',
+    price: 57990000,
+    image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Gaming laptop cao cấp, build đẹp, hiệu năng cực mạnh.',
+    fullDescription: 'Razer Blade 14 dành cho game thủ cao cấp và người dùng cần thiết kế sang trọng + hiệu năng mạnh.',
+    description: 'Razer Blade 14 dành cho game thủ cao cấp và người dùng cần thiết kế sang trọng + hiệu năng mạnh.',
+    tags: ['laptop', 'gaming', 'premium'],
+    specifications: {
+      display: '14-inch QHD+ 240Hz',
+      processor: 'AMD Ryzen 9 8945HS',
+      ram: '32 GB',
+      storage: '1 TB SSD',
+      battery: '68Wh',
+      camera: '1080p Camera'
+    }
+  },
+  {
+    id: 50,
+    name: 'Microsoft Surface Laptop 7',
+    brand: 'Microsoft',
+    price: 35990000,
+    image: 'https://images.unsplash.com/photo-1516387938699-a93567ec168e?auto=format&fit=crop&w=1000&q=80',
+    shortDescription: 'Laptop mỏng nhẹ cao cấp cho công việc và học tập.',
+    fullDescription: 'Surface Laptop 7 phù hợp người cần máy đẹp, pin tốt, bàn phím ngon và trải nghiệm Windows mượt.',
+    description: 'Surface Laptop 7 phù hợp người cần máy đẹp, pin tốt, bàn phím ngon và trải nghiệm Windows mượt.',
+    tags: ['laptop', 'premium', 'office'],
+    specifications: {
+      display: '13.8-inch PixelSense',
+      processor: 'Snapdragon X Elite',
+      ram: '16 GB',
+      storage: '512 GB SSD',
+      battery: 'up to 20 hours',
+      camera: '1080p Studio Camera'
+    }
   }
 ];
 
