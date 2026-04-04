@@ -7,7 +7,8 @@
     "start": "node server.js",
     "dev": "node server.js",
     "seed": "node seed/phonesSeed.js",
-    "ensure-admin": "node scripts/ensureAdmin.js"
+    "ensure-admin": "node scripts/ensureAdmin.js",
+    "test:smoke": "node scripts/smokeTest.js"
   },
   "keywords": [
     "nodejs",

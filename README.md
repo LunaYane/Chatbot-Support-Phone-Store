@@ -197,7 +197,13 @@ npm run ensure-admin
 npm start
 ```
 
-### 5) Mở trình duyệt
+### 5) Chạy smoke test nhanh
+
+```bash
+npm run test:smoke
+```
+
+### 6) Mở trình duyệt
 
 - Home: `http://localhost:3001`
 - Detail: `http://localhost:3001/product/1`
