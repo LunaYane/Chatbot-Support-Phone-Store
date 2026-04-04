@@ -32,7 +32,7 @@ function showToast(message) {
 function createPhoneCard(phone) {
   return `
     <article class="product-card">
-      <img src="${phone.image}" alt="${phone.name}" class="product-image" />
+      <img src="${phone.image}" alt="${phone.name}" class="product-image" onerror="this.onerror=null;this.src='/images/phone-placeholder.svg';" />
       <div class="product-content">
         <h4>${phone.name}</h4>
         <p class="brand">${phone.brand}</p>

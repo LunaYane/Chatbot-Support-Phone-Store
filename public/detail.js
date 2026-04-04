@@ -41,7 +41,7 @@ function renderSpecifications(specs) {
 function renderProductDetail(phone) {
   return `
     <article class="detail-card">
-      <img class="detail-image" src="${phone.image}" alt="${phone.name}" />
+      <img class="detail-image" src="${phone.image}" alt="${phone.name}" onerror="this.onerror=null;this.src='/images/phone-placeholder.svg';" />
       <div class="detail-content">
         <div class="brand">${phone.brand}</div>
         <h2 class="detail-name">${phone.name}</h2>

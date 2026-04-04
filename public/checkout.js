@@ -47,7 +47,7 @@ function renderCheckoutItems() {
         <tr>
           <td>
             <div class="checkout-product">
-              <img src="${item.image}" alt="${item.name}" />
+              <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='/images/phone-placeholder.svg';" />
               <div>
                 <strong>${item.name}</strong>
                 <p>${item.brand}</p>
