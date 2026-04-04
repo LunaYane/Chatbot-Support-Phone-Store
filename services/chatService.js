@@ -102,7 +102,13 @@ function detectBudget(message) {
   };
 }
 
-function detectIntent(message) {
+function detectComparisonModels(message, products) {
+  const lowered = normalizeText(message);
+  const hits = products.filter((p) => lowered.includes(normalizeText(p.name))).slice(0, 3);
+  return hits;
+}
+
+function detectIntent(message, products = []) {
   if (!message) return { intent: 'empty' };
 
   const faqIntent = detectFaqIntent(message);
@@ -113,7 +119,7 @@ function detectIntent(message) {
   }
 
   if (message.includes('so sanh') || message.includes('nen mua') || message.includes('chon giua')) {
-    return { intent: 'comparison' };
+    return { intent: 'comparison', models: detectComparisonModels(message, products) };
   }
 
   const budget = detectBudget(message);
@@ -214,20 +220,43 @@ function buildConsultationResult(products, filters) {
   return `${intro}\n${lines}\nBạn thích mình chốt theo hướng nào trước: camera, pin hay hiệu năng game?`;
 }
 
-function buildComparisonReply() {
-  return 'Mình so sánh được nhé 👌 Bạn gửi giúp mình 2-3 mẫu cụ thể (ví dụ: iPhone 16 vs S25) + nhu cầu chính, mình sẽ chốt ưu/nhược điểm dễ hiểu luôn.';
+function buildComparisonReply(models, lastContext = {}) {
+  if (!models || models.length < 2) {
+    return 'Mình so sánh được nhé 👌 Bạn gửi giúp mình 2 mẫu cụ thể (ví dụ: iPhone 16 vs S24 FE) + nhu cầu chính, mình chốt nhanh ưu/nhược điểm cho bạn.';
+  }
+
+  const [a, b] = models;
+  const focus = (lastContext.needs || []).map(humanizeNeed).join(', ');
+  const note = focus ? ` Theo nhu cầu ${focus},` : '';
+
+  return `${note} ${a.name} mạnh ở ${a.specifications?.processor || 'hiệu năng'}, còn ${b.name} nổi bật ở ${b.specifications?.camera || 'camera'}.\nNếu bạn ưu tiên pin/giá thì mình chốt 1 con phù hợp nhất luôn cho bạn.`;
 }
 
-function buildClarifyReply() {
-  return 'Mình tư vấn tự nhiên theo kiểu mua thật luôn nha 😄 Bạn chỉ cần nói ngắn gọn kiểu: “tầm 15 củ, ưu tiên pin + camera” là mình gợi ý ngay.';
+function buildClarifyReply(lastContext = {}) {
+  const hints = [];
+  if (!lastContext.brand) hints.push('hãng (vd: iPhone/Samsung)');
+  if (!lastContext.budget) hints.push('ngân sách (vd: 12 triệu)');
+  if (!lastContext.needs || lastContext.needs.length === 0) hints.push('nhu cầu (game/camera/pin)');
+
+  return `Mình tư vấn tự nhiên theo kiểu mua thật luôn nha 😄 Bạn bổ sung giúp mình ${hints.join(', ')} là mình chốt mẫu chuẩn hơn.`;
 }
 
-function buildChatReply(rawMessage, products) {
+function mergeContext(lastContext = {}, current = {}) {
+  return {
+    brand: current.brand || lastContext.brand || null,
+    budget: current.budget || lastContext.budget || null,
+    needs: current.needs?.length ? current.needs : lastContext.needs || []
+  };
+}
+
+function buildChatReply(rawMessage, products, lastContext = {}) {
   const message = normalizeText(String(rawMessage || '').trim());
-  const { intent, faqIntent, budget, brand, needs } = detectIntent(message);
+  const { intent, faqIntent, budget, brand, needs, models } = detectIntent(message, products);
 
   let reply =
     'Mình chưa bắt đúng ý lắm. Bạn thử nói kiểu: “dưới 12 triệu”, “iphone chụp đẹp”, hoặc “máy game tầm 15 củ” nhé.';
+
+  const context = mergeContext(lastContext, { budget, brand, needs });
 
   if (intent === 'empty') {
     reply = 'Bạn cứ nói nhu cầu tự nhiên nha, ví dụ: “mình cần máy pin trâu tầm 10 triệu”.';
@@ -236,14 +265,18 @@ function buildChatReply(rawMessage, products) {
   } else if (intent === 'faq') {
     reply = FAQ_RESPONSES[faqIntent];
   } else if (intent === 'comparison') {
-    reply = buildComparisonReply();
+    reply = buildComparisonReply(models, context);
   } else if (intent === 'consultation') {
-    reply = buildConsultationResult(products, { budget, brand, needs: needs || [] });
+    reply = buildConsultationResult(products, {
+      budget: context.budget,
+      brand: context.brand,
+      needs: context.needs || []
+    });
   } else if (intent === 'clarify') {
-    reply = buildClarifyReply();
+    reply = buildClarifyReply(context);
   }
 
-  return { reply, intent, source: 'db-rule-v2' };
+  return { reply, intent, source: 'db-rule-v3', context };
 }
 
 module.exports = { buildChatReply };
