@@ -1,5 +1,12 @@
 # Phone Store Demo Website (Upgraded)
 
+Nhóm AI Gánh Team
+Thành Viên:
+- 1721030593 - Nguyễn Thanh Hải
+- 1721030867 - Trần Đông Anh
+- 172100321 - Nguyễn Trọng Nghĩa
+- 1721001336 - Tô Văn Dương
+
 Demo website bán điện thoại cho đồ án cuối kỳ, nâng cấp theo hướng **full demo flow**: lọc/sắp xếp/phân trang, chatbot tư vấn theo dữ liệu DB, giỏ hàng + checkout giả lập, admin CRUD có upload ảnh.
 
 ## Tech Stack
