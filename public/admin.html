@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Phone Store Demo</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-header">
+      <div class="container head-row">
+        <a class="logo" href="/">PHONE STORE</a>
+      </div>
+    </header>
+
+    <nav class="main-nav">
+      <div class="container nav-links">
+        <a href="/">Home</a>
+        <a href="/checkout">Checkout</a>
+        <a href="/admin">Admin</a>
+      </div>
+    </nav>
+
+    <main class="container section">
+      <section class="admin-card">
+        <h2 class="section-title">product management (admin only)</h2>
+        <p id="auth-status" class="result-count"></p>
+      </section>
+
+      <section class="admin-card hidden" id="editor-card">
+        <h3>Add / Edit Product</h3>
+        <form id="admin-form" class="auth-form">
+          <input type="hidden" id="editing-original-id" />
+
+          <div class="filters">
+            <input id="id" type="number" min="1" placeholder="ID" required />
+            <input id="name" type="text" placeholder="Name" required />
+            <input id="brand" type="text" placeholder="Brand" required />
+            <input id="price" type="number" min="0" placeholder="Price" required />
+            <input id="image" type="url" placeholder="Image URL" required />
+          </div>
+
+          <div class="field-group">
+            <label for="image-file">Hoặc upload ảnh</label>
+            <div class="upload-inline">
+              <input id="image-file" type="file" accept="image/*" />
+              <button type="button" class="btn-secondary" id="upload-image-btn">Upload</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="shortDescription">Short Description</label>
+            <textarea id="shortDescription" rows="2"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="fullDescription">Full Description</label>
+            <textarea id="fullDescription" rows="3"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="tags">Tags (comma separated)</label>
+            <input id="tags" type="text" />
+          </div>
+
+          <div class="field-group">
+            <label for="specs">Specs JSON</label>
+            <textarea id="specs" rows="4"></textarea>
+          </div>
+
+          <div class="head-actions">
+            <button type="submit" class="btn-primary" id="submit-btn">Add Product</button>
+            <button type="button" class="btn-secondary" id="cancel-edit">Cancel Edit</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="admin-card">
+        <h3>Product List</h3>
+        <p id="admin-count" class="result-count"></p>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Price</th>
+                <th>Tags</th>
+                <th id="actions-header" class="hidden">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-product-list"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/admin.js"></script>
+  </body>
+</html>
