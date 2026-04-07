@@ -29,9 +29,6 @@ const phoneSchema = new mongoose.Schema(
     brand: { type: String, required: true, index: true },
     price: { type: Number, required: true, index: true },
     image: { type: String, required: true },
-    shortDescription: { type: String, default: '' },
-    fullDescription: { type: String, default: '' },
-    tags: { type: [String], default: [] },
     description: { type: String, required: true },
     specifications: { type: specificationSchema, required: true },
     recommendation: { type: recommendationSchema, required: true }

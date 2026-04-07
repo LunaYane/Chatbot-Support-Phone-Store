@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,164 +7,73 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="top-header">
-      <div class="container head-row">
-        <a class="logo" href="/">PHONE STORE</a>
-
-        <div class="search-wrap">
-          <input id="top-search-input" type="text" placeholder="Tìm điện thoại..." />
-          <button id="top-search-btn" type="button">Search</button>
-        </div>
-
-        <div class="head-actions">
-          <a href="/checkout" class="head-icon">🛒 <span id="cart-count">0</span></a>
-          <button class="head-icon" id="open-login-btn" type="button">👤</button>
-          <button class="head-icon hidden" id="logout-auth-btn" type="button">↩</button>
-        </div>
+    <header class="hero">
+      <div class="container">
+        <h1>Phone Store Demo</h1>
+        <p>Simple website demo for mobile phone sales project</p>
       </div>
     </header>
 
-    <nav class="main-nav">
-      <div class="container nav-links">
-        <a href="#home-banner">Home</a>
-        <a href="#top-arrival">Shop</a>
-        <a href="#products">Products</a>
-        <a href="#categories">Category</a>
-        <a href="/admin">Admin</a>
-      </div>
-    </nav>
-
-    <main>
-      <section id="home-banner" class="home-banner">
-        <div class="container">
-          <h2>best collection for<br />mobile lovers</h2>
-          <p>
-            Discover smartphones that redefine performance and style<br />
-            Find your perfect phone with modern design and smart features
-          </p>
-          <button id="promo-view-btn" class="btn-primary" type="button">Shop Now</button>
-        </div>
-      </section>
-
-      <section class="container features">
-        <article class="feature-box">
-          <h4>Free Shipping</h4>
-          <p>Order over 5,000,000đ</p>
-        </article>
-        <article class="feature-box">
-          <h4>Money Returns</h4>
-          <p>7 days return policy</p>
-        </article>
-        <article class="feature-box">
-          <h4>24/7 Support</h4>
-          <p>Chatbot + hotline support</p>
-        </article>
-      </section>
-
-      <section id="top-arrival" class="container section">
-        <h2 class="section-title">top new arrival</h2>
-        <div id="top-arrival-grid" class="product-grid"></div>
-      </section>
-
-      <section id="categories" class="container section">
-        <h2 class="section-title">shop by category</h2>
-        <div class="category-grid">
-          <a class="cat-card cat-1" data-category="brand" href="#products"><span>By Brand</span></a>
-          <a class="cat-card cat-2" data-category="gaming" href="#products"><span>Gaming</span></a>
-          <a class="cat-card cat-3" data-category="camera" href="#products"><span>Camera</span></a>
-          <a class="cat-card cat-4" data-category="battery" href="#products"><span>Battery</span></a>
-          <a class="cat-card cat-5" data-category="" href="#products"><span>All Phones</span></a>
-          <a class="cat-card cat-6" data-category="brand" href="#products"><span>Best Sellers</span></a>
-        </div>
-      </section>
-
-      <section class="container section">
-        <div class="ads-banner">FLASH SALE - Giảm đến 20% cho các mẫu bán chạy</div>
-      </section>
-
-      <section class="container section">
-        <h2 class="section-title">recommended for you</h2>
-        <div id="recommended-grid" class="product-grid"></div>
-      </section>
-
-      <section id="products" class="container section">
-        <h2 class="section-title">all products</h2>
+    <main class="container">
+      <section>
+        <h2 class="section-title">Available Phones</h2>
 
         <div class="filters">
-          <input id="search-input" type="text" placeholder="Tìm sản phẩm..." />
-          <select id="brand-filter"><option value="">All brand</option></select>
-          <input id="min-price" type="number" placeholder="Min price" />
-          <input id="max-price" type="number" placeholder="Max price" />
-          <select id="sort-filter">
-            <option value="price_asc">Price Low - High</option>
-            <option value="price_desc">Price High - Low</option>
-            <option value="name_asc">Name A-Z</option>
-            <option value="name_desc">Name Z-A</option>
-          </select>
-          <button id="apply-filters" class="btn-primary" type="button">Apply</button>
-          <button id="clear-filters" class="btn-secondary" type="button">Clear</button>
+          <div class="filter-group filter-search">
+            <label for="search-input">Search by product name</label>
+            <input id="search-input" type="text" placeholder="Example: iPhone, Galaxy..." />
+          </div>
+
+          <div class="filter-group">
+            <label for="brand-filter">Brand</label>
+            <select id="brand-filter">
+              <option value="">All brands</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="min-price">Min price (VND)</label>
+            <input id="min-price" type="number" min="0" step="100000" placeholder="0" />
+          </div>
+
+          <div class="filter-group">
+            <label for="max-price">Max price (VND)</label>
+            <input id="max-price" type="number" min="0" step="100000" placeholder="30000000" />
+          </div>
+
+          <div class="filter-actions">
+            <button id="apply-filters" type="button">Apply</button>
+            <button id="clear-filters" type="button" class="btn-secondary">Clear</button>
+          </div>
         </div>
 
         <p id="result-count" class="result-count"></p>
-        <div id="loading-state" class="empty-state hidden">Loading...</div>
-        <div id="phone-list" class="product-grid"></div>
-        <div id="pagination" class="pagination"></div>
+        <div id="phone-list" class="phone-grid"></div>
       </section>
     </main>
 
-    <footer class="footer">© 2026 Phone Store Demo</footer>
+    <footer>
+      <p>© 2026 Phone Store Demo - University Final Project</p>
+    </footer>
 
-    <aside id="floating-support" class="floating-support">
-      <p>💬 Need help?</p>
-      <button id="support-open-chat" type="button">Open Chat</button>
-    </aside>
+    <button id="chat-toggle" class="chat-toggle" type="button">💬 Chat</button>
 
-    <section id="chatbox" class="chatbox hidden">
+    <section id="chatbox" class="chatbox hidden" aria-label="Support chatbox">
       <header class="chatbox-header">
-        <h3>Phone Store Assistant</h3>
-        <button id="chat-close" type="button">✕</button>
+        <h3>Support Chat</h3>
+        <button id="chat-close" type="button" class="chat-close">✕</button>
       </header>
+
       <div id="chat-messages" class="chat-messages">
-        <div class="chat-message bot">Xin chào! Mình có thể tư vấn theo hãng, tầm giá và nhu cầu sử dụng của bạn.</div>
+        <div class="chat-message bot">Hi! I am Phone Store Bot. Ask me about products, price, or brand.</div>
       </div>
+
       <form id="chat-form" class="chat-form">
-        <input id="chat-input" type="text" placeholder="Nhập câu hỏi của bạn..." autocomplete="off" />
-        <button type="submit">Gửi</button>
+        <input id="chat-input" type="text" placeholder="Type your message..." autocomplete="off" />
+        <button type="submit">Send</button>
       </form>
     </section>
 
-    <section id="auth-modal" class="auth-modal hidden">
-      <div class="auth-modal-card">
-        <div class="auth-modal-head">
-          <h3 id="auth-modal-title">Đăng nhập</h3>
-          <button type="button" id="close-auth-modal">✕</button>
-        </div>
-        <form id="auth-form" class="auth-form">
-          <div class="field-group hidden" id="auth-fullname-wrap">
-            <label for="auth-fullname">Họ tên</label>
-            <input id="auth-fullname" type="text" />
-          </div>
-          <div class="field-group">
-            <label for="auth-email">Email</label>
-            <input id="auth-email" type="email" required />
-          </div>
-          <div class="field-group hidden" id="auth-phone-wrap">
-            <label for="auth-phone">SĐT</label>
-            <input id="auth-phone" type="tel" />
-          </div>
-          <div class="field-group">
-            <label for="auth-password">Mật khẩu</label>
-            <input id="auth-password" type="password" required />
-          </div>
-          <button class="btn-primary" type="submit" id="auth-submit-btn">Đăng nhập</button>
-          <button class="btn-secondary" type="button" id="open-register-btn">Đăng ký</button>
-        </form>
-      </div>
-    </section>
-
-    <div id="toast-container" class="toast-container"></div>
-
-    <script src="cart.js"></script>
     <script src="chat.js"></script>
     <script src="script.js"></script>
   </body>
