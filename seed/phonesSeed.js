@@ -9,20 +9,10 @@ async function seedPhones() {
   try {
     await mongoose.connect(MONGO_URI);
 
-    const phonesWithRecommendation = phones.map((phone) => {
-      const shortDescription = String(phone.shortDescription || '').trim();
-      const fullDescription = String(phone.fullDescription || '').trim();
-      const description = String(phone.description || shortDescription || fullDescription || '').trim();
-
-      return {
-        ...phone,
-        shortDescription: shortDescription || description,
-        fullDescription: fullDescription || description,
-        description,
-        tags: Array.isArray(phone.tags) ? phone.tags : [],
-        recommendation: buildRecommendationAttributes(phone)
-      };
-    });
+    const phonesWithRecommendation = phones.map((phone) => ({
+      ...phone,
+      recommendation: buildRecommendationAttributes(phone)
+    }));
 
     await Phone.deleteMany({});
     await Phone.insertMany(phonesWithRecommendation);
