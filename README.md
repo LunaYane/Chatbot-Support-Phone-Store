@@ -1,4 +1,4 @@
-# Phone Store Demo Website (Upgraded)
+# Phone Store Demo Website
 
 Nhóm AI Gánh Team
 Thành Viên:
