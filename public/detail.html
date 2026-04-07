@@ -1,47 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product Detail - Phone Store Demo</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <header class="hero">
-      <div class="container">
-        <h1>Phone Store Demo</h1>
-        <p>Product detail page</p>
+    <header class="top-header">
+      <div class="container head-row">
+        <a class="logo" href="/">PHONE STORE</a>
+
+        <div class="search-wrap">
+          <input id="top-search-input" type="text" placeholder="Tìm điện thoại..." />
+          <button id="top-search-btn" type="button" onclick="window.location.href='/'">Search</button>
+        </div>
+
+        <div class="head-actions">
+          <a class="head-icon" href="/checkout">🛒 <span id="cart-count">0</span></a>
+        </div>
       </div>
     </header>
 
-    <main class="container">
-      <a class="back-link" href="/">← Back to homepage</a>
-      <section id="product-detail"></section>
+    <nav class="main-nav">
+      <div class="container nav-links">
+        <a href="/">Home</a>
+        <a href="/#products">Products</a>
+        <a href="/checkout">Checkout</a>
+      </div>
+    </nav>
+
+    <main class="container section">
+      <div class="detail-topbar">
+        <a class="back-link" href="/">← Quay lại trang chủ</a>
+      </div>
+      <section id="product-detail">
+        <p class="empty-state">Đang tải chi tiết sản phẩm...</p>
+      </section>
     </main>
 
-    <footer>
-      <p>© 2026 Phone Store Demo - University Final Project</p>
-    </footer>
-
-    <button id="chat-toggle" class="chat-toggle" type="button">💬 Chat</button>
+    <button id="chat-toggle" class="floating-support" type="button">💬 Chat tư vấn</button>
 
     <section id="chatbox" class="chatbox hidden" aria-label="Support chatbox">
       <header class="chatbox-header">
-        <h3>Support Chat</h3>
-        <button id="chat-close" type="button" class="chat-close">✕</button>
+        <h3>Phone Store Assistant</h3>
+        <button id="chat-close" type="button">✕</button>
       </header>
-
       <div id="chat-messages" class="chat-messages">
-        <div class="chat-message bot">Hi! I am Phone Store Bot. Ask me about products, price, or brand.</div>
+        <div class="chat-message bot">Xin chào! Bạn cần tư vấn điện thoại nào hôm nay?</div>
       </div>
-
       <form id="chat-form" class="chat-form">
-        <input id="chat-input" type="text" placeholder="Type your message..." autocomplete="off" />
-        <button type="submit">Send</button>
+        <input id="chat-input" type="text" placeholder="Nhập câu hỏi..." autocomplete="off" />
+        <button type="submit">Gửi</button>
       </form>
     </section>
 
-    <script src="chat.js"></script>
-    <script src="detail.js"></script>
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/cart.js"></script>
+    <script src="/chat.js"></script>
+    <script src="/detail.js"></script>
   </body>
 </html>
