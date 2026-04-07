@@ -266,5 +266,3 @@ Bạn có thể override bằng biến môi trường khi chạy.
 - Test chatbot với câu tiếng Việt theo hãng + ngân sách
 - Thêm hàng vào giỏ, sang checkout và đặt đơn demo
 - Show rõ phần phân trang + sort + empty/loading states
-
-Chúc bạn bảo vệ đồ án ngon 🔥
